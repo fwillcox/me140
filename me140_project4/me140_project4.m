@@ -1,6 +1,9 @@
-% me140_project4.m
-% 4-22-16 - Created Jon Renslo
-% Script for Project 4 in ME140. Fuel Cells. 
+% ME140 PROJECT 4: FUEL CELLS
+% ----------------------------
+% FILENAME: me140_project4.m
+% Jon Renslo, Emily Bohl, Frankie Willcox, Natasha Berk, Kendall Fagan
+% 4/15/16 - Created Jon Renslo
+
 close all; clear; clc;
 
 % Constants
@@ -22,7 +25,9 @@ MM_h2o = 2*MM_h + MM_o;
 % -------------------------------------------------
 % Part 1: Efficiency of PEM Fuel Cells Found 3 Ways
 % -------------------------------------------------
-% (1) LHV, (2) HHV, (3) Accounting for liquid/gas mixture
+% ASSUME: isothermal, isobaric (reversible)
+% USE: First- Law Effiency (LEC 8, SIDE 13):
+% eta = (-m_reactants*dg_rxn)/(mfuel*HV) where HV = LHV or HHV
 
 npts = 100;
 T = linspace(25+C_TO_K,1000+C_TO_K,npts);
@@ -57,7 +62,7 @@ delG_LHV = gprod_LHV - greact;
 eta_HHV = -delG_HHV / (HHV_h2 * mass_h2 * KJ_TO_J);
 eta_LHV = -delG_LHV / (LHV_h2 * mass_h2 * KJ_TO_J);
 % eta_liquidGasMix = ??? todo find g actual based on liquid water mixture
-% eta_ carnot
+% eta_carnot = 1- Tlow/Thigh;
 
 figure();
 plot(T,eta_HHV,T,eta_LHV);
