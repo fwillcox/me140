@@ -78,8 +78,8 @@ greact = gEng(T,Patm,'h2',mol_h2) + gEng(T,Patm,'o2',mol_o2_rxn) + gEng(T,Patm,'
 beta = 1;               % ASSUME: all vapor
 Ptotal = Patm;
 Psat = PsatW(T);
-Pv = Ptotal*(beta./(beta + 0.5.*(gamma(T)-1) +0.5.*gamma(T).*N_TO_O ));
-
+[~,~,gamma] = sp_heats(T);
+iterations =0;
 for i = 1:length(Psat)
     if Pv(i) < Psat(i)
         % All H2O is vapor (beta = 1)
