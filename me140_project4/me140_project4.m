@@ -42,7 +42,7 @@ Patm = 101.3*KPA_TO_PA;             % Pa,     Preact = Pprod = Patm
 % % UNCOMMENT FOR PART 2a (varrying lambda)
 % T_C = [80 220 650 800];
 % T = T_C + C_TO_K;
-% lambda = linspace(1,10,npts);      % (Comment back in for Part 2)         
+% lambda = linspace(1,10,npts);       % (Comment back in for Part 2)         
 % Patm = 101.3*KPA_TO_PA;             % Pa,     Preact = Pprod = Patm 
 
 % % UNCOMMENT FOR PART 2b (varrying Patm)
@@ -81,7 +81,7 @@ Psat = PsatW(T);
 gamma = mol_h2o - beta;
 Pv_guess = Ptotal*(beta./(beta + 0.5.*(gamma-1) +0.5.*gamma.*N_TO_O ));
 Pv_h2o = Psat;
-%eta_carnot = carnotEff(T,T(1));      % ASSUME: Tcold = 25 degrees C
+eta_carnot = carnotEff(T,T(1));      % ASSUME: Tcold = 25 degrees C
 
 iterations =0;
 mol_h2ovap=zeros(size(Psat));
@@ -95,15 +95,19 @@ for i = 1:length(Psat)
         % Some H2O is vapor, some liquid (beta not = 1)
         % LET: Pv = Psat, solve for beta
         Pv_h2o(i) = Psat(i);
-        mol_h2ovap(i) = (mol_o2_prod + mol_n2)*Pv_h2o(i)/(Ptotal-Pv_h2o(i));
+        mol_h2ovap(i) = (mol_o2_prod + mol_n2)*Pv_h2o(i)/(Ptotal-Pv_h2o(i)); % beta
         mol_h2oliq(i) = mol_h2o-mol_h2ovap(i);
     end
 
 % DOUBLE CHECK THIS
+mol_total = mol_o2_prod + mol_n2 + mol_h2o;
+y_o2 = mol_o2_prod/mol_total;
+y_n2 = mol_n2/mol_total;
+
 gprod_LHV_mix(i) = gEng(T(i),Patm,'h2ovap',mol_h2ovap(i))...
-    + gEng(T(i),Patm,'h2o',mol_h2oliq(i))...
-    + gEng(T(i),Patm,'o2',mol_o2_prod)... o2 and n2 come in at partial pressures! does the mol thing account for this?
-    + gEng(T(i),Patm,'n2',mol_n2);
+    + gEng(T(i), Patm,      'h2o', mol_h2oliq(i))...
+    + gEng(T(i), Patm*y_o2, 'o2', mol_o2_prod)... o2 and n2 come in at partial pressures! does the mol thing account for this?
+    + gEng(T(i), Patm*y_n2, 'n2', mol_n2);
 delG_mix(i) = gprod_LHV_mix(i) - greact(i);    % TODO: DOUBLE CHECK THIS use LHV because no way to recover evaporated air?
 hprod(i) = hEng(T(i),'h2ovap',mol_h2ovap(i))...
     + hEng(T(i),'h2o',mol_h2oliq(i))...
