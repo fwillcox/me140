@@ -1,1 +1,1 @@
-%carnotEff.m %4-22-16 - Created Jon Renslofunction eta = carnotEff(Th,Tc)        eta = 1 - Tc/Th;end
+%carnotEff.m %4-22-16 - Created Jon Renslofunction eta = carnotEff(Th,Tc)        eta = 1 - Tc./Th;end
