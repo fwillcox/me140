@@ -5,14 +5,14 @@
 % 4/15/16 - Created Jon Renslo
 
 close all; clear; clc;
+
 % Constants
 G_TO_KG = 10^-3;
 KPA_TO_PA = 10^3;
 KJ_TO_J = 10^3;
 C_TO_K = 273.15;
 
-N_TO_O = 79/21;         % Engineering Air Molar Mass Ratio of Nitrogen to Oxygen
-AIR_TO_H = 4.76;        % Ratio between H combusted and air
+N_TO_O = 3.7619;        % Engineering Air Molar Mass Ratio of Nitrogen to Oxygen
 
 % Molar Masses
 MM_c = 12;
@@ -30,14 +30,14 @@ MM_air = 28.85;
 % USE: First- Law Effiency, eta = (-m_reactants*dg_rxn)/(mfuel*HV) where HV = LHV or HHV
 % SOURCE: LEC 8, SLIDE 13
 npts = 100;
-HHV_h2 = 141800;                    % kj/kg,  Higher Heating Value   
-LHV_h2 = 120000;                    % kj/kg,  Lower Heating Value  
+HHV_h2 = 141.8*10^6;                    % J/kg,  Higher Heating Value   
+LHV_h2 = 120.0*10^6;                    % J/kg,  Lower Heating Value  
 
 % ------------------------------------------
 % UNCOMMENT FOR PART 1:
 T = linspace(25+C_TO_K,1000+C_TO_K,npts);
-lambda = 2;                         % Equivalence Ratio(ASSUME: 100% excess air)        
-Patm = 101.3*KPA_TO_PA;             % Pa,     Preact = Pprod = Patm 
+lambda = 2;                             % Equivalence Ratio(ASSUME: 100% excess air)        
+Patm = 101.3*KPA_TO_PA;                 % Pa,     Preact = Pprod = Patm 
 
 % % UNCOMMENT FOR PART 2a (varrying lambda)
 % T_C = [80 220 650 800];
@@ -52,19 +52,21 @@ Patm = 101.3*KPA_TO_PA;             % Pa,     Preact = Pprod = Patm
 % Patm = linspace(101.3*KPA_TO_PA,4053*KPA_TO_PA,npts); % Pa, (Comment back in for Part 2)
 % ------------------------------------------
 
-mol_h2 = 1;                         % (ASSUME: 1 mol H2-->4.76/2 mol air = 139 g)
-mass_h2 = mol_h2 * 2*MM_h * G_TO_KG; 
-mol_air = AIR_TO_H * lambda / 2;
-mol_o2_rxn = mol_air / AIR_TO_H;    
-mol_n2 = mol_air * N_TO_O / AIR_TO_H;
+% assume 1 mol of h2 combusted --> 4.76/2 mol air
+% 139 g total
+mol_h2 = 1;
+mass_h2 = mol_h2*(2*MM_h)/G_TO_KG;
+mol_air = 4.76*lambda/2;
+mol_o2_rxn = mol_air/4.76;
+mol_n2 = mol_air*3.76/4.76;
 mol_h2o = mol_h2;
-mol_o2_prod = 0.5*(lambda - mol_h2) * mol_o2_rxn;
+mol_o2_prod = 0.5*(lambda-mol_h2)*mol_o2_rxn;
 
 % Check Mass Balance
-% MM_air = 28.85;
-% mass_react = mass_h2 + mol_air*MM_air*G_TO_KG
-% mass_prod = (mol_o2_prod*2*MM_o*G_TO_KG) + (mol_n2*2*MM_n*G_TO_KG + ...
-% ...mol_h2o*MM_h2o*G_TO_KG);
+MM_air = 28.85;
+mass_react = mass_h2 + mol_air*MM_air*G_TO_KG
+mass_prod = (mol_o2_prod*2*MM_o*G_TO_KG) + (mol_n2*2*MM_n*G_TO_KG  ... 
++mol_h2o*MM_h2o*G_TO_KG);
 
 % Calculate Change in Gibbs Free Energy 
 gprod_LHV = gEng(T,Patm,'h2ovap',mol_h2o) + gEng(T,Patm,'o2',mol_o2_prod) + gEng(T,Patm,'n2',mol_n2); % J, Gibbs Free Energy 
@@ -91,7 +93,7 @@ for i = 1:length(Psat)
         mol_h2ovap(i) = beta;
         mol_h2oliq(i) = 0;
         Pv_h2o(i) = Pv_guess;
-    else
+    else % i = 1-10
         % Some H2O is vapor, some liquid (beta not = 1)
         % LET: Pv = Psat, solve for beta
         Pv_h2o(i) = Psat(i);
@@ -133,7 +135,8 @@ eta_HHV = -delG_HHV / (HHV_h2 * mass_h2 * KJ_TO_J);
 eta_LHV = -delG_LHV / (LHV_h2 * mass_h2 * KJ_TO_J);
 
 figure(1);
-plot(T,eta_HHV,'b--', T,eta_LHV,'m--', T,eta_mix,'go', T,eta_carnot,'c');
+plot(T,eta_HHV,'b--', T,eta_LHV);
+%'m--',T,eta_mix,'go', T,eta_carnot,'c');
 legend('\eta_{HHV}','\eta_{LHV}','\eta_{Mixed Liquid and Gas}','\eta_{Carnot}');
 xlabel('Temperature [K]');
 ylabel('Maximum 1st Law Efficiency');
@@ -141,6 +144,7 @@ plotfixer();
 
 
 % %% Part 3
+% % SOURCE: LEC 10
 % % what humidity necesarry in inlet air to obtain saturated exit?
 % % below certain temp, condensate forms, so add no water.
 % % plot inlet air humidity vs T 25-100C
