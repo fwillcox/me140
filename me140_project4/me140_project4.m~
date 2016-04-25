@@ -27,9 +27,15 @@ MM_h2o = 2*MM_h + MM_o;
 % -------------------------------------------------
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 % ASSUME: isothermal, isobaric (reversible)
 % USE: First- Law Effiency (LEC 8, SIDE 13):
 % eta = (-m_reactants*dg_rxn)/(mfuel*HV) where HV = LHV or HHV
+=======
+% ASSUME: isothermal, isobaric i.e. reversible
+% USE: First- Law Effiency, eta = (-m_reactants*dg_rxn)/(mfuel*HV) where HV = LHV or HHV
+% SOURCE: LEC 8, SLIDE 13
+>>>>>>> origin/master
 =======
 % ASSUME: isothermal, isobaric i.e. reversible
 % USE: First- Law Effiency, eta = (-m_reactants*dg_rxn)/(mfuel*HV) where HV = LHV or HHV
@@ -110,6 +116,9 @@ eta_LHV = -delG_LHV / (LHV_h2 * mass_h2 * KJ_TO_J);
 
 % Y_h2o = mol_h2o/mol_total;
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> origin/master
+=======
 >>>>>>> origin/master
 =======
 >>>>>>> origin/master
