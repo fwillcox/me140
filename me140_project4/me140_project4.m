@@ -52,9 +52,9 @@ mol_o2_prod = 0.5*(lambda - mol_h2) * mol_o2_rxn;
 % ...mol_h2o*MM_h2o*G_TO_KG);
 
 % Calculate Change in Gibbs Free Energy 
-gprod_LHV = gEng(T,P,'h2o_vap',mol_h2o) + gEng(T,P,'o2',mol_o2_prod) + gEng(T,P,'n2',mol_n2); % J, Gibbs Free Energy 
-gprod_HHV = gEng(T,P,'h2o',mol_h2o) + gEng(T,P,'o2',mol_o2_prod) + gEng(T,P,'n2',mol_n2);    
-greact = gEng(T,P,'h2',mol_h2) + gEng(T,P,'o2',mol_o2_rxn) + gEng(T,P,'n2',mol_n2);
+gprod_LHV = gEng(T,Patm,'h2ovap',mol_h2o) + gEng(T,Patm,'o2',mol_o2_prod) + gEng(T,Patm,'n2',mol_n2); % J, Gibbs Free Energy 
+gprod_HHV = gEng(T,Patm,'h2o',mol_h2o) + gEng(T,Patm,'o2',mol_o2_prod) + gEng(T,Patm,'n2',mol_n2);    
+greact = gEng(T,Patm,'h2',mol_h2) + gEng(T,Patm,'o2',mol_o2_rxn) + gEng(T,Patm,'n2',mol_n2);
 
 % Account for Gas/Liquid Mixture
 % SOURCE: LEC 8 Slide 24, LEC 9, Slide 29
@@ -64,7 +64,7 @@ greact = gEng(T,P,'h2',mol_h2) + gEng(T,P,'o2',mol_o2_rxn) + gEng(T,P,'n2',mol_n
 beta = 1;               % ASSUME: all vapor
 Ptotal = Patm;
 Psat = PsatW(T);
-Pv = Ptotal*(beta./(beta + 0.5.*(gamma-1) +0.5.*gamma.*N_TO_O ));
+Pv = Ptotal*(beta./(beta + 0.5.*(gamma(T)-1) +0.5.*gamma(T).*N_TO_O ));
 
 for i = 1:length(Psat)
     if Pv(i) < Psat(i)
