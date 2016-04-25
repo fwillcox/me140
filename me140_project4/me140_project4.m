@@ -4,6 +4,8 @@
 % Jon Renslo, Emily Bohl, Frankie Willcox, Natasha Berk, Kendall Fagan
 % 4/15/16 - Created Jon Renslo
 
+%change
+
 close all; clear; clc;
 
 % Constants
