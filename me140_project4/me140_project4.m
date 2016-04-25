@@ -29,6 +29,9 @@ MM_air = 28.85;
 % ASSUME: isothermal, isobaric i.e. reversible
 % USE: First- Law Effiency, eta = (-m_reactants*dg_rxn)/(mfuel*HV) where HV = LHV or HHV
 % SOURCE: LEC 8, SLIDE 13
+npts = 100;
+HHV_h2 = 141800;                    % kj/kg,  Higher Heating Value   
+LHV_h2 = 120000;                    % kj/kg,  Lower Heating Value  
 
 % ------------------------------------------
 % UNCOMMENT FOR PART 1:
@@ -54,7 +57,6 @@ mass_h2 = mol_h2 * 2*MM_h * G_TO_KG;
 mol_air = AIR_TO_H * lambda / 2;
 mol_o2_rxn = mol_air / AIR_TO_H;    
 mol_n2 = mol_air * N_TO_O / AIR_TO_H;
-
 mol_h2o = mol_h2;
 mol_o2_prod = 0.5*(lambda - mol_h2) * mol_o2_rxn;
 
@@ -65,36 +67,24 @@ mol_o2_prod = 0.5*(lambda - mol_h2) * mol_o2_rxn;
 % ...mol_h2o*MM_h2o*G_TO_KG);
 
 % Calculate Change in Gibbs Free Energy 
-<<<<<<< HEAD
-% TODO** Use partial pressures?
-P = Patm;
-=======
-<<<<<<< HEAD
 gprod_LHV = gEng(T,Patm,'h2ovap',mol_h2o) + gEng(T,Patm,'o2',mol_o2_prod) + gEng(T,Patm,'n2',mol_n2); % J, Gibbs Free Energy 
 gprod_HHV = gEng(T,Patm,'h2o',mol_h2o) + gEng(T,Patm,'o2',mol_o2_prod) + gEng(T,Patm,'n2',mol_n2);    
 greact = gEng(T,Patm,'h2',mol_h2) + gEng(T,Patm,'o2',mol_o2_rxn) + gEng(T,Patm,'n2',mol_n2);
-=======
->>>>>>> master
-gprod_LHV = gEng(T,P,'h2ovap',mol_h2o) + gEng(T,P,'o2',mol_o2_prod) + gEng(T,P,'n2',mol_n2); % J, Gibbs Free Energy 
-gprod_HHV = gEng(T,P,'h2o',mol_h2o) + gEng(T,P,'o2',mol_o2_prod) + gEng(T,P,'n2',mol_n2);    
-greact = gEng(T,P,'h2',mol_h2) + gEng(T,P,'o2',mol_o2_rxn) + gEng(T,P,'n2',mol_n2);
->>>>>>> master
 
 % Account for Gas/Liquid Mixture
 % SOURCE: LEC 8 Slide 24, LEC 9, Slide 29
 % APPROACH: (1) Assume beta=1, let Pv=Psat (2) Solve for Ptotal
 % -------- If Pv < Psat, all vapor. If Pv > Psat, must be some liquid.
-
 beta = 1;               % ASSUME: all vapor
 Ptotal = Patm;
 Psat = PsatW(T);
-<<<<<<< HEAD
+
 Pv_guess = Ptotal*(beta./(beta + 0.5.*(mol_h2o-beta-1) +0.5.*(mol_h2o-beta).*N_TO_O ));
 Pv = Psat;
-=======
-Pv = Ptotal*(beta./(beta + 0.5.*(gamma(T)-1) +0.5.*gamma(T).*N_TO_O ));
 
->>>>>>> master
+[~,~,gamma] = sp_heats(T);
+iterations =0;
+
 for i = 1:length(Psat)
     if Pv_guess < Psat(i)
         % All H2O is vapor (beta = 1)
