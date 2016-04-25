@@ -112,10 +112,11 @@ hprod(i) = hEng(T(i),'h2ovap',mol_h2ovap(i))...
     + hEng(T(i),'o2',mol_o2_prod)...
     + hEng(T(i),'n2',mol_n2);
 hreact(i) = hEng(T(i),'h2',mol_h2) + hEng(T(i),'o2',mol_o2_rxn) + hEng(T(i),'n2',mol_n2);
-h(i) = hprod(i) - hreact(i);
-%eta_mix(i) = -delG_mix(i)/ (dh of mix of air and gas);
-iterations = iterations + 1
+dh(i) = hprod(i) - hreact(i);
+eta_mix(i) = -delG_mix(i)/ dh(i);
+iterations = iterations + 1;
 end
+iterations
 
 delG_HHV = gprod_HHV - greact;
 delG_LHV = gprod_LHV - greact;
