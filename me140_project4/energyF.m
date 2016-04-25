@@ -91,17 +91,17 @@ function out = energyF(T,P,species,moles)
 %     I2 = a*log(T0/T) + b*(T0 - T) + c/2*(T0^2 - T^2) + d/3*(T0^3 - T^3) + e/4*(T0^4 - T^4);
 
     gPerKg = 1000;
-    out.cpbar = (a + b*T + c*T.^2 + d*T.^3); % J/mol-k
-    out.cp = out.cpbar/m{i}*gPerKg; %J/g-k
+    out.cpbar = (a + b*T + c*T.^2 + d*T.^3); % J/mol-k, Mol Specific Heat
+    out.cp = out.cpbar/m{i}*gPerKg;          % J/g-k,   Specific Heat
     
     % integrate cp from t0 to t in j/mol kelvin
     delH = (a*(T - T0) + b/2*(T.^2 - T0.^2) + c/3*(T.^3 - T0.^3) + d/4*(T.^4 - T0.^4)); 
     intCpbarOnT = a*log(T./T0) + b*(T - T0) + c/2*(T.^2 - T0.^2) + d/3*(T.^3 - T0.^3);
     delS = intCpbarOnT - R *log(P/P0); 
-    out.S = (sf{i} + delS)*moles;
-    out.H = (hf{i} + delH)*moles;
     
-    out.G = (delH - T.*delS+ gf{i})*moles; 
+    out.S = (sf{i} + delS)*moles;           % Entropy1
+    out.H = (hf{i} + delH)*moles;           % Enthalpy
+    out.G = (out.H - T.*out.S)*moles;  % Gibbs Free Energy
     %**double check this calculation
     % delH*moles -T.*out.S + gf{i}*moles seems to produce best results, why?
 end
