@@ -22,13 +22,15 @@ MM_o = 16;
 MM_n = 14;
 MM_h2o = 2*MM_h + MM_o;
 
-%test
 % -------------------------------------------------
 % Part 1: Efficiency of PEM Fuel Cells Found 3 Ways
 % -------------------------------------------------
 % ASSUME: isothermal, isobaric i.e. reversible
 % USE: First- Law Effiency, eta = (-m_reactants*dg_rxn)/(mfuel*HV) where HV = LHV or HHV
 % SOURCE: LEC 8, SLIDE 13
+npts = 100;
+HHV_h2 = 141800;                    % kj/kg,  Higher Heating Value   
+LHV_h2 = 120000;                    % kj/kg,  Lower Heating Value  
 
 % ------------------------------------------
 % UNCOMMENT FOR PART 1:
@@ -54,7 +56,6 @@ mass_h2 = mol_h2 * 2*MM_h * G_TO_KG;
 mol_air = AIR_TO_H * lambda / 2;
 mol_o2_rxn = mol_air / AIR_TO_H;    
 mol_n2 = mol_air * N_TO_O / AIR_TO_H;
-
 mol_h2o = mol_h2;
 mol_o2_prod = 0.5*(lambda - mol_h2) * mol_o2_rxn;
 
