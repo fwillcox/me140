@@ -1,48 +1,81 @@
-% Project4.m
-% 4-22-16 - Created Jon Renslo
-% Script for Project 4 in ME140. Fuel Cells. 
+% ME140 PROJECT 4: FUEL CELLS
+% ----------------------------
+% FILENAME: me140_project4.m
+% Jon Renslo, Emily Bohl, Frankie Willcox, Natasha Berk, Kendall Fagan
+% 4/15/16 - Created Jon Renslo
+
 close all; clear; clc;
-%% Part 1
-% find first law eta_max for a PEM fuel cell 
+
+% Constants
+G_TO_KG = 10^-3;
+KPA_TO_PA = 10^3;
+KJ_TO_J = 10^3;
+C_TO_K = 273.15;
+
+N_TO_O = 79/21;         % Engineering Air Molar Mass Ratio of Nitrogen to Oxygen
+AIR_TO_H = 4.76;        % Ratio between H combusted and air
+
+% Molar Masses
+MM_c = 12;
+MM_h = 1;
+MM_o = 16;
+MM_n = 14;
+MM_h2o = 2*MM_h + MM_o;
+
+% -------------------------------------------------
+% Part 1: Efficiency of PEM Fuel Cells Found 3 Ways
+% -------------------------------------------------
+% ASSUME: isothermal, isobaric (reversible)
+% USE: First- Law Effiency (LEC 8, SIDE 13):
+% eta = (-m_reactants*dg_rxn)/(mfuel*HV) where HV = LHV or HHV
+
 npts = 100;
-T = linspace(25+273,1273,npts);
-lambda = 2; % 100% excess air
-HHV_h2 = 141800; %kj/kg
-LHV_h2 = 120000; %kj/kg
-MMh2 = 2.02; %g/mol
-gToKg = 1000;
-P = 101.3e3; %Pa, Preact = Pprod = Patm
+T = linspace(25+C_TO_K,1000+C_TO_K,npts);
+lambda = 2;                         % Equivalence Ratio(ASSUME: 100% excess air)
+HHV_h2 = 141800;                    % kj/kg,  Higher Heating Value   
+LHV_h2 = 120000;                    % kj/kg,  Lower Heating Value           
+P = 101.3*KPA_TO_PA;                % Pa,     Preact = Pprod = Patm
 
-% assume 1 mol of h2 combusted --> 4.76/2 mol air
-% 139 g total
-molh2 = 1;
-massh2 = molh2*MMh2/gToKg;
-molair = 4.76*lambda/2;
-molo2_rxn = molair/4.76;
-moln2 = molair*3.76/4.76;
+mol_h2 = 1;                         % (ASSUME: 1 mol H2-->4.76/2 mol air = 139 g)
+mass_h2 = mol_h2 * 2*MM_h * G_TO_KG; 
+mol_air = AIR_TO_H * lambda / 2;
+mol_o2_rxn = mol_air / AIR_TO_H;
+mol_n2 = mol_air * N_TO_O / AIR_TO_H;
 
-molh2o = molh2;
-molo2_prod = 0.5*(lambda-molh2)*molo2_rxn;
+mol_h2o = mol_h2;
+mol_o2_prod = 0.5*(lambda - mol_h2) * mol_o2_rxn;
 
-% check mass balance
-% mreact = massh2 + molair*28.85/1000
-% mprod = molo2_prod*32/1000 + moln2*28/1000 + molh2o*18.02/1000
+% Check Mass Balance
+% MM_air = 28.85;
+% mass_react = mass_h2 + mol_air*MM_air*G_TO_KG
+% mass_prod = (mol_o2_prod*2*MM_o*G_TO_KG) + (mol_n2*2*MM_n*G_TO_KG + ...
+% ...mol_h2o*MM_h2o*G_TO_KG);
 
-% gives in Joules, as we multiply by moles
-gprod_LHV = gEng(T,P,'h2ovap',molh2o) + gEng(T,P,'o2',molo2_prod) + gEng(T,P,'n2',moln2);
-gprod_HHV = gEng(T,P,'h2o',molh2o) + gEng(T,P,'o2',molo2_prod) + gEng(T,P,'n2',moln2);
-greact = gEng(T,P,'h2',molh2) + gEng(T,P,'o2',molo2_rxn) + gEng(T,P,'n2',moln2);
+% Calculate Change in Gibbs Free Energy 
+gprod_LHV = gEng(T,P,'h2ovap',mol_h2o) + gEng(T,P,'o2',mol_o2_prod) + gEng(T,P,'n2',mol_n2); % J, Gibbs Free Energy 
+gprod_HHV = gEng(T,P,'h2o',mol_h2o) + gEng(T,P,'o2',mol_o2_prod) + gEng(T,P,'n2',mol_n2);    
+greact = gEng(T,P,'h2',mol_h2) + gEng(T,P,'o2',mol_o2_rxn) + gEng(T,P,'n2',mol_n2);
 
-delG_hhv = gprod_HHV-greact;
-delG_lhv = gprod_LHV-greact;
-eta_hhv = -delG_hhv/(HHV_h2*massh2*1000);
-eta_lhv = -delG_lhv/(LHV_h2*massh2*1000);
-%todo find g actual based on liquid water mixture
+delG_HHV = gprod_HHV - greact;
+delG_LHV = gprod_LHV - greact;
+% delG_liquidGasMix = ???
+eta_HHV = -delG_HHV / (HHV_h2 * mass_h2 * KJ_TO_J);
+eta_LHV = -delG_LHV / (LHV_h2 * mass_h2 * KJ_TO_J);
+% eta_liquidGasMix = ??? todo find g actual based on liquid water mixture
+% eta_carnot = 1- Tlow/Thigh;
+
 figure();
-plot(T,eta_hhv,T,eta_lhv);
+plot(T,eta_HHV,T,eta_LHV);
 legend('\eta_{HHV}','\eta_{LHV}');
 xlabel('Temperature K');
 ylabel('Maximum 1st Law Efficiency');
 plotfixer();
+
+
+% Part 2
+
+% Plot eta_LHV vs lambda (1:10), (p = 1atm)
+%      eta_LHV vs pressure (1:40atm), (lambda = 2)
+%       each at 80 220 650 800C
 
 
