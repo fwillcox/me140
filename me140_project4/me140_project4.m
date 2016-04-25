@@ -66,21 +66,14 @@ mol_o2_prod = 0.5*(lambda - mol_h2) * mol_o2_rxn;
 % ...mol_h2o*MM_h2o*G_TO_KG);
 
 % Calculate Change in Gibbs Free Energy 
-<<<<<<< HEAD
 gprod_LHV = gEng(T,Patm,'h2ovap',mol_h2o) + gEng(T,Patm,'o2',mol_o2_prod) + gEng(T,Patm,'n2',mol_n2); % J, Gibbs Free Energy 
 gprod_HHV = gEng(T,Patm,'h2o',mol_h2o) + gEng(T,Patm,'o2',mol_o2_prod) + gEng(T,Patm,'n2',mol_n2);    
 greact = gEng(T,Patm,'h2',mol_h2) + gEng(T,Patm,'o2',mol_o2_rxn) + gEng(T,Patm,'n2',mol_n2);
-=======
-gprod_LHV = gEng(T,P,'h2ovap',mol_h2o) + gEng(T,P,'o2',mol_o2_prod) + gEng(T,P,'n2',mol_n2); % J, Gibbs Free Energy 
-gprod_HHV = gEng(T,P,'h2o',mol_h2o) + gEng(T,P,'o2',mol_o2_prod) + gEng(T,P,'n2',mol_n2);    
-greact = gEng(T,P,'h2',mol_h2) + gEng(T,P,'o2',mol_o2_rxn) + gEng(T,P,'n2',mol_n2);
->>>>>>> master
 
 % Account for Gas/Liquid Mixture
 % SOURCE: LEC 8 Slide 24, LEC 9, Slide 29
 % APPROACH: (1) Assume beta=1, let Pv=Psat (2) Solve for Ptotal
 % -------- If Pv < Psat, all vapor. If Pv > Psat, must be some liquid.
-
 beta = 1;               % ASSUME: all vapor
 Ptotal = Patm;
 Psat = PsatW(T);
