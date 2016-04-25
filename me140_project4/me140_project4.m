@@ -116,4 +116,6 @@ plotfixer();
 %      eta_LHV vs pressure (1:40atm), (lambda = 2)
 %       each at 80 220 650 800C
 
+%good luck
+
 
