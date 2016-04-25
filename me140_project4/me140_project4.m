@@ -89,6 +89,7 @@ for i = 1:length(Psat)
     if Pv_guess < Psat(i)
         % All H2O is vapor (beta = 1)
         mol_h2ovap(i) = beta;
+        mol_h2oliq(i) = 0;
         Pv_h2o(i) = Pv_guess;
     else
         % Some H2O is vapor, some liquid (beta not = 1)
