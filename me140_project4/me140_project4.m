@@ -81,8 +81,7 @@ for i = 1:length(Psat)
         
     end
 end
-%gg
-
+%comment
 
 delG_HHV = gprod_HHV - greact;
 delG_LHV = gprod_LHV - greact;
