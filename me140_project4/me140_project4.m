@@ -7,7 +7,7 @@
 close all; clear; clc;
 
 % Constants
-G_TO_KG = -10^3;
+G_TO_KG = 10^-3;
 KPA_TO_PA = 10^3;
 KJ_TO_J = 10^3;
 C_TO_K = 273.15;
@@ -52,9 +52,15 @@ mol_o2_prod = 0.5*(lambda - mol_h2) * mol_o2_rxn;
 % ...mol_h2o*MM_h2o*G_TO_KG);
 
 % Calculate Change in Gibbs Free Energy 
+<<<<<<< HEAD
 gprod_LHV = gEng(T,Patm,'h2ovap',mol_h2o) + gEng(T,Patm,'o2',mol_o2_prod) + gEng(T,Patm,'n2',mol_n2); % J, Gibbs Free Energy 
 gprod_HHV = gEng(T,Patm,'h2o',mol_h2o) + gEng(T,Patm,'o2',mol_o2_prod) + gEng(T,Patm,'n2',mol_n2);    
 greact = gEng(T,Patm,'h2',mol_h2) + gEng(T,Patm,'o2',mol_o2_rxn) + gEng(T,Patm,'n2',mol_n2);
+=======
+gprod_LHV = gEng(T,P,'h2ovap',mol_h2o) + gEng(T,P,'o2',mol_o2_prod) + gEng(T,P,'n2',mol_n2); % J, Gibbs Free Energy 
+gprod_HHV = gEng(T,P,'h2o',mol_h2o) + gEng(T,P,'o2',mol_o2_prod) + gEng(T,P,'n2',mol_n2);    
+greact = gEng(T,P,'h2',mol_h2) + gEng(T,P,'o2',mol_o2_rxn) + gEng(T,P,'n2',mol_n2);
+>>>>>>> master
 
 % Account for Gas/Liquid Mixture
 % SOURCE: LEC 8 Slide 24, LEC 9, Slide 29
@@ -102,5 +108,12 @@ legend('\eta_{HHV}','\eta_{LHV}');
 xlabel('Temperature K');
 ylabel('Maximum 1st Law Efficiency');
 plotfixer();
+
+
+% Part 2
+
+% Plot eta_LHV vs lambda (1:10), (p = 1atm)
+%      eta_LHV vs pressure (1:40atm), (lambda = 2)
+%       each at 80 220 650 800C
 
 
