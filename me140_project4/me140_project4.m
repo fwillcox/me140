@@ -5,7 +5,6 @@
 % 4/15/16 - Created Jon Renslo
 
 close all; clear; clc;
-%Hi I'm Emily
 % Constants
 G_TO_KG = 10^-3;
 KPA_TO_PA = 10^3;
