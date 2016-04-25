@@ -29,12 +29,24 @@ MM_h2o = 2*MM_h + MM_o;
 % USE: First- Law Effiency, eta = (-m_reactants*dg_rxn)/(mfuel*HV) where HV = LHV or HHV
 % SOURCE: LEC 8, SLIDE 13
 
-npts = 100;
+% ------------------------------------------
+% UNCOMMENT FOR PART 1:
 T = linspace(25+C_TO_K,1000+C_TO_K,npts);
-lambda = 2;                         % Equivalence Ratio(ASSUME: 100% excess air)
-HHV_h2 = 141800;                    % kj/kg,  Higher Heating Value   
-LHV_h2 = 120000;                    % kj/kg,  Lower Heating Value           
-Patm = 101.3*KPA_TO_PA;             % Pa,     Preact = Pprod = Patm
+lambda = 2;                         % Equivalence Ratio(ASSUME: 100% excess air)        
+Patm = 101.3*KPA_TO_PA;             % Pa,     Preact = Pprod = Patm 
+
+% % UNCOMMENT FOR PART 2a (varrying lambda)
+% T_C = [80 220 650 800];
+% T = T_C + C_TO_K;
+% lambda = linspace(1,10,npts);      % (Comment back in for Part 2)         
+% Patm = 101.3*KPA_TO_PA;             % Pa,     Preact = Pprod = Patm 
+
+% % UNCOMMENT FOR PART 2b (varrying Patm)
+% T_C = [80 220 650 800];
+% T = T_C + C_TO_K;
+% lambda = 2;                         % Equivalence Ratio(ASSUME: 100% excess air)     
+% Patm = linspace(101.3*KPA_TO_PA,4053*KPA_TO_PA,npts); % Pa, (Comment back in for Part 2)
+% ------------------------------------------
 
 mol_h2 = 1;                         % (ASSUME: 1 mol H2-->4.76/2 mol air = 139 g)
 mass_h2 = mol_h2 * 2*MM_h * G_TO_KG; 
