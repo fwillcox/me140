@@ -1,4 +1,3 @@
-% HI NATASHA
 % ME140 PROJECT 4: FUEL CELLS
 % ----------------------------
 % FILENAME: me140_project4.m
@@ -43,7 +42,7 @@ Patm = 101.3*KPA_TO_PA;             % Pa,     Preact = Pprod = Patm
 % % UNCOMMENT FOR PART 2a (varrying lambda)
 % T_C = [80 220 650 800];
 % T = T_C + C_TO_K;
-% lambda = linspace(1,10,npts);      % (Comment back in for Part 2)         
+% lambda = linspace(1,10,npts);       % (Comment back in for Part 2)         
 % Patm = 101.3*KPA_TO_PA;             % Pa,     Preact = Pprod = Patm 
 
 % % UNCOMMENT FOR PART 2b (varrying Patm)
@@ -79,39 +78,47 @@ greact = gEng(T,Patm,'h2',mol_h2) + gEng(T,Patm,'o2',mol_o2_rxn) + gEng(T,Patm,'
 beta = 1;               % ASSUME: all vapor
 Ptotal = Patm;
 Psat = PsatW(T);
+gamma = mol_h2o - beta;
+Pv_guess = Ptotal*(beta./(beta + 0.5.*(gamma-1) +0.5.*gamma.*N_TO_O ));
+Pv_h2o = Psat;
+eta_carnot = carnotEff(T,T(1));      % ASSUME: Tcold = 25 degrees C
 
-Pv_guess = Ptotal*(beta./(beta + 0.5.*(mol_h2o-beta-1) +0.5.*(mol_h2o-beta).*N_TO_O ));
-Pv = Psat;
-
-[~,~,gamma] = sp_heats(T);
 iterations =0;
-
+mol_h2ovap=zeros(size(Psat));
 for i = 1:length(Psat)
-     eta_carnot(i) = carnotEff(T(i),T(1));      % ASSUME: Tcold = 25 degrees C
-    beta =1;
-    Pv_test(i) = Ptotal*( beta / ( beta + 0.5*(gamma(i)-1) +0.5*gamma(i)*N_TO_O ) );
     if Pv_guess < Psat(i)
         % All H2O is vapor (beta = 1)
-        beta = 1;
-        Pv(i) = Ptotal*( beta / ( beta + 0.5*((mol_h2o-beta)-1) +0.5*(mol_h2o-beta)*N_TO_O ) );
+        mol_h2ovap(i) = beta;
+        mol_h2oliq(i) = 0;
+        Pv_h2o(i) = Pv_guess;
     else
         % Some H2O is vapor, some liquid (beta not = 1)
         % LET: Pv = Psat, solve for beta
-        Pv(i) = PsatW(i);
-        syms b
-        beta(i) = solve(Pv(i)/Ptotal == b/(b + 0.5*((mol_h2o-b)-1) +0.5*(mol_h2o-b)*N_TO_O ) ,b);
-        gamma(i) = mol_h2o-beta(i);
+        Pv_h2o(i) = Psat(i);
+        mol_h2ovap(i) = (mol_o2_prod + mol_n2)*Pv_h2o(i)/(Ptotal-Pv_h2o(i)); % beta
+        mol_h2oliq(i) = mol_h2o-mol_h2ovap(i);
     end
 
-% DOUBLE CHECK THE LINE BELOW!
-mol_total = mol_h2o + mol_n2 + mol_o2_prod;  % total mols of products
-y_vap = beta(i)/mol_total;
-y_liq = gamma(i)/mol_total;
-gprod_LHV_mix(i) = y_vap*gEng(T(i),Patm,'h2ovap',beta(i)*mol_h2o) + y_liq*gEng(T(i),Patm,'h2o',gamma(i)*mol_h2o) + gEng(T(i),Patm,'o2',mol_o2_prod) + gEng(T(i),Patm,'n2',mol_n2);
+% DOUBLE CHECK THIS
+mol_total = mol_o2_prod + mol_n2 + mol_h2o;
+y_o2 = mol_o2_prod/mol_total;
+y_n2 = mol_n2/mol_total;
+
+gprod_LHV_mix(i) = gEng(T(i),Patm,'h2ovap',mol_h2ovap(i))...
+    + gEng(T(i), Patm,      'h2o', mol_h2oliq(i))...
+    + gEng(T(i), Patm*y_o2, 'o2', mol_o2_prod)... o2 and n2 come in at partial pressures! does the mol thing account for this?
+    + gEng(T(i), Patm*y_n2, 'n2', mol_n2);
 delG_mix(i) = gprod_LHV_mix(i) - greact(i);    % TODO: DOUBLE CHECK THIS use LHV because no way to recover evaporated air?
-eta_mix(i) = -delG_mix(i)/ (LHV_h2 * mass_h2 * KJ_TO_J);
-iterations = iterations +1
+hprod(i) = hEng(T(i),'h2ovap',mol_h2ovap(i))...
+    + hEng(T(i),'h2o',mol_h2oliq(i))...
+    + hEng(T(i),'o2',mol_o2_prod)...
+    + hEng(T(i),'n2',mol_n2);
+hreact(i) = hEng(T(i),'h2',mol_h2) + hEng(T(i),'o2',mol_o2_rxn) + hEng(T(i),'n2',mol_n2);
+dh(i) = hprod(i) - hreact(i);
+eta_mix(i) = -delG_mix(i)/ dh(i);
+iterations = iterations + 1;
 end
+iterations
 
 delG_HHV = gprod_HHV - greact;
 delG_LHV = gprod_LHV - greact;
@@ -126,34 +133,34 @@ ylabel('Maximum 1st Law Efficiency');
 plotfixer();
 
 
-%% Part 3
-% what humidity necesarry in inlet air to obtain saturated exit?
-% below certain temp, condensate forms, so add no water.
-% plot inlet air humidity vs T 25-100C
-
-% questions:
-% must we take into account the diffusion thru membrane?
-lambda = 2; %as before
-Ptotal = Patm;
-% find psat at exit based on temp, 
-T = linspace(25,100,npts);
-psat = PsatW(T+273);
-% find mole fraction of water
-y_h2o = psat./Ptotal;
-y_h2o_prod = mol_h2o/(mol_o2_prod + mol_h2o + mol_n2);
-mol_out = (mol_o2_prod + mol_h2o + mol_n2);
-mol_h2o_sat = mol_out*y_h2o;
-Pv = y_h2o_prod*Ptotal;
-Pv(psat>Pv) = psat(psat>Pv);
-
-% if less than what is formed, add the difference to dry air reagent
-omega = Pv./(Ptotal-Pv)*(MM_h2o)/(MM_air); %formula from lecture does not seem to work.
-diff = mol_h2o_sat - mol_h2o;
-diff(diff<0) = 0;
-omega2 = diff*(MM_h2o)/(mol_o2_rxn*MM_o*2 + mol_n2*MM_n*2);
-%convert mol fraction to humidity
-plot(T,diff,T,omega2);
-legend('Moles of H2O to Add','Absolute Humidity')
+% %% Part 3
+% % what humidity necesarry in inlet air to obtain saturated exit?
+% % below certain temp, condensate forms, so add no water.
+% % plot inlet air humidity vs T 25-100C
+% 
+% % questions:
+% % must we take into account the diffusion thru membrane?
+% lambda = 2; %as before
+% Ptotal = Patm;
+% % find psat at exit based on temp, 
+% T = linspace(25,100,npts);
+% psat = PsatW(T+273);
+% % find mole fraction of water
+% y_h2o = psat./Ptotal;
+% y_h2o_prod = mol_h2o/(mol_o2_prod + mol_h2o + mol_n2);
+% mol_out = (mol_o2_prod + mol_h2o + mol_n2);
+% mol_h2o_sat = mol_out*y_h2o;
+% Pv = y_h2o_prod*Ptotal;
+% Pv(psat>Pv) = psat(psat>Pv);
+% 
+% % if less than what is formed, add the difference to dry air reagent
+% omega = Pv./(Ptotal-Pv)*(MM_h2o)/(MM_air); %formula from lecture does not seem to work.
+% diff = mol_h2o_sat - mol_h2o;
+% diff(diff<0) = 0;
+% omega2 = diff*(MM_h2o)/(mol_o2_rxn*MM_o*2 + mol_n2*MM_n*2);
+% %convert mol fraction to humidity
+% plot(T,diff,T,omega2);
+% legend('Moles of H2O to Add','Absolute Humidity')
 
 
     
