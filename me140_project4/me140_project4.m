@@ -72,3 +72,10 @@ ylabel('Maximum 1st Law Efficiency');
 plotfixer();
 
 
+% Part 2
+
+% Plot eta_LHV vs lambda (1:10), (p = 1atm)
+%      eta_LHV vs pressure (1:40atm), (lambda = 2)
+%       each at 80 220 650 800C
+
+
