@@ -81,7 +81,7 @@ Psat = PsatW(T);
 gamma = mol_h2o - beta;
 Pv_guess = Ptotal*(beta./(beta + 0.5.*(gamma-1) +0.5.*gamma.*N_TO_O ));
 Pv_h2o = Psat;
-%eta_carnot = carnotEff(T,T(1));      % ASSUME: Tcold = 25 degrees C
+eta_carnot = carnotEff(T,T(1));      % ASSUME: Tcold = 25 degrees C
 
 iterations =0;
 mol_h2ovap=zeros(size(Psat));
