@@ -7,7 +7,6 @@
 %change
 
 close all; clear; clc;
-
 % Constants
 G_TO_KG = 10^-3;
 KPA_TO_PA = 10^3;
@@ -92,6 +91,7 @@ for i = 1:length(Psat)
     if Pv_guess < Psat(i)
         % All H2O is vapor (beta = 1)
         mol_h2ovap(i) = beta;
+        mol_h2oliq(i) = 0;
         Pv_h2o(i) = Pv_guess;
     else
         % Some H2O is vapor, some liquid (beta not = 1)
@@ -102,12 +102,21 @@ for i = 1:length(Psat)
     end
 
 % DOUBLE CHECK THIS
-gprod_LHV_mix(i) = gEng(T(i),Patm,'h2ovap',mol_h2ovap(i)) + gEng(T(i),Patm,'h2o',mol_h2oliq(i))...
-    + gEng(T(i),Patm,'o2',mol_o2_prod) + gEng(T(i),Patm,'n2',mol_n2);
+gprod_LHV_mix(i) = gEng(T(i),Patm,'h2ovap',mol_h2ovap(i))...
+    + gEng(T(i),Patm,'h2o',mol_h2oliq(i))...
+    + gEng(T(i),Patm,'o2',mol_o2_prod)... o2 and n2 come in at partial pressures! does the mol thing account for this?
+    + gEng(T(i),Patm,'n2',mol_n2);
 delG_mix(i) = gprod_LHV_mix(i) - greact(i);    % TODO: DOUBLE CHECK THIS use LHV because no way to recover evaporated air?
-%eta_mix(i) = -delG_mix(i)/ (dh of mix of air and gas);
-iterations = iterations + 1
+hprod(i) = hEng(T(i),'h2ovap',mol_h2ovap(i))...
+    + hEng(T(i),'h2o',mol_h2oliq(i))...
+    + hEng(T(i),'o2',mol_o2_prod)...
+    + hEng(T(i),'n2',mol_n2);
+hreact(i) = hEng(T(i),'h2',mol_h2) + hEng(T(i),'o2',mol_o2_rxn) + hEng(T(i),'n2',mol_n2);
+dh(i) = hprod(i) - hreact(i);
+eta_mix(i) = -delG_mix(i)/ dh(i);
+iterations = iterations + 1;
 end
+iterations
 
 delG_HHV = gprod_HHV - greact;
 delG_LHV = gprod_LHV - greact;
