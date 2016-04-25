@@ -25,8 +25,9 @@ MM_h2o = 2*MM_h + MM_o;
 % -------------------------------------------------
 % Part 1: Efficiency of PEM Fuel Cells Found 3 Ways
 % -------------------------------------------------
-% Use First- Law Effiency (LEC 8, SIDE 13) eta = W/(mfuel*HV
-% (1) LHV, (2) HHV, (3) Accounting for liquid/gas mixture
+% ASSUME: isothermal, isobaric (reversible)
+% USE: First- Law Effiency (LEC 8, SIDE 13):
+% eta = (-m_reactants*dg_rxn)/(mfuel*HV) where HV = LHV or HHV
 
 npts = 100;
 T = linspace(25+C_TO_K,1000+C_TO_K,npts);
@@ -51,15 +52,15 @@ mol_o2_prod = 0.5*(lambda - mol_h2) * mol_o2_rxn;
 % ...mol_h2o*MM_h2o*G_TO_KG);
 
 % Calculate Change in Gibbs Free Energy 
-gprod_LHV = gEng(T,P,'h2o_vap',mol_h2o) + gEng(T,P,'o2',mol_o2_prod) + gEng(T,P,'n2',mol_n2); % J, Gibbs Free Energy 
+gprod_LHV = gEng(T,P,'h2ovap',mol_h2o) + gEng(T,P,'o2',mol_o2_prod) + gEng(T,P,'n2',mol_n2); % J, Gibbs Free Energy 
 gprod_HHV = gEng(T,P,'h2o',mol_h2o) + gEng(T,P,'o2',mol_o2_prod) + gEng(T,P,'n2',mol_n2);    
 greact = gEng(T,P,'h2',mol_h2) + gEng(T,P,'o2',mol_o2_rxn) + gEng(T,P,'n2',mol_n2);
 
 delG_HHV = gprod_HHV - greact;
 delG_LHV = gprod_LHV - greact;
 % delG_liquidGasMix = ???
-eta_HHV = -delG_HHV / (HHV_h2 * mass_h2 * KJ_TO_J);
-eta_LHV = -delG_LHV / (LHV_h2 * mass_h2 * KJ_TO_J);
+eta_HHV = -delG_HHV / (HHV_h2 * mass_h2);
+eta_LHV = -delG_LHV / (LHV_h2 * mass_h2);
 % eta_liquidGasMix = ??? todo find g actual based on liquid water mixture
 % eta_carnot = 1- Tlow/Thigh;
 
