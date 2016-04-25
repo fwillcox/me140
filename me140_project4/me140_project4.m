@@ -79,37 +79,32 @@ greact = gEng(T,Patm,'h2',mol_h2) + gEng(T,Patm,'o2',mol_o2_rxn) + gEng(T,Patm,'
 beta = 1;               % ASSUME: all vapor
 Ptotal = Patm;
 Psat = PsatW(T);
+gamma = mol_h2o - beta;
+Pv_guess = Ptotal*(beta./(beta + 0.5.*(gamma-1) +0.5.*gamma.*N_TO_O ));
+Pv_h2o = Psat;
+%eta_carnot = carnotEff(T,T(1));      % ASSUME: Tcold = 25 degrees C
 
-Pv_guess = Ptotal*(beta./(beta + 0.5.*(mol_h2o-beta-1) +0.5.*(mol_h2o-beta).*N_TO_O ));
-Pv = Psat;
-[~,~,gamma] = sp_heats(T);
 iterations =0;
-
+mol_h2ovap=zeros(size(Psat));
 for i = 1:length(Psat)
-    eta_carnot(i) = carnotEff(T(i),T(1));      % ASSUME: Tcold = 25 degrees C
-    beta(i) =1;
-    Pv_test(i) = Ptotal*( beta / ( beta + 0.5*(gamma(i)-1) +0.5*gamma(i)*N_TO_O ) );
     if Pv_guess < Psat(i)
         % All H2O is vapor (beta = 1)
-        beta(i) = 1;
-        Pv(i) = Ptotal*( beta / ( beta + 0.5*((mol_h2o-beta)-1) +0.5*(mol_h2o-beta)*N_TO_O ) );
+        mol_h2ovap(i) = beta;
+        Pv_h2o(i) = Pv_guess;
     else
         % Some H2O is vapor, some liquid (beta not = 1)
         % LET: Pv = Psat, solve for beta
-        Pv(i) = Psat(i);
-        syms b
-        beta(i) = solve(Pv(i)/Ptotal == b/(b + 0.5*((mol_h2o-b)-1) +0.5*(mol_h2o-b)*N_TO_O ) ,b);
-        gamma(i) = mol_h2o-beta(i);
+        Pv_h2o(i) = Psat(i);
+        mol_h2ovap(i) = (mol_o2_prod + mol_n2)*Pv_h2o(i)/(Ptotal-Pv_h2o(i));
+        mol_h2oliq(i) = mol_h2o-mol_h2ovap(i);
     end
 
 % DOUBLE CHECK THIS
-mol_total = mol_h2o + mol_n2 + mol_o2_prod;  % total mols of products
-y_vap = beta(i)/mol_total;
-y_liq = gamma(i)/mol_total;
-gprod_LHV_mix(i) = y_vap*gEng(T(i),Patm,'h2ovap',beta(i)*mol_h2o) + y_liq*gEng(T(i),Patm,'h2o',gamma(i)*mol_h2o) + gEng(T(i),Patm,'o2',mol_o2_prod) + gEng(T(i),Patm,'n2',mol_n2);
+gprod_LHV_mix(i) = gEng(T(i),Patm,'h2ovap',mol_h2ovap(i)) + gEng(T(i),Patm,'h2o',mol_h2oliq(i))...
+    + gEng(T(i),Patm,'o2',mol_o2_prod) + gEng(T(i),Patm,'n2',mol_n2);
 delG_mix(i) = gprod_LHV_mix(i) - greact(i);    % TODO: DOUBLE CHECK THIS use LHV because no way to recover evaporated air?
-eta_mix(i) = -delG_mix(i)/ (LHV_h2 * mass_h2 * KJ_TO_J);
-iterations = iterations +1
+%eta_mix(i) = -delG_mix(i)/ (dh of mix of air and gas);
+iterations = iterations + 1
 end
 
 delG_HHV = gprod_HHV - greact;
