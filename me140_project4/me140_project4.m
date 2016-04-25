@@ -21,6 +21,7 @@ MM_h = 1;
 MM_o = 16;
 MM_n = 14;
 MM_h2o = 2*MM_h + MM_o;
+MM_air = 28.85;
 
 % -------------------------------------------------
 % Part 1: Efficiency of PEM Fuel Cells Found 3 Ways
@@ -52,6 +53,8 @@ mol_o2_prod = 0.5*(lambda - mol_h2) * mol_o2_rxn;
 % ...mol_h2o*MM_h2o*G_TO_KG);
 
 % Calculate Change in Gibbs Free Energy 
+% TODO** Use partial pressures?
+P = Patm;
 gprod_LHV = gEng(T,P,'h2ovap',mol_h2o) + gEng(T,P,'o2',mol_o2_prod) + gEng(T,P,'n2',mol_n2); % J, Gibbs Free Energy 
 gprod_HHV = gEng(T,P,'h2o',mol_h2o) + gEng(T,P,'o2',mol_o2_prod) + gEng(T,P,'n2',mol_n2);    
 greact = gEng(T,P,'h2',mol_h2) + gEng(T,P,'o2',mol_o2_rxn) + gEng(T,P,'n2',mol_n2);
@@ -64,10 +67,10 @@ greact = gEng(T,P,'h2',mol_h2) + gEng(T,P,'o2',mol_o2_rxn) + gEng(T,P,'n2',mol_n
 beta = 1;               % ASSUME: all vapor
 Ptotal = Patm;
 Psat = PsatW(T);
-Pv = Ptotal*(beta./(beta + 0.5.*(gamma-1) +0.5.*gamma.*N_TO_O ));
-
+Pv_guess = Ptotal*(beta./(beta + 0.5.*(mol_h2o-beta-1) +0.5.*(mol_h2o-beta).*N_TO_O ));
+Pv = Psat;
 for i = 1:length(Psat)
-    if Pv(i) < Psat(i)
+    if Pv_guess < Psat(i)
         % All H2O is vapor (beta = 1)
         beta = 1;
         Pv(i) = Ptotal*( beta / ( beta + 0.5*((mol_h2o-beta)-1) +0.5*(mol_h2o-beta)*N_TO_O ) );
@@ -75,7 +78,6 @@ for i = 1:length(Psat)
         % Some H2O is vapor, some liquid (beta not = 1)
         % LET: Pv = Psat, solve for beta
         Pv(i) = PsatW(i);
-        gamma = mol_h2o - beta;
         syms b
         solve(Pv(i)/Ptotal == b/(b + 0.5*((mol_h2o-b)-1) +0.5*(mol_h2o-b)*N_TO_O ) ,b);
         
@@ -109,5 +111,38 @@ plotfixer();
 % Plot eta_LHV vs lambda (1:10), (p = 1atm)
 %      eta_LHV vs pressure (1:40atm), (lambda = 2)
 %       each at 80 220 650 800C
+
+
+%% Part 3
+% what humidity necesarry in inlet air to obtain saturated exit?
+% below certain temp, condensate forms, so add no water.
+% plot inlet air humidity vs T 25-100C
+
+% questions:
+% must we take into account the diffusion thru membrane?
+lambda = 2; %as before
+Ptotal = Patm;
+% find psat at exit based on temp, 
+T = linspace(25,100,npts);
+psat = PsatW(T+273);
+% find mole fraction of water
+y_h2o = psat./Ptotal;
+y_h2o_prod = mol_h2o/(mol_o2_prod + mol_h2o + mol_n2);
+mol_out = (mol_o2_prod + mol_h2o + mol_n2);
+mol_h2o_sat = mol_out*y_h2o;
+Pv = y_h2o_prod*Ptotal;
+Pv(psat>Pv) = psat(psat>Pv);
+
+% if less than what is formed, add the difference to dry air reagent
+omega = Pv./(Ptotal-Pv)*(MM_h2o)/(MM_air); %formula from lecture does not seem to work.
+diff = mol_h2o_sat - mol_h2o;
+diff(diff<0) = 0;
+omega2 = diff*(MM_h2o)/(mol_o2_rxn*MM_o*2 + mol_n2*MM_n*2);
+%convert mol fraction to humidity
+plot(T,diff,T,omega2);
+legend('Moles of H2O to Add','Absolute Humidity')
+
+
+    
 
 
