@@ -25,21 +25,39 @@ MM_h2o = 2*MM_h + MM_o;
 % -------------------------------------------------
 % Part 1: Efficiency of PEM Fuel Cells Found 3 Ways
 % -------------------------------------------------
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 % ASSUME: isothermal, isobaric (reversible)
 % USE: First- Law Effiency (LEC 8, SIDE 13):
 % eta = (-m_reactants*dg_rxn)/(mfuel*HV) where HV = LHV or HHV
+=======
+% ASSUME: isothermal, isobaric i.e. reversible
+% USE: First- Law Effiency, eta = (-m_reactants*dg_rxn)/(mfuel*HV) where HV = LHV or HHV
+% SOURCE: LEC 8, SLIDE 13
+>>>>>>> origin/master
+=======
+% ASSUME: isothermal, isobaric i.e. reversible
+% USE: First- Law Effiency, eta = (-m_reactants*dg_rxn)/(mfuel*HV) where HV = LHV or HHV
+% SOURCE: LEC 8, SLIDE 13
+>>>>>>> origin/master
+=======
+% ASSUME: isothermal, isobaric i.e. reversible
+% USE: First- Law Effiency, eta = (-m_reactants*dg_rxn)/(mfuel*HV) where HV = LHV or HHV
+% SOURCE: LEC 8, SLIDE 13
+>>>>>>> origin/master
 
 npts = 100;
 T = linspace(25+C_TO_K,1000+C_TO_K,npts);
 lambda = 2;                         % Equivalence Ratio(ASSUME: 100% excess air)
 HHV_h2 = 141800;                    % kj/kg,  Higher Heating Value   
 LHV_h2 = 120000;                    % kj/kg,  Lower Heating Value           
-P = 101.3*KPA_TO_PA;                % Pa,     Preact = Pprod = Patm
+Patm = 101.3*KPA_TO_PA;             % Pa,     Preact = Pprod = Patm
 
 mol_h2 = 1;                         % (ASSUME: 1 mol H2-->4.76/2 mol air = 139 g)
 mass_h2 = mol_h2 * 2*MM_h * G_TO_KG; 
 mol_air = AIR_TO_H * lambda / 2;
-mol_o2_rxn = mol_air / AIR_TO_H;
+mol_o2_rxn = mol_air / AIR_TO_H;    
 mol_n2 = mol_air * N_TO_O / AIR_TO_H;
 
 mol_h2o = mol_h2;
@@ -56,11 +74,54 @@ gprod_LHV = gEng(T,P,'h2ovap',mol_h2o) + gEng(T,P,'o2',mol_o2_prod) + gEng(T,P,'
 gprod_HHV = gEng(T,P,'h2o',mol_h2o) + gEng(T,P,'o2',mol_o2_prod) + gEng(T,P,'n2',mol_n2);    
 greact = gEng(T,P,'h2',mol_h2) + gEng(T,P,'o2',mol_o2_rxn) + gEng(T,P,'n2',mol_n2);
 
+% Account for Gas/Liquid Mixture
+% SOURCE: LEC 8 Slide 24, LEC 9, Slide 29
+% APPROACH: (1) Assume beta=1, let Pv=Psat (2) Solve for Ptotal
+% -------- If Pv < Psat, all vapor. If Pv > Psat, must be some liquid.
+
+beta = 1;               % ASSUME: all vapor
+Ptotal = Patm;
+PsatW = PsatW(T);
+Pv = Ptotal*(beta./(beta + 0.5.*(gamma-1) +0.5.*gamma.*N_TO_O ));
+
+for i = 1:length(PsatW)
+    if Pv(i) < PsatW(i)
+        % All H2O is vapor (beta = 1)
+        beta = 1;
+        Pv(i) = 
+    else
+        % Some H2O is vapor, some liquid (beta not = 1)
+        % LET: Pv = Psat, solve for beta
+        Pv(i) = PsatW(i);
+        gamma = mol_h2o - beta;
+        syms b
+        solve(Pv(i)/Ptotal == b/(b + 0.5*((mol_h2o-b)-1) +0.5*(mol_h2o-b)*N_TO_O,b);
+        
+    end
+end
+
+
 delG_HHV = gprod_HHV - greact;
 delG_LHV = gprod_LHV - greact;
 % delG_liquidGasMix = ???
+<<<<<<< HEAD
 eta_HHV = -delG_HHV / (HHV_h2 * mass_h2);
 eta_LHV = -delG_LHV / (LHV_h2 * mass_h2);
+=======
+eta_HHV = -delG_HHV / (HHV_h2 * mass_h2 * KJ_TO_J);
+eta_LHV = -delG_LHV / (LHV_h2 * mass_h2 * KJ_TO_J);
+
+
+
+
+% Y_h2o = mol_h2o/mol_total;
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> origin/master
+=======
+>>>>>>> origin/master
+=======
+>>>>>>> origin/master
 % eta_liquidGasMix = ??? todo find g actual based on liquid water mixture
 % eta_carnot = 1- Tlow/Thigh;
 
