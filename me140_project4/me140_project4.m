@@ -5,7 +5,6 @@
 % 4/15/16 - Created Jon Renslo
 
 close all; clear; clc;
-%Hi I'm Emily
 % Constants
 G_TO_KG = 10^-3;
 KPA_TO_PA = 10^3;
@@ -23,9 +22,10 @@ MM_n = 14;
 MM_h2o = 2*MM_h + MM_o;
 MM_air = 28.85;
 
-% -------------------------------------------------
-% Part 1: Efficiency of PEM Fuel Cells Found 3 Ways
-% -------------------------------------------------
+% ----------------------------------------------------
+% Part 1 & 2: Efficiency of PEM Fuel Cells Found 3 Ways
+% ----------- then, varrying lambda & presssure
+% -----------------------------------------------------
 % ASSUME: isothermal, isobaric i.e. reversible
 % USE: First- Law Effiency, eta = (-m_reactants*dg_rxn)/(mfuel*HV) where HV = LHV or HHV
 % SOURCE: LEC 8, SLIDE 13
@@ -86,6 +86,9 @@ Pv = Psat;
 iterations =0;
 
 for i = 1:length(Psat)
+     eta_carnot(i) = carnotEff(T(i),T(1));      % ASSUME: Tcold = 25 degrees C
+    beta =1;
+    Pv_test(i) = Ptotal*( beta / ( beta + 0.5*(gamma(i)-1) +0.5*gamma(i)*N_TO_O ) );
     if Pv_guess < Psat(i)
         % All H2O is vapor (beta = 1)
         beta = 1;
@@ -95,42 +98,31 @@ for i = 1:length(Psat)
         % LET: Pv = Psat, solve for beta
         Pv(i) = PsatW(i);
         syms b
-        solve(Pv(i)/Ptotal == b/(b + 0.5*((mol_h2o-b)-1) +0.5*(mol_h2o-b)*N_TO_O ) ,b);
-        
+        beta(i) = solve(Pv(i)/Ptotal == b/(b + 0.5*((mol_h2o-b)-1) +0.5*(mol_h2o-b)*N_TO_O ) ,b);
+        gamma(i) = mol_h2o-beta(i);
     end
+
+% DOUBLE CHECK THE LINE BELOW!
+mol_total = mol_h2o + mol_n2 + mol_o2_prod;  % total mols of products
+y_vap = beta(i)/mol_total;
+y_liq = gamma(i)/mol_total;
+gprod_LHV_mix(i) = y_vap*gEng(T(i),Patm,'h2ovap',beta(i)*mol_h2o) + y_liq*gEng(T(i),Patm,'h2o',gamma(i)*mol_h2o) + gEng(T(i),Patm,'o2',mol_o2_prod) + gEng(T(i),Patm,'n2',mol_n2);
+delG_mix(i) = gprod_LHV_mix(i) - greact(i);    % TODO: DOUBLE CHECK THIS use LHV because no way to recover evaporated air?
+eta_mix(i) = -delG_mix(i)/ (LHV_h2 * mass_h2 * KJ_TO_J);
+iterations = iterations +1
 end
-%comment
 
 delG_HHV = gprod_HHV - greact;
 delG_LHV = gprod_LHV - greact;
-% delG_liquidGasMix = ???
 eta_HHV = -delG_HHV / (HHV_h2 * mass_h2 * KJ_TO_J);
 eta_LHV = -delG_LHV / (LHV_h2 * mass_h2 * KJ_TO_J);
 
-
-
-
-% Y_h2o = mol_h2o/mol_total;
-% eta_liquidGasMix = ??? todo find g actual based on liquid water mixture
-% eta_carnot = 1- Tlow/Thigh;
-
-figure();
-plot(T,eta_HHV,T,eta_LHV);
-legend('\eta_{HHV}','\eta_{LHV}');
-xlabel('Temperature K');
+figure(1);
+plot(T,eta_HHV,'b--', T,eta_LHV,'m--', T,eta_mix,'go', T,eta_carnot,'c');
+legend('\eta_{HHV}','\eta_{LHV}','\eta_{Mixed Liquid and Gas}','\eta_{Carnot}');
+xlabel('Temperature [K]');
 ylabel('Maximum 1st Law Efficiency');
 plotfixer();
-
-
-% Part 2
-
-% Plot eta_LHV vs lambda (1:10), (p = 1atm)
-%      eta_LHV vs pressure (1:40atm), (lambda = 2)
-%       each at 80 220 650 800C
-
-%good luck
-% more luck
-% even more
 
 
 %% Part 3
