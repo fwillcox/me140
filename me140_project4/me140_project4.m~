@@ -26,9 +26,15 @@ MM_h2o = 2*MM_h + MM_o;
 % Part 1: Efficiency of PEM Fuel Cells Found 3 Ways
 % -------------------------------------------------
 <<<<<<< HEAD
+<<<<<<< HEAD
 % ASSUME: isothermal, isobaric (reversible)
 % USE: First- Law Effiency (LEC 8, SIDE 13):
 % eta = (-m_reactants*dg_rxn)/(mfuel*HV) where HV = LHV or HHV
+=======
+% ASSUME: isothermal, isobaric i.e. reversible
+% USE: First- Law Effiency, eta = (-m_reactants*dg_rxn)/(mfuel*HV) where HV = LHV or HHV
+% SOURCE: LEC 8, SLIDE 13
+>>>>>>> origin/master
 =======
 % ASSUME: isothermal, isobaric i.e. reversible
 % USE: First- Law Effiency, eta = (-m_reactants*dg_rxn)/(mfuel*HV) where HV = LHV or HHV
@@ -103,6 +109,9 @@ eta_LHV = -delG_LHV / (LHV_h2 * mass_h2 * KJ_TO_J);
 
 
 % Y_h2o = mol_h2o/mol_total;
+<<<<<<< HEAD
+>>>>>>> origin/master
+=======
 >>>>>>> origin/master
 % eta_liquidGasMix = ??? todo find g actual based on liquid water mixture
 % eta_carnot = 1- Tlow/Thigh;
