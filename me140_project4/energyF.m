@@ -99,6 +99,7 @@ function out = energyF(T,P,species,moles)
     intCpbarOnT = a*log(T./T0) + b*(T - T0) + c/2*(T.^2 - T0.^2) + d/3*(T.^3 - T0.^3);
     delS = intCpbarOnT - R *log(P/P0); 
     
+    out.S = (sf{i} + delS)*moles;           % Entropy1
     out.H = (hf{i} + delH)*moles;           % Enthalpy
     out.G = (out.H - T.*out.S)*moles;  % Gibbs Free Energy
     %**double check this calculation
