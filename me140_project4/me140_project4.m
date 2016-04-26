@@ -14,7 +14,7 @@ C_TO_K = 273.15;
 
 N_TO_O = 3.7619;        % Engineering Air Molar Mass Ratio of Nitrogen to Oxygen
 
-% Molar Masses ( in g / mol )
+% Molar Masses
 MM_c = 12;
 MM_h = 1;
 MM_o = 16;
@@ -26,7 +26,7 @@ MM_air = 28.85;
 % Part 1 & 2: Efficiency of PEM Fuel Cells Found 3 Ways
 % ----------- then, varrying lambda & presssure
 % -----------------------------------------------------
-% ASSUME: isothermal and isobaric --> reversible
+% ASSUME: isothermal, isobaric i.e. reversible
 % USE: First- Law Effiency, eta = (-m_reactants*dg_rxn)/(mfuel*HV) where HV = LHV or HHV
 % SOURCE: LEC 8, SLIDE 13
 npts = 100;
@@ -35,36 +35,38 @@ LHV_h2 = 120.0*10^6;                    % J/kg,  Lower Heating Value
 
 % ------------------------------------------
 % UNCOMMENT FOR PART 1:
-T = linspace(25 + C_TO_K, 1000 + C_TO_K, npts);
-lambda = 2;                     % Equivalence Ratio(ASSUME: cell operates with 100% excess air)        
-Patm = 101.3*KPA_TO_PA;         % Pa, Pressure at each electrode, Preact = Pprod = Patm
+T = linspace(25+C_TO_K,1000+C_TO_K,npts);
+lambda = 2;                             % Equivalence Ratio(ASSUME: 100% excess air)        
+Patm = 101.3*KPA_TO_PA;                 % Pa,     Preact = Pprod = Patm 
 
-% % UNCOMMENT FOR PART 2a (varying lambda)
+% % UNCOMMENT FOR PART 2a (varrying lambda)
 % T_C = [80 220 650 800];
 % T = T_C + C_TO_K;
-% lambda = linspace(1, 10, npts);     % (Comment back in for Part 2)         
-% Patm = 101.3*KPA_TO_PA;             % Pa, Preact = Pprod = Patm 
+% lambda = linspace(1,10,npts);       % (Comment back in for Part 2)         
+% Patm = 101.3*KPA_TO_PA;             % Pa,     Preact = Pprod = Patm 
 
-% % UNCOMMENT FOR PART 2b (varying Patm)
+% % UNCOMMENT FOR PART 2b (varrying Patm)
 % T_C = [80 220 650 800];
 % T = T_C + C_TO_K;
 % lambda = 2;                         % Equivalence Ratio(ASSUME: 100% excess air)     
-% Patm = linspace(101.3*KPA_TO_PA, 4053*KPA_TO_PA, npts); % Pa, (Comment back in for Part 2)
+% Patm = linspace(101.3*KPA_TO_PA,4053*KPA_TO_PA,npts); % Pa, (Comment back in for Part 2)
 % ------------------------------------------
 
-% Assume 1 mole of H2 combusted --> 4.76 / 2 moles of air
-% Total: 139 grams
+% assume 1 mol of h2 combusted --> 4.76/2 mol air
+% 139 g total
 mol_h2 = 1;
-mass_h2 = mol_h2 * (2 * MM_h)/G_TO_KG;  % 1 mol H2-> 2H -> 1 g/mol H -> to kg
-mol_air = (4.76 / 2) * lambda;
-mol_o2_rxn = mol_air * (1 / 4.76);      % Getting moles of O2 using stoichiometric coeff
-mol_n2 = mol_air * (3.76 / 4.76);       % Getting moles of N2 using stoichiometric coeff
+mass_h2 = mol_h2*(MM_h*2)*G_TO_KG;
+mol_air = 4.76*lambda/2;
+mol_o2_rxn = mol_air/4.76;
+
+mol_n2 = mol_air*3.76/4.76;
+mol_o2_prod = 0.5*(lambda-mol_h2)*mol_o2_rxn;  
+
 mol_h2o = mol_h2;
-mol_o2_prod = 0.5*(lambda - mol_h2)*mol_o2_rxn;
+mass_h2o = mol_h2o*MM_h2o;
 
 % Check Mass Balance
-
-
+MM_air = 28.85;
 mass_react = mass_h2 + mol_air*MM_air*G_TO_KG;
 mass_prod = (mol_o2_prod*2*MM_o*G_TO_KG) + (mol_n2*2*MM_n*G_TO_KG  ... 
 +mol_h2o*MM_h2o*G_TO_KG);
@@ -172,5 +174,4 @@ plotfixer();
 
 
     
-
 
