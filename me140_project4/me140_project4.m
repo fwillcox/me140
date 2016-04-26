@@ -55,12 +55,15 @@ Patm = 101.3*KPA_TO_PA;                 % Pa,     Preact = Pprod = Patm
 % assume 1 mol of h2 combusted --> 4.76/2 mol air
 % 139 g total
 mol_h2 = 1;
-mass_h2 = mol_h2*(2*MM_h)/G_TO_KG;
+mass_h2 = mol_h2*(MM_h*2)/G_TO_KG;
 mol_air = 4.76*lambda/2;
 mol_o2_rxn = mol_air/4.76;
+
 mol_n2 = mol_air*3.76/4.76;
+mol_o2_prod = 0.5*(lambda-mol_h2)*mol_o2_rxn;  
+
 mol_h2o = mol_h2;
-mol_o2_prod = 0.5*(lambda-mol_h2)*mol_o2_rxn;
+mass_h2o = mol_h2o*MM_h2o;
 
 % Check Mass Balance
 MM_air = 28.85;
@@ -129,8 +132,8 @@ iterations = iterations + 1;
 end
 iterations
 
-delG_HHV = gprod_HHV - greact;
-delG_LHV = gprod_LHV - greact;
+delG_HHV = mass_prod*(gprod_HHV - greact);
+delG_LHV = mass_prod*(gprod_LHV - greact);
 eta_HHV = -delG_HHV / (HHV_h2 * mass_h2 * KJ_TO_J);
 eta_LHV = -delG_LHV / (LHV_h2 * mass_h2 * KJ_TO_J);
 
