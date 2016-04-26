@@ -71,10 +71,6 @@ mass_react = mass_h2 + mol_air*MM_air*G_TO_KG;
 mass_prod = (mol_o2_prod*2*MM_o*G_TO_KG) + (mol_n2*2*MM_n*G_TO_KG  ... 
 +mol_h2o*MM_h2o*G_TO_KG);
 
-% Calculate Change in Gibbs Free Energy 
-gprod = gEng(T,Patm,'h2ovap',mol_h2o) + gEng(T,Patm,'h2o',mol_h2o)+ gEng(T,Patm,'o2',mol_o2_prod) + gEng(T,Patm,'n2',mol_n2); % J, Gibbs Free Energy 
-greact = gEng(T,Patm,'h2',mol_h2) + gEng(T,Patm,'o2',mol_o2_rxn) + gEng(T,Patm,'n2',mol_n2);
-
 % Account for Gas/Liquid Mixture
 % SOURCE: LEC 8 Slide 24, LEC 9, Slide 29
 % APPROACH: (1) Assume beta=1, let Pv=Psat (2) Solve for Ptotal
@@ -109,13 +105,13 @@ y_h2ovap = mol_h2o/mol_total;
 y_o2 = mol_o2_prod/mol_total;
 y_n2 = mol_n2/mol_total;
 
-gprod_mix(i) = ...
+gprod(i) = ...
       gEng(T(i), Patm*y_h2ovap, 'h2ovap', mol_h2ovap(i))...
     + gEng(T(i), Patm,          'h2o',    mol_h2oliq(i))...
     + gEng(T(i), Patm*y_o2,     'o2',     mol_o2_prod)...   
     + gEng(T(i), Patm*y_n2,     'n2',     mol_n2);
 
-delG_mix(i) = gprod_mix(i) - greact(i);    
+delG(i) = gprod(i) - greact(i);    
 hprod(i) = ...
       hEng(T(i),'h2ovap', mol_h2ovap(i))...
     + hEng(T(i),'h2o',    mol_h2oliq(i))...
@@ -126,18 +122,21 @@ hreact(i) = ...
     + hEng(T(i),'o2',     mol_o2_rxn)...
     + hEng(T(i),'n2',     mol_n2);
 dh(i) = hprod(i) - hreact(i);
-eta_mix(i) = -delG_mix(i)/ dh(i);
+eta_mix(i) = -delG(i)/ dh(i);
 iterations = iterations + 1;
 end
 iterations
 
-delG = mass_react*(gprod - greact);
-eta_HHV = -delG / (HHV_h2 * mass_h2);
-eta_LHV = -delG / (LHV_h2 * mass_h2);
+% Calculate Change in Gibbs Free Energy 
+% gprod = gEng(T,Patm*y_h2ovap,'h2ovap',mol_h2o) + gEng(T,Patm,'h2o',mol_h2o)+ gEng(T,Patm,'o2',mol_o2_prod) + gEng(T,Patm,'n2',mol_n2); % J, Gibbs Free Energy 
+% greact = gEng(T,Patm,'h2',mol_h2) + gEng(T,Patm,'o2',mol_o2_rxn) + gEng(T,Patm,'n2',mol_n2);
+% delG = mass_react*(gprod - greact);
+
+eta_HHV = -mass_react*delG / (HHV_h2 * mass_h2);
+eta_LHV = -mass_react*delG / (LHV_h2 * mass_h2);
 
 figure(1);
-plot(T,eta_HHV,'b--', T,eta_LHV);
-%'m--',T,eta_mix,'go', T,eta_carnot,'c');
+plot(T,eta_HHV,'b--', T,eta_LHV,'m--',T,eta_mix,'go', T,eta_carnot,'c');
 legend('\eta_{HHV}','\eta_{LHV}','\eta_{Mixed Liquid and Gas}','\eta_{Carnot}');
 xlabel('Temperature [K]');
 ylabel('Maximum 1st Law Efficiency');
