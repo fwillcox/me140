@@ -4,6 +4,8 @@ function [eta, pctVap,delG] = PEMstoich(lambda,T,Ptotal)
 % Calculates the stoichiometry for a PEM fuel cell
 % Returns the efficiency and the % of water vapor in the products by mass
 
+% do we want to return a mixture vector also?
+
 % all return values per mol of fuel burned (assuming 1 mol here)
 mol_h2 = 1; 
 mol_air = 4.76*lambda/2*mol_h2;

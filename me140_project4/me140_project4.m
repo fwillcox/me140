@@ -39,17 +39,6 @@ T = linspace(25+C_TO_K,1000+C_TO_K,npts);
 lambda = 2;                             % Equivalence Ratio(ASSUME: 100% excess air)        
 Patm = 101.3*KPA_TO_PA;                 % Pa,     Preact = Pprod = Patm 
 
-% % UNCOMMENT FOR PART 2a (varying lambda)
-% T_C = [80 220 650 800];
-% T = T_C + C_TO_K;
-% lambda = linspace(1,10,npts);       % (Comment back in for Part 2)         
-% Patm = 101.3*KPA_TO_PA;             % Pa,     Preact = Pprod = Patm 
-
-% % UNCOMMENT FOR PART 2b (varying Patm)
-% T_C = [80 220 650 800];
-% T = T_C + C_TO_K;
-% lambda = 2;                         % Equivalence Ratio(ASSUME: 100% excess air)     
-% Patm = linspace(101.3*KPA_TO_PA,4053*KPA_TO_PA,npts); % Pa, (Comment back in for Part 2)
 % ------------------------------------------
 
 
@@ -75,6 +64,40 @@ legend('\eta_{HHV}','\eta_{LHV}','\eta_{Mixed Liquid and Gas}','\eta_{Carnot}', 
 xlabel('Temperature [K]');
 ylabel('Maximum 1st Law Efficiency');
 plotfixer();
+
+% % UNCOMMENT FOR PART 2a (varying lambda)
+T_C = [80 220 650 800];
+T = T_C + C_TO_K;
+lambda = linspace(1,10,npts);       % (Comment back in for Part 2)         
+Patm = 101.3*KPA_TO_PA;             % Pa,     Preact = Pprod = Patm 
+
+for Ti = 1:length(T)
+    for li = 1:length(lambda)
+        [etaLambda(li,Ti), pctVapLambda(li,Ti) ,delGLambda(li,Ti)] ...
+            = PEMstoich(lambda(li),T(Ti),Patm);
+    end
+end
+figure(2);
+plot(lambda,etaLambda);
+
+%%part2.1 plot%%
+
+% % UNCOMMENT FOR PART 2b (varying Patm)
+T_C = [80 220 650 800];
+T = T_C + C_TO_K;
+lambda = 2;                         % Equivalence Ratio(ASSUME: 100% excess air)     
+Patm = linspace(101.3*KPA_TO_PA,4053*KPA_TO_PA,npts); % Pa, (Comment back in for Part 2)
+
+for Ti = 1:length(T)
+    for pi = 1:length(Patm)
+        [etaPres(pi,Ti), pctVapPres(pi,Ti) ,delGPres(pi,Ti)] ...
+            = PEMstoich(lambda,T(Ti),Patm(pi));
+    end
+end
+
+figure(3);
+plot(Patm,etaPres);
+return
 
 % figure(2)
 % plot(T,mol_h2ovap);
