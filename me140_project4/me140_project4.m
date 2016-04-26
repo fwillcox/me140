@@ -60,7 +60,7 @@ mol_air = 4.76*lambda/2*mol_h2;
 mol_o2_react = mol_air/4.76;
 
 mol_n2 = mol_air*3.76/4.76;
-mol_o2_prod = 0.5*(lambda-mol_h2)*mol_o2_react;  
+mol_o2_prod = 0.5*(lambda-mol_h2).*mol_o2_react;  
 
 mol_h2o = mol_h2;
 
@@ -90,24 +90,27 @@ y_h2_react = mol_h2       /mol_h2;
 % because membrane separates h2 from air, partial pressures are
 % separate
 
-for i = 1:length(Psat)
-    if Pv_guess < Psat(i)
-        % All H2O is vapor (beta = 1)
-        mol_h2ovap(i) = beta;
-        mol_h2oliq(i) = 0;
-        Pv_h2o(i) = Pv_guess;
-    else % i = 1-10
-        % Some H2O is vapor, some liquid (beta not = 1)
-        % LET: Pv = Psat, solve for beta
-        Pv_h2o(i) = Psat(i);
-        mol_h2ovap(i) = (mol_o2_prod + mol_n2)*Pv_h2o(i)/(Ptotal-Pv_h2o(i)); % beta
-        mol_h2oliq(i) = mol_h2o - mol_h2ovap(i);
+% TODO check indicies!!
+for i = 1:length(Psat) %loop temperature
+    for j = 1:length(Pv_guess) % loop lambda
+        if Pv_guess(j) < Psat(i)
+            % All H2O is vapor (beta = 1)
+            mol_h2ovap(j,i) = beta;
+            mol_h2oliq(j,i) = 0;
+            Pv_h2o(j,i) = Pv_guess(j);
+        else % i = 1-10
+            % Some H2O is vapor, some liquid (beta not = 1)
+            % LET: Pv = Psat, solve for beta
+            Pv_h2o(i,j) = Psat(i,j);
+            mol_h2ovap(i,j) = (mol_o2_prod(j) + mol_n2(j))*Pv_h2o(i,j)/(Ptotal-Pv_h2o(i,j)); % beta
+            mol_h2oliq(i,j) = mol_h2o - mol_h2ovap(i,j);
+        end
     end
     iterations = iterations + 1;
 end
 iterations
 
-mol_total_prod  = mol_o2_prod + mol_n2 + mol_h2ovap;
+mol_total_prod  = mol_o2_prod + mol_n2 + mol_h2ovap;%% sizes do not agree
 y_h2ovap = mol_h2ovap./mol_total_prod;
 y_o2_prod = mol_o2_prod./mol_total_prod;
 y_n2_prod = mol_n2./mol_total_prod;
