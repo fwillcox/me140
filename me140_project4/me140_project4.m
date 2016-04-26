@@ -65,9 +65,9 @@ mol_o2_prod = 0.5*(lambda-mol_h2)*mol_o2_react;
 mol_h2o = mol_h2;
 
 % Check Mass Balance
-mass_react = mass_h2 + mol_air*MM_air*G_TO_KG;
-mass_prod = (mol_o2_prod*2*MM_o*G_TO_KG) + (mol_n2*2*MM_n*G_TO_KG  ... 
-+mol_h2o*MM_h2o*G_TO_KG);
+% mass_react = mass_h2 + mol_air*MM_air*G_TO_KG;
+% mass_prod = (mol_o2_prod*2*MM_o*G_TO_KG) + (mol_n2*2*MM_n*G_TO_KG  ... 
+% +mol_h2o*MM_h2o*G_TO_KG);
 
 % Account for Gas/Liquid Mixture
 % SOURCE: LEC 8 Slide 24, LEC 9, Slide 29
@@ -93,6 +93,11 @@ hreact = zeros(size(Psat));
 dh = zeros(size(Psat));
 eta_mix = zeros(size(Psat));
 
+mol_total_react = mol_o2_react + mol_n2;
+y_o2_react = mol_o2_react /mol_total_react;
+y_n2_react = mol_n2       /mol_total_react;
+y_h2_react = mol_h2       /mol_h2; 
+
 for i = 1:length(Psat)
     if Pv_guess < Psat(i)
         % All H2O is vapor (beta = 1)
@@ -107,45 +112,41 @@ for i = 1:length(Psat)
         mol_h2oliq(i) = mol_h2o - mol_h2ovap(i);
     end
 
-    mol_total_prod(i)  = mol_o2_prod + mol_n2 + mol_h2ovap(i);
-    y_h2ovap(i) = mol_h2ovap(i)/mol_total_prod(i);
-    y_o2_prod(i) = mol_o2_prod/mol_total_prod(i);
-    y_n2_prod(i) = mol_n2/mol_total_prod(i);
-
-    mol_total_react = mol_o2_react + mol_n2;
-    y_o2_react = mol_o2_react /mol_total_react;
-    y_n2_react = mol_n2       /mol_total_react;
-    y_h2_react = mol_h2       /mol_h2; 
     % because membrane separates h2 from air, partial pressures are
     % separate
-
-    greact(i) = gEng(T(i),Patm*y_h2_react,'h2',mol_h2) ...
-              + gEng(T(i),Patm*y_o2_react,'o2',mol_o2_react) ...
-              + gEng(T(i),Patm*y_n2_react,'n2',mol_n2);
-
-    gprod(i) = ...
-          gEng(T(i), Patm*y_h2ovap(i), 'h2ovap', mol_h2ovap(i))...
-        + gEng(T(i), Patm,          'h2o',       mol_h2oliq(i))...
-        + gEng(T(i), Patm*y_o2_prod(i),     'o2',     mol_o2_prod)...   
-        + gEng(T(i), Patm*y_n2_prod(i),     'n2',     mol_n2);
-
-    delG(i) = gprod(i) - greact(i);    
-    hprod(i) = ...
-          hEng(T(i),'h2ovap', mol_h2ovap(i))...
-        + hEng(T(i),'h2o',    mol_h2oliq(i))...
-        + hEng(T(i),'o2',     mol_o2_prod)...
-        + hEng(T(i),'n2',     mol_n2);
-    hreact(i) = ...
-          hEng(T(i),'h2',     mol_h2)... 
-        + hEng(T(i),'o2',     mol_o2_react)...
-        + hEng(T(i),'n2',     mol_n2);
-    dh(i) = hprod(i) - hreact(i);
-
-    eta_mix(i) = delG(i)/ dh(i);
+% 
+%     greact(i) = gEng(T(i),Patm*y_h2_react,'h2',mol_h2) ...
+%               + gEng(T(i),Patm*y_o2_react,'o2',mol_o2_react) ...
+%               + gEng(T(i),Patm*y_n2_react,'n2',mol_n2);
+% 
+%     gprod(i) = ...
+%           gEng(T(i), Patm*y_h2ovap(i), 'h2ovap', mol_h2ovap(i))...
+%         + gEng(T(i), Patm,          'h2o',       mol_h2oliq(i))...
+%         + gEng(T(i), Patm*y_o2_prod(i),     'o2',     mol_o2_prod)...   
+%         + gEng(T(i), Patm*y_n2_prod(i),     'n2',     mol_n2);
+% 
+%     delG(i) = gprod(i) - greact(i);    
+%     hprod(i) = ...
+%           hEng(T(i),'h2ovap', mol_h2ovap(i))...
+%         + hEng(T(i),'h2o',    mol_h2oliq(i))...
+%         + hEng(T(i),'o2',     mol_o2_prod)...
+%         + hEng(T(i),'n2',     mol_n2);
+%     hreact(i) = ...
+%           hEng(T(i),'h2',     mol_h2)... 
+%         + hEng(T(i),'o2',     mol_o2_react)...
+%         + hEng(T(i),'n2',     mol_n2);
+%     dh(i) = hprod(i) - hreact(i);
+% 
+%     eta_mix(i) = delG(i)/ dh(i);
 
     iterations = iterations + 1;
 end
 iterations
+
+mol_total_prod  = mol_o2_prod + mol_n2 + mol_h2ovap;
+y_h2ovap = mol_h2ovap./mol_total_prod;
+y_o2_prod = mol_o2_prod./mol_total_prod;
+y_n2_prod = mol_n2./mol_total_prod;
 
 % DOUBLE CHECK THIS
 mol_total = mol_o2_prod + mol_n2 + mol_h2ovap;
@@ -153,7 +154,9 @@ y_h2ovap = mol_h2ovap ./ mol_total;
 y_o2 = mol_o2_prod ./ mol_total;
 y_n2 = mol_n2 ./ mol_total;
 
-greact = gEng(T,Patm,'h2',mol_h2) + gEng(T,Patm .* y_o2,'o2',mol_o2_react) + gEng(T,Patm .* y_n2,'n2',mol_n2);
+greact = gEng(T,Patm,'h2',mol_h2) ...
+    + gEng(T,Patm .* y_o2,'o2',mol_o2_react) ...
+    + gEng(T,Patm .* y_n2,'n2',mol_n2);
 
 gprod = ...
       gEng(T, Patm.*y_h2ovap,   'h2ovap', mol_h2ovap)...
@@ -163,8 +166,8 @@ gprod = ...
 
 delG = gprod - greact;    
 hprod = ...
-      hEng(T,'h2ovap', mol_h2ovap(i))...
-    + hEng(T,'h2o',    mol_h2oliq(i))...
+      hEng(T,'h2ovap', mol_h2ovap)...
+    + hEng(T,'h2o',    mol_h2oliq)...
     + hEng(T,'o2',     mol_o2_prod)...
     + hEng(T,'n2',     mol_n2);
 hreact = ...
@@ -193,9 +196,9 @@ plotfixer();
 % figure(2)
 % plot(T,mol_h2ovap);
 
-figure(3)
-plot(T,dh,'b',T,hreact,'g');
-plotfixer();
+% figure(3)
+% plot(T,dh,'b',T,hreact,'g');
+% plotfixer();
 
 
 
