@@ -106,7 +106,7 @@ y_h2ovap = mol_h2o/mol_total;
 y_o2 = mol_o2_prod/mol_total;
 y_n2 = mol_n2/mol_total;
 
-greact(i) = gEng(T(i),Patm,'h2',mol_h2) + gEng(T(i),Patm,'o2',mol_o2_rxn) + gEng(T(i),Patm,'n2',mol_n2);
+greact(i) = gEng(T(i),Patm,'h2',mol_h2) + gEng(T(i),Patm*y_o2,'o2',mol_o2_rxn) + gEng(T(i),Patm*y_n2,'n2',mol_n2);
 
 gprod(i) = ...
       gEng(T(i), Patm*y_h2ovap, 'h2ovap', mol_h2ovap(i))...
