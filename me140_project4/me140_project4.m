@@ -27,7 +27,7 @@ MM_air = 28.85;
 % ----------- then, varying lambda & presssure
 % -----------------------------------------------------
 % ASSUME: isothermal, isobaric i.e. reversible
-% USE: First- Law Effiency, eta = (-m_reactants*dg_rxn)/(mfuel*HV) where HV = LHV or HHV
+% USE: First- Law Effiency, eta = (-m_reactants*dg_react)/(mfuel*HV) where HV = LHV or HHV
 % SOURCE: LEC 8, SLIDE 13
 npts = 100;
 HHV_h2 = 141.8*10^6;                    % J/kg,  Higher Heating Value   
@@ -106,7 +106,6 @@ for i = 1:length(Psat)
         mol_h2ovap(i) = (mol_o2_prod + mol_n2)*Pv_h2o(i)/(Ptotal-Pv_h2o(i)); % beta
         mol_h2oliq(i) = mol_h2o - mol_h2ovap(i);
     end
-<<<<<<< HEAD
 
     mol_total_prod(i)  = mol_o2_prod + mol_n2 + mol_h2ovap(i);
     y_h2ovap(i) = mol_h2ovap(i)/mol_total_prod(i);
@@ -145,9 +144,6 @@ for i = 1:length(Psat)
     eta_mix(i) = delG(i)/ dh(i);
 
     iterations = iterations + 1;
-=======
-iterations = iterations + 1;
->>>>>>> f2799178fde7e9ca7df6140507635a99153148f4
 end
 iterations
 
@@ -157,7 +153,7 @@ y_h2ovap = mol_h2ovap ./ mol_total;
 y_o2 = mol_o2_prod ./ mol_total;
 y_n2 = mol_n2 ./ mol_total;
 
-greact = gEng(T,Patm,'h2',mol_h2) + gEng(T,Patm .* y_o2,'o2',mol_o2_rxn) + gEng(T,Patm .* y_n2,'n2',mol_n2);
+greact = gEng(T,Patm,'h2',mol_h2) + gEng(T,Patm .* y_o2,'o2',mol_o2_react) + gEng(T,Patm .* y_n2,'n2',mol_n2);
 
 gprod = ...
       gEng(T, Patm.*y_h2ovap,   'h2ovap', mol_h2ovap)...
@@ -173,7 +169,7 @@ hprod = ...
     + hEng(T,'n2',     mol_n2);
 hreact = ...
       hEng(T,'h2',     mol_h2)... 
-    + hEng(T,'o2',     mol_o2_rxn)...
+    + hEng(T,'o2',     mol_o2_react)...
     + hEng(T,'n2',     mol_n2);
 dh = hprod - hreact;
 
@@ -227,7 +223,7 @@ plotfixer();
 % omega = Pv./(Ptotal-Pv)*(MM_h2o)/(MM_air); %formula from lecture does not seem to work.
 % diff = mol_h2o_sat - mol_h2o;
 % diff(diff<0) = 0;
-% omega2 = diff*(MM_h2o)/(mol_o2_rxn*MM_o*2 + mol_n2*MM_n*2);
+% omega2 = diff*(MM_h2o)/(mol_o2_react*MM_o*2 + mol_n2*MM_n*2);
 % %convert mol fraction to humidity
 % plot(T,diff,T,omega2);
 % legend('Moles of H2O to Add','Absolute Humidity')
