@@ -55,7 +55,7 @@ Patm = 101.3*KPA_TO_PA;                 % Pa,     Preact = Pprod = Patm
 % assume 1 mol of h2 combusted --> 4.76/2 mol air
 % 139 g total
 mol_h2 = 1;
-mass_h2 = mol_h2*(MM_h*2)/G_TO_KG;
+mass_h2 = mol_h2*(MM_h*2)*G_TO_KG;
 mol_air = 4.76*lambda/2;
 mol_o2_rxn = mol_air/4.76;
 
@@ -67,13 +67,12 @@ mass_h2o = mol_h2o*MM_h2o;
 
 % Check Mass Balance
 MM_air = 28.85;
-mass_react = mass_h2 + mol_air*MM_air*G_TO_KG
+mass_react = mass_h2 + mol_air*MM_air*G_TO_KG;
 mass_prod = (mol_o2_prod*2*MM_o*G_TO_KG) + (mol_n2*2*MM_n*G_TO_KG  ... 
 +mol_h2o*MM_h2o*G_TO_KG);
 
 % Calculate Change in Gibbs Free Energy 
-gprod_LHV = gEng(T,Patm,'h2ovap',mol_h2o) + gEng(T,Patm,'o2',mol_o2_prod) + gEng(T,Patm,'n2',mol_n2); % J, Gibbs Free Energy 
-gprod_HHV = gEng(T,Patm,'h2o',mol_h2o) + gEng(T,Patm,'o2',mol_o2_prod) + gEng(T,Patm,'n2',mol_n2);    
+gprod = gEng(T,Patm,'h2ovap',mol_h2o) + gEng(T,Patm,'h2o',mol_h2o)+ gEng(T,Patm,'o2',mol_o2_prod) + gEng(T,Patm,'n2',mol_n2); % J, Gibbs Free Energy 
 greact = gEng(T,Patm,'h2',mol_h2) + gEng(T,Patm,'o2',mol_o2_rxn) + gEng(T,Patm,'n2',mol_n2);
 
 % Account for Gas/Liquid Mixture
@@ -110,13 +109,13 @@ y_h2ovap = mol_h2o/mol_total;
 y_o2 = mol_o2_prod/mol_total;
 y_n2 = mol_n2/mol_total;
 
-gprod_LHV_mix(i) = ...
+gprod_mix(i) = ...
       gEng(T(i), Patm*y_h2ovap, 'h2ovap', mol_h2ovap(i))...
     + gEng(T(i), Patm,          'h2o',    mol_h2oliq(i))...
     + gEng(T(i), Patm*y_o2,     'o2',     mol_o2_prod)...   
     + gEng(T(i), Patm*y_n2,     'n2',     mol_n2);
 
-delG_mix(i) = gprod_LHV_mix(i) - greact(i);    
+delG_mix(i) = gprod_mix(i) - greact(i);    
 hprod(i) = ...
       hEng(T(i),'h2ovap', mol_h2ovap(i))...
     + hEng(T(i),'h2o',    mol_h2oliq(i))...
@@ -132,10 +131,9 @@ iterations = iterations + 1;
 end
 iterations
 
-delG_HHV = mass_prod*(gprod_HHV - greact);
-delG_LHV = mass_prod*(gprod_LHV - greact);
-eta_HHV = -delG_HHV / (HHV_h2 * mass_h2 * KJ_TO_J);
-eta_LHV = -delG_LHV / (LHV_h2 * mass_h2 * KJ_TO_J);
+delG = mass_react*(gprod - greact);
+eta_HHV = -delG / (HHV_h2 * mass_h2);
+eta_LHV = -delG / (LHV_h2 * mass_h2);
 
 figure(1);
 plot(T,eta_HHV,'b--', T,eta_LHV);
