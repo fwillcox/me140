@@ -52,101 +52,25 @@ Patm = 101.3*KPA_TO_PA;                 % Pa,     Preact = Pprod = Patm
 % Patm = linspace(101.3*KPA_TO_PA,4053*KPA_TO_PA,npts); % Pa, (Comment back in for Part 2)
 % ------------------------------------------
 
-% assume 1 mol of h2 combusted --> 4.76/2 mol air
-% 139 g total
-mol_h2 = 1;
-mass_h2 = mol_h2*(MM_h*2)*G_TO_KG;
-mol_air = 4.76*lambda/2*mol_h2;
-mol_o2_react = mol_air/4.76;
 
-mol_n2 = mol_air*3.76/4.76;
-mol_o2_prod = 0.5*(lambda-mol_h2).*mol_o2_react;  
-
-mol_h2o = mol_h2;
-
-% Check Mass Balance
-% mass_react = mass_h2 + mol_air*MM_air*G_TO_KG;
-% mass_prod = (mol_o2_prod*2*MM_o*G_TO_KG) + (mol_n2*2*MM_n*G_TO_KG  ... 
-% +mol_h2o*MM_h2o*G_TO_KG);
-
-% Account for Gas/Liquid Mixture
-% SOURCE: LEC 8 Slide 24, LEC 9, Slide 29
-% APPROACH: (1) Assume beta=1, let Pv=Psat (2) Solve for Ptotal
-% -------- If Pv < Psat, all vapor. If Pv > Psat, must be some liquid.
-beta = mol_h2;               % ASSUME: all vapor
-Ptotal = Patm;
-Psat = PsatW(T);
-Pv_guess = Ptotal*(beta./(beta + 0.5.*(lambda-1) +0.5.*lambda.*N_TO_O ));
 iterations =0;
-
-Pv_h2o = zeros(size(Psat));
-mol_h2oliq = zeros(size(Psat));
-mol_h2ovap = zeros(size(Psat));
-
-mol_total_react = mol_o2_react + mol_n2;
-y_o2_react = mol_o2_react /mol_total_react;
-y_n2_react = mol_n2       /mol_total_react;
-y_h2_react = mol_h2       /mol_h2; 
-% because membrane separates h2 from air, partial pressures are
-% separate
-
-% TODO check indicies!!
-for i = 1:length(Psat) %loop temperature
-    for j = 1:length(Pv_guess) % loop lambda
-        if Pv_guess(j) < Psat(i)
-            % All H2O is vapor (beta = 1)
-            mol_h2ovap(j,i) = beta;
-            mol_h2oliq(j,i) = 0;
-            Pv_h2o(j,i) = Pv_guess(j);
-        else % i = 1-10
-            % Some H2O is vapor, some liquid (beta not = 1)
-            % LET: Pv = Psat, solve for beta
-            Pv_h2o(i,j) = Psat(i,j);
-            mol_h2ovap(i,j) = (mol_o2_prod(j) + mol_n2(j))*Pv_h2o(i,j)/(Ptotal-Pv_h2o(i,j)); % beta
-            mol_h2oliq(i,j) = mol_h2o - mol_h2ovap(i,j);
-        end
-    end
+eta = zeros(size(T));
+pctVap = zeros(size(T));
+delG = zeros(size(T));
+for i = 1:length(T) %loop temperature (cols)
+    [eta(i), pctVap(i),delG(i)] = PEMstoich(lambda,T(i),Patm);
     iterations = iterations + 1;
 end
 iterations
-
-mol_total_prod  = mol_o2_prod + mol_n2 + mol_h2ovap;%% sizes do not agree
-y_h2ovap = mol_h2ovap./mol_total_prod;
-y_o2_prod = mol_o2_prod./mol_total_prod;
-y_n2_prod = mol_n2./mol_total_prod;
-
-greact = gEng(T,Patm,'h2',mol_h2) ...
-    + gEng(T,Patm .* y_o2_react,'o2',mol_o2_react) ...
-    + gEng(T,Patm .* y_n2_react,'n2',mol_n2);
-
-gprod = ...
-      gEng(T, Patm.*y_h2ovap,   'h2ovap', mol_h2ovap)...
-    + gEng(T, Patm,             'h2o',    mol_h2oliq)...
-    + gEng(T, Patm.*y_o2_prod,       'o2',     mol_o2_prod)...   
-    + gEng(T, Patm.*y_n2_prod,       'n2',     mol_n2);
-
-delG = gprod - greact;    
-hprod = ...
-      hEng(T,'h2ovap', mol_h2ovap)...
-    + hEng(T,'h2o',    mol_h2oliq)...
-    + hEng(T,'o2',     mol_o2_prod)...
-    + hEng(T,'n2',     mol_n2);
-hreact = ...
-      hEng(T,'h2',     mol_h2)... 
-    + hEng(T,'o2',     mol_o2_react)...
-    + hEng(T,'n2',     mol_n2);
-dh = hprod - hreact;
-
-eta_mix = delG ./ dh;
-
+%PEMstoich assumes per mol of h2, 1mol h2 burned
+mass_h2 = 1*(MM_h*2)*G_TO_KG;
 eta_HHV = -delG / (HHV_h2 * mass_h2);
 eta_LHV = -delG / (LHV_h2 * mass_h2);
 
 eta_carnot = carnotEff(T,T(1));      % ASSUME: Tcold = 25 degrees C
 
-
 figure(1);
-plot(T,eta_HHV,'b--', T,eta_LHV,'m--',T,eta_mix,'g-', T,eta_carnot,'c');
+plot(T,eta_HHV,'b--', T,eta_LHV,'m--',T,eta,'g-', T,eta_carnot,'c');
 legend('\eta_{HHV}','\eta_{LHV}','\eta_{Mixed Liquid and Gas}','\eta_{Carnot}', 'Location', 'Best');
 xlabel('Temperature [K]');
 ylabel('Maximum 1st Law Efficiency');
