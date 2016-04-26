@@ -102,7 +102,7 @@ function out = energyF(T,P,species,moles)
     
     out.S = (sf{i} + delS);           % Entropy1
     out.H = (hf{i} + delH);           % Enthalpy
-    out.G = (out.H - T.*out.S)*moles;       % Gibbs Free Energy
+    out.G = (out.H - T.*out.S)*moles; % Gibbs Free Energy
     %**double check this calculation
     % delH*moles -T.*out.S + gf{i}*moles seems to produce best results, why?
 end

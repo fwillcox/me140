@@ -97,22 +97,21 @@ for i = 1:length(Psat)
         Pv_h2o(i) = Psat(i);
         mol_h2ovap(i) = (mol_o2_prod + mol_n2)*Pv_h2o(i)/(Ptotal-Pv_h2o(i)); % beta
         mol_h2oliq(i) = mol_h2o - mol_h2ovap(i);
-        i
     end
 
 % DOUBLE CHECK THIS
-mol_total = mol_o2_prod + mol_n2 + mol_h2o;
-y_h2ovap = mol_h2o/mol_total;
-y_o2 = mol_o2_prod/mol_total;
-y_n2 = mol_n2/mol_total;
+mol_total(i) = mol_o2_prod + mol_n2 + mol_h2ovap(i);
+y_h2ovap(i) = mol_h2ovap(i)/mol_total(i);
+y_o2(i) = mol_o2_prod/mol_total(i);
+y_n2(i) = mol_n2/mol_total(i);
 
-greact(i) = gEng(T(i),Patm,'h2',mol_h2) + gEng(T(i),Patm*y_o2,'o2',mol_o2_rxn) + gEng(T(i),Patm*y_n2,'n2',mol_n2);
+greact(i) = gEng(T(i),Patm,'h2',mol_h2) + gEng(T(i),Patm*y_o2(i),'o2',mol_o2_rxn) + gEng(T(i),Patm*y_n2(i),'n2',mol_n2);
 
 gprod(i) = ...
-      gEng(T(i), Patm*y_h2ovap, 'h2ovap', mol_h2ovap(i))...
-    + gEng(T(i), Patm,          'h2o',    mol_h2oliq(i))...
-    + gEng(T(i), Patm*y_o2,     'o2',     mol_o2_prod)...   
-    + gEng(T(i), Patm*y_n2,     'n2',     mol_n2);
+      gEng(T(i), Patm*y_h2ovap(i), 'h2ovap', mol_h2ovap(i))...
+    + gEng(T(i), Patm,          'h2o',       mol_h2oliq(i))...
+    + gEng(T(i), Patm*y_o2(i),     'o2',     mol_o2_prod)...   
+    + gEng(T(i), Patm*y_n2(i),     'n2',     mol_n2);
 
 delG(i) = gprod(i) - greact(i);    
 hprod(i) = ...
