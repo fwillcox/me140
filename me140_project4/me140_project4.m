@@ -133,36 +133,71 @@ ylabel('Maximum 1st Law Efficiency');
 plotfixer();
 
 
-% %% Part 3
-% % what humidity necesarry in inlet air to obtain saturated exit?
-% % below certain temp, condensate forms, so add no water.
-% % plot inlet air humidity vs T 25-100C
-% 
-% % questions:
-% % must we take into account the diffusion thru membrane?
-% lambda = 2; %as before
-% Ptotal = Patm;
-% % find psat at exit based on temp, 
-% T = linspace(25,100,npts);
-% psat = PsatW(T+273);
-% % find mole fraction of water
-% y_h2o = psat./Ptotal;
-% y_h2o_prod = mol_h2o/(mol_o2_prod + mol_h2o + mol_n2);
-% mol_out = (mol_o2_prod + mol_h2o + mol_n2);
-% mol_h2o_sat = mol_out*y_h2o;
+%% Part 3
+% what humidity necesarry in inlet air to obtain saturated exit?
+% below certain temp, condensate forms, so add no water.
+% plot inlet air humidity vs T 25-100C
+
+% questions:
+% must we take into account the diffusion thru membrane? -> don't need to
+% worry about gas diffusion through MEA membrane
+lambda = 2; %as before
+Ptotal = Patm;
+% find psat at exit based on temp, 
+T = linspace(25,100,npts);
+psat = PsatW(T+273);
+
+% find mole fraction of water in products
+y_h2o = psat./Ptotal;
+mol_out = (mol_o2_prod + mol_h2o + mol_n2);
+mol_h2o_sat = mol_out*y_h2o;
+
+y_h2o_prod = mol_h2o/(mol_o2_prod + mol_h2o + mol_n2);
+
+
+% if less than what is formed, add the difference to dry air reagent
+% omega = Pv./(Ptotal-Pv)*(MM_h2o)/(MM_air); % DELETE? - formula from lecture does not seem to work.
+alpha = mol_h2o_sat - mol_h2o;
+alpha(alpha<0) = 0;
+y_h2o_react = alpha./(mol_o2_rxn + mol_n2 + alpha);  
+Pv_react = Ptotal*y_h2o_react;
+Pv_react(Pv_react>psat) = psat(Pv_react>psat); % if Pv > psat, Pv = psat 
+hum_rel = Pv_react./psat;
+hum_rel(Pv_react>psat) = 0; 
+
+% omega2 = alpha*(MM_h2o)/(mol_o2_rxn*MM_o*2 + mol_n2*MM_n*2); - DELETE
+%convert mol fraction to humidity
+% plot(T,alpha,T,omega2,T,hum_rel);
+% legend('Moles of H2O to Add','Relative Humidity, outlet?')
+plot(T,hum_rel)
+legend('Relative Humidity of Input Air');
+xlabel('Temperature - K');
+ylabel('Relative Humidity %');
+plotfixer();
+
+% calculate # mols of water in products at saturation (from mole fraction =
+% psat/p)--> mol_h2o_sat
+% then do atom balance - add water on reactant side - how many mols of
+% reactant water would u need to get result 
+% Pv/psat of products should be 1, then can use beta = alpha + 1 to relate
+% prods and reactants and find Pv of reactants w/ alpha, then just find
+% Pv/psat
+% relative humidity is just Pv/psat
+
+
+
+% DELETE
+% % find partial pressure of products
 % Pv = y_h2o_prod*Ptotal;
-% Pv(psat>Pv) = psat(psat>Pv);
-% 
-% % if less than what is formed, add the difference to dry air reagent
-% omega = Pv./(Ptotal-Pv)*(MM_h2o)/(MM_air); %formula from lecture does not seem to work.
-% diff = mol_h2o_sat - mol_h2o;
-% diff(diff<0) = 0;
-% omega2 = diff*(MM_h2o)/(mol_o2_rxn*MM_o*2 + mol_n2*MM_n*2);
-% %convert mol fraction to humidity
-% plot(T,diff,T,omega2);
-% legend('Moles of H2O to Add','Absolute Humidity')
+% Pv(Pv>psat) = psat(Pv>psat); % if Pv > psat, Pv = psat 
 
+%hum_rel = Pv./psat; % DELETE
+%hum_rel(Pv>psat) = 0; % DELETE
 
+% DELETE
+% figure();
+% plot(T,Pv./psat);
+% title('Pv/psat');
     
 
 
