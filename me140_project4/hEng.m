@@ -2,7 +2,10 @@
 % 4-22-16 created by Jon Renslo
 function H = hEng(T,spec,mol)
     
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
     if(nargin == 2)
         mol = 1;
     end
