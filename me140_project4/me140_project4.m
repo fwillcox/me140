@@ -114,18 +114,18 @@ return
 % plotfixer();
 
 %% Part 3
-% what humidity necesarry in inlet air to obtain saturated exit?
+% what humidity necesary for inlet air to obtain saturated exit?
 % below certain temp, condensate forms, so add no water.
 % plot inlet air humidity vs T 25-100C
 
 % questions:
 % must we take into account the diffusion thru membrane? -> don't need to
 % worry about gas diffusion through MEA membrane
-lambda = 2; %as before
+lambda = 2; % as before
 Ptotal = Patm;
 % find psat at exit based on temp, 
 T = linspace(25,100,npts);
-psat = PsatW(T+273);
+psat = PsatW(T + C_TO_K);
 
 % find mole fraction of water in products
 y_h2o = psat./Ptotal;
