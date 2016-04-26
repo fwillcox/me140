@@ -103,6 +103,8 @@ y_h2ovap = mol_h2o/mol_total;
 y_o2 = mol_o2_prod/mol_total;
 y_n2 = mol_n2/mol_total;
 
+greact(i) = gEng(T(i),Patm,'h2',mol_h2) + gEng(T(i),Patm,'o2',mol_o2_rxn) + gEng(T(i),Patm,'n2',mol_n2);
+
 gprod(i) = ...
       gEng(T(i), Patm*y_h2ovap, 'h2ovap', mol_h2ovap(i))...
     + gEng(T(i), Patm,          'h2o',    mol_h2oliq(i))...
@@ -120,15 +122,12 @@ hreact(i) = ...
     + hEng(T(i),'o2',     mol_o2_rxn)...
     + hEng(T(i),'n2',     mol_n2);
 dh(i) = hprod(i) - hreact(i);
-eta_mix(i) = -delG(i)/ dh(i);
+
+eta_mix(i) = -mass_react*delG(i)/ dh(i);
+
 iterations = iterations + 1;
 end
 iterations
-
-% Calculate Change in Gibbs Free Energy 
-% gprod = gEng(T,Patm*y_h2ovap,'h2ovap',mol_h2o) + gEng(T,Patm,'h2o',mol_h2o)+ gEng(T,Patm,'o2',mol_o2_prod) + gEng(T,Patm,'n2',mol_n2); % J, Gibbs Free Energy 
-% greact = gEng(T,Patm,'h2',mol_h2) + gEng(T,Patm,'o2',mol_o2_rxn) + gEng(T,Patm,'n2',mol_n2);
-% delG = mass_react*(gprod - greact);
 
 eta_HHV = -mass_react*delG / (HHV_h2 * mass_h2);
 eta_LHV = -mass_react*delG / (LHV_h2 * mass_h2);
