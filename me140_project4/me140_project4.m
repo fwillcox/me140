@@ -126,7 +126,7 @@ hreact(i) = ...
     + hEng(T(i),'n2',     mol_n2);
 dh(i) = hprod(i) - hreact(i);
 
-eta_mix(i) = 2*delG(i)/ dh(i);
+eta_mix(i) = delG(i)/ dh(i);
 
 iterations = iterations + 1;
 end
@@ -143,6 +143,9 @@ legend('\eta_{HHV}','\eta_{LHV}','\eta_{Mixed Liquid and Gas}','\eta_{Carnot}', 
 xlabel('Temperature [K]');
 ylabel('Maximum 1st Law Efficiency');
 plotfixer();
+
+figure(2)
+plot(T,mol_h2ovap);
 
 
 % %% Part 3
