@@ -91,12 +91,14 @@ for i = 1:length(Psat)
         mol_h2ovap(i) = beta;
         mol_h2oliq(i) = 0;
         Pv_h2o(i) = Pv_guess;
+        
     else
         % Some H2O is vapor, some liquid (beta not = 1)
         % LET: Pv = Psat, solve for beta
         Pv_h2o(i) = Psat(i);
         mol_h2ovap(i) = (mol_o2_prod + mol_n2)*Pv_h2o(i)/(Ptotal-Pv_h2o(i)); % beta
         mol_h2oliq(i) = mol_h2o - mol_h2ovap(i);
+        i
     end
 
 % DOUBLE CHECK THIS
