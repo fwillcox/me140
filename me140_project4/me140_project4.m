@@ -199,37 +199,7 @@ plotfixer();
 
 
 
-<<<<<<< HEAD
-% %% Part 3
-% % SOURCE: LEC 10
-% % what humidity necesarry in inlet air to obtain saturated exit?
-% % below certain temp, condensate forms, so add no water.
-% % plot inlet air humidity vs T 25-100C
-% 
-% % questions:
-% % must we take into account the diffusion thru membrane?
-% lambda = 2; %as before
-% Ptotal = Patm;
-% % find psat at exit based on temp, 
-% T = linspace(25,100,npts);
-% psat = PsatW(T+273);
-% % find mole fraction of water
-% y_h2o = psat./Ptotal;
-% y_h2o_prod = mol_h2o/(mol_o2_prod + mol_h2o + mol_n2);
-% mol_out = (mol_o2_prod + mol_h2o + mol_n2);
-% mol_h2o_sat = mol_out*y_h2o;
-% Pv = y_h2o_prod*Ptotal;
-% Pv(psat>Pv) = psat(psat>Pv);
-% 
-% % if less than what is formed, add the difference to dry air reagent
-% omega = Pv./(Ptotal-Pv)*(MM_h2o)/(MM_air); %formula from lecture does not seem to work.
-% diff = mol_h2o_sat - mol_h2o;
-% diff(diff<0) = 0;
-% omega2 = diff*(MM_h2o)/(mol_o2_react*MM_o*2 + mol_n2*MM_n*2);
-% %convert mol fraction to humidity
-% plot(T,diff,T,omega2);
-% legend('Moles of H2O to Add','Absolute Humidity')
-=======
+
 %% Part 3
 % what humidity necesarry in inlet air to obtain saturated exit?
 % below certain temp, condensate forms, so add no water.
@@ -287,7 +257,6 @@ plotfixer();
 % % find partial pressure of products
 % Pv = y_h2o_prod*Ptotal;
 % Pv(Pv>psat) = psat(Pv>psat); % if Pv > psat, Pv = psat 
->>>>>>> natasha
 
 %hum_rel = Pv./psat; % DELETE
 %hum_rel(Pv>psat) = 0; % DELETE
