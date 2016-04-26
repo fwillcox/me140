@@ -56,17 +56,15 @@ Patm = 101.3*KPA_TO_PA;                 % Pa,     Preact = Pprod = Patm
 % 139 g total
 mol_h2 = 1;
 mass_h2 = mol_h2*(MM_h*2)*G_TO_KG;
-mol_air = 4.76*lambda/2;
-mol_o2_rxn = mol_air/4.76;
+mol_air = 4.76*lambda/2*mol_h2;
+mol_o2_react = mol_air/4.76;
 
 mol_n2 = mol_air*3.76/4.76;
-mol_o2_prod = 0.5*(lambda-mol_h2)*mol_o2_rxn;  
+mol_o2_prod = 0.5*(lambda-mol_h2)*mol_o2_react;  
 
 mol_h2o = mol_h2;
-mass_h2o = mol_h2o*MM_h2o;
 
 % Check Mass Balance
-MM_air = 28.85;
 mass_react = mass_h2 + mol_air*MM_air*G_TO_KG;
 mass_prod = (mol_o2_prod*2*MM_o*G_TO_KG) + (mol_n2*2*MM_n*G_TO_KG  ... 
 +mol_h2o*MM_h2o*G_TO_KG);
@@ -75,16 +73,26 @@ mass_prod = (mol_o2_prod*2*MM_o*G_TO_KG) + (mol_n2*2*MM_n*G_TO_KG  ...
 % SOURCE: LEC 8 Slide 24, LEC 9, Slide 29
 % APPROACH: (1) Assume beta=1, let Pv=Psat (2) Solve for Ptotal
 % -------- If Pv < Psat, all vapor. If Pv > Psat, must be some liquid.
-beta = 1;               % ASSUME: all vapor
+beta = mol_h2;               % ASSUME: all vapor
 Ptotal = Patm;
 Psat = PsatW(T);
-gamma = mol_h2o - beta;
 Pv_guess = Ptotal*(beta./(beta + 0.5.*(lambda-1) +0.5.*lambda.*N_TO_O ));
-Pv_h2o = Psat;
-eta_carnot = carnotEff(T,T(1));      % ASSUME: Tcold = 25 degrees C
-
+Pv_h2o = zeros(size(Psat));
+mol_h2oliq = zeros(size(Psat));
 iterations =0;
-mol_h2ovap=zeros(size(Psat));
+mol_h2ovap = zeros(size(Psat));
+mol_total_prod = zeros(size(Psat));
+y_h2ovap = zeros(size(Psat));
+y_o2_prod = zeros(size(Psat));
+y_n2_prod = zeros(size(Psat));
+greact = zeros(size(Psat));
+gprod = zeros(size(Psat));
+delG = zeros(size(Psat));
+hprod = zeros(size(Psat));
+hreact = zeros(size(Psat));
+dh = zeros(size(Psat));
+eta_mix = zeros(size(Psat));
+
 for i = 1:length(Psat)
     if Pv_guess < Psat(i)
         % All H2O is vapor (beta = 1)
@@ -99,41 +107,49 @@ for i = 1:length(Psat)
         mol_h2oliq(i) = mol_h2o - mol_h2ovap(i);
     end
 
-% DOUBLE CHECK THIS
-mol_total(i) = mol_o2_prod + mol_n2 + mol_h2ovap(i);
-y_h2ovap(i) = mol_h2ovap(i)/mol_total(i);
-y_o2(i) = mol_o2_prod/mol_total(i);
-y_n2(i) = mol_n2/mol_total(i);
+    mol_total_prod(i)  = mol_o2_prod + mol_n2 + mol_h2ovap(i);
+    y_h2ovap(i) = mol_h2ovap(i)/mol_total_prod(i);
+    y_o2_prod(i) = mol_o2_prod/mol_total_prod(i);
+    y_n2_prod(i) = mol_n2/mol_total_prod(i);
 
-greact(i) = gEng(T(i),Patm,'h2',mol_h2) + gEng(T(i),Patm*y_o2(i),'o2',mol_o2_rxn) + gEng(T(i),Patm*y_n2(i),'n2',mol_n2);
+    mol_total_react = mol_o2_react + mol_n2 + mol_h2;
+    y_o2_react = mol_o2_react /mol_total_react;
+    y_n2_react = mol_n2       /mol_total_react;
+    y_h2_react = mol_h2       /mol_total_react;
 
-gprod(i) = ...
-      gEng(T(i), Patm*y_h2ovap(i), 'h2ovap', mol_h2ovap(i))...
-    + gEng(T(i), Patm,          'h2o',       mol_h2oliq(i))...
-    + gEng(T(i), Patm*y_o2(i),     'o2',     mol_o2_prod)...   
-    + gEng(T(i), Patm*y_n2(i),     'n2',     mol_n2);
+    greact(i) = gEng(T(i),Patm*y_h2_react,'h2',mol_h2) ...
+              + gEng(T(i),Patm*y_o2_react,'o2',mol_o2_react) ...
+              + gEng(T(i),Patm*y_n2_react,'n2',mol_n2);
 
-delG(i) = gprod(i) - greact(i);    
-hprod(i) = ...
-      hEng(T(i),'h2ovap', mol_h2ovap(i))...
-    + hEng(T(i),'h2o',    mol_h2oliq(i))...
-    + hEng(T(i),'o2',     mol_o2_prod)...
-    + hEng(T(i),'n2',     mol_n2);
-hreact(i) = ...
-      hEng(T(i),'h2',     mol_h2)... 
-    + hEng(T(i),'o2',     mol_o2_rxn)...
-    + hEng(T(i),'n2',     mol_n2);
-dh(i) = hprod(i) - hreact(i);
+    gprod(i) = ...
+          gEng(T(i), Patm*y_h2ovap(i), 'h2ovap', mol_h2ovap(i))...
+        + gEng(T(i), Patm,          'h2o',       mol_h2oliq(i))...
+        + gEng(T(i), Patm*y_o2_prod(i),     'o2',     mol_o2_prod)...   
+        + gEng(T(i), Patm*y_n2_prod(i),     'n2',     mol_n2);
 
-eta_mix(i) = delG(i)/ dh(i);
+    delG(i) = gprod(i) - greact(i);    
+    hprod(i) = ...
+          hEng(T(i),'h2ovap', mol_h2ovap(i))...
+        + hEng(T(i),'h2o',    mol_h2oliq(i))...
+        + hEng(T(i),'o2',     mol_o2_prod)...
+        + hEng(T(i),'n2',     mol_n2);
+    hreact(i) = ...
+          hEng(T(i),'h2',     mol_h2)... 
+        + hEng(T(i),'o2',     mol_o2_react)...
+        + hEng(T(i),'n2',     mol_n2);
+    dh(i) = hprod(i) - hreact(i);
 
-iterations = iterations + 1;
+    eta_mix(i) = delG(i)/ dh(i);
+
+    iterations = iterations + 1;
 end
 iterations
 
 
 eta_HHV = -delG / (HHV_h2 * mass_h2);
 eta_LHV = -delG / (LHV_h2 * mass_h2);
+
+eta_carnot = carnotEff(T,T(1));      % ASSUME: Tcold = 25 degrees C
 
 
 figure(1);
@@ -143,8 +159,12 @@ xlabel('Temperature [K]');
 ylabel('Maximum 1st Law Efficiency');
 plotfixer();
 
-figure(2)
-plot(T,mol_h2ovap);
+% figure(2)
+% plot(T,mol_h2ovap);
+
+figure(3)
+plot(T,dh,'b',T,hreact,'g');
+plotfixer();
 
 
 % %% Part 3

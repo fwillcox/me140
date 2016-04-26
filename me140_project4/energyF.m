@@ -42,8 +42,8 @@ function out = energyF(T,P,species,moles)
     sf{h2o} = 69.92; % for liquid water
     sf{n2} = 191.61;
     sf{o2} = 205.04;
-    sf{air} = sf{n2}*3.76/4.76 + sf{o2}/4.76; %** cannot do
-    sf{airConst} = sf{n2}*3.76/4.76 + sf{o2}/4.76; %** not in table
+    %sf{air} = sf{n2}*3.76/4.76 + sf{o2}/4.76; %** cannot do
+    %sf{airConst} = sf{n2}*3.76/4.76 + sf{o2}/4.76; %** not in table
     sf{h2} = 130.68;
     
 
@@ -96,13 +96,12 @@ function out = energyF(T,P,species,moles)
     out.cp = out.cpbar/m{i}*gPerKg;          % J/g-k,   Specific Heat
     
     % integrate cp from t0 to t in j/mol kelvin
-    delH = (a*(T - T0) + b/2*(T.^2 - T0.^2) + c/3*(T.^3 - T0.^3) + d/4*(T.^4 - T0.^4)); 
-    intCpbarOnT = a*log(T./T0) + b*(T - T0) + c/2*(T.^2 - T0.^2) + d/3*(T.^3 - T0.^3);
+    delH = (a*(T - T0) + b*(T.^2 - T0.^2)/2 + c*(T.^3 - T0.^3)/3 + d*(T.^4 - T0.^4)/4); 
+    intCpbarOnT = a*log(T./T0) + b*(T - T0) + c*(T.^2 - T0.^2)/2 + d*(T.^3 - T0.^3)/3;
     delS = intCpbarOnT - R *log(P/P0); 
     
-    out.S = (sf{i} + delS);           % Entropy1
-    out.H = (hf{i} + delH);           % Enthalpy
-    out.G = (out.H - T.*out.S)*moles; % Gibbs Free Energy
+    out.S = (sf{i} + delS)*moles;           % Entropy
+    out.H = (hf{i} + delH)*moles;           % Enthalpy 
+    out.G = out.H - T.*out.S; % Gibbs Free Energy
     %**double check this calculation
-    % delH*moles -T.*out.S + gf{i}*moles seems to produce best results, why?
 end
