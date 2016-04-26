@@ -77,8 +77,14 @@ for Ti = 1:length(T)
             = PEMstoich(lambda(li),T(Ti),Patm);
     end
 end
+mass_h2 = 1* (MM_h*2)*G_TO_KG;
+delH_LHV = LHV_h2 * mass_h2;
+etaLambda_LHV = -delGLambda/delH_LHV;
 figure(2);
-plot(lambda,etaLambda);
+plot(lambda,etaLambda_LHV);
+legend('80C','220C','650C','800C','Location','Best');
+xlabel('Excess air coefficient \lambda');
+ylabel('Efficiency on LHV basis \eta');
 
 %%part2.1 plot%%
 
@@ -95,8 +101,12 @@ for Ti = 1:length(T)
     end
 end
 
+etaPres_LHV = -delGPres/delH_LHV;
 figure(3);
-plot(Patm,etaPres);
+plot(Patm/101300,etaPres_LHV);
+legend('80C','220C','650C','800C','Location','Best');
+xlabel('Pressure Bar');
+ylabel('Efficiency on LHV basis \eta');
 return
 
 % figure(2)
