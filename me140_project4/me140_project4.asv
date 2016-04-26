@@ -52,18 +52,19 @@ Patm = 101.3*KPA_TO_PA;         % Pa, Pressure at each electrode, Preact = Pprod
 % Patm = linspace(101.3*KPA_TO_PA, 4053*KPA_TO_PA, npts); % Pa, (Comment back in for Part 2)
 % ------------------------------------------
 
-% Assume 1 mole of H2 combusted --> 4.76 / 2 moles of air
-% Total: 139 grams
+% assume 1 mol of h2 combusted --> 4.76/2 mol air
+% 139 g total
 mol_h2 = 1;
 mass_h2 = mol_h2 * (2 * MM_h)/G_TO_KG;  % 1 mol H2-> 2H -> 1 g/mol H -> to kg
 mol_air = (4.76 / 2) * lambda;
 mol_o2_rxn = mol_air * (1 / 4.76);      % Getting moles of O2 using stoichiometric coeff
 mol_n2 = mol_air * (3.76 / 4.76);       % Getting moles of N2 using stoichiometric coeff
 mol_h2o = mol_h2;
-mol_o2_prod = 0.5*(lambda - mol_h2)*mol_o2_rxn;
+mol_o2_prod = 0.5*(lambda-mol_h2)*mol_o2_rxn;
 
 % Check Mass Balance
-mass_react = mass_h2 + mol_air*MM_air*G_TO_KG;
+MM_air = 28.85;
+mass_react = mass_h2 + mol_air*MM_air*G_TO_KG
 mass_prod = (mol_o2_prod*2*MM_o*G_TO_KG) + (mol_n2*2*MM_n*G_TO_KG  ... 
 +mol_h2o*MM_h2o*G_TO_KG);
 
