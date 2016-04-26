@@ -64,6 +64,7 @@ mol_o2_prod = 0.5*(lambda - mol_h2)*mol_o2_rxn;
 
 % Check Mass Balance
 
+
 mass_react = mass_h2 + mol_air*MM_air*G_TO_KG;
 mass_prod = (mol_o2_prod*2*MM_o*G_TO_KG) + (mol_n2*2*MM_n*G_TO_KG  ... 
 +mol_h2o*MM_h2o*G_TO_KG);
