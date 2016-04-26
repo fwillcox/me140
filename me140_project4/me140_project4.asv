@@ -52,22 +52,26 @@ Patm = 101.3*KPA_TO_PA;         % Pa, Pressure at each electrode, Preact = Pprod
 % Patm = linspace(101.3*KPA_TO_PA, 4053*KPA_TO_PA, npts); % Pa, (Comment back in for Part 2)
 % ------------------------------------------
 
-% Assume 1 mole of H2 combusted --> 4.76 / 2 moles of air
-% Total: 139 grams
+% assume 1 mol of h2 combusted --> 4.76/2 mol air
+% 139 g total
 mol_h2 = 1;
 mass_h2 = mol_h2 * (2 * MM_h)/G_TO_KG;  % 1 mol H2-> 2H -> 1 g/mol H -> to kg
 mol_air = (4.76 / 2) * lambda;
 mol_o2_rxn = mol_air * (1 / 4.76);      % Getting moles of O2 using stoichiometric coeff
 mol_n2 = mol_air * (3.76 / 4.76);       % Getting moles of N2 using stoichiometric coeff
 mol_h2o = mol_h2;
-mol_o2_prod = 0.5*(lambda - mol_h2)*mol_o2_rxn;
+mol_o2_prod = 0.5*(lambda-mol_h2)*mol_o2_rxn;
 
 % Check Mass Balance
-
-
-mass_react = mass_h2 + mol_air*MM_air*G_TO_KG;
+MM_air = 28.85;
+mass_react = mass_h2 + mol_air*MM_air*G_TO_KG
 mass_prod = (mol_o2_prod*2*MM_o*G_TO_KG) + (mol_n2*2*MM_n*G_TO_KG  ... 
 +mol_h2o*MM_h2o*G_TO_KG);
+
+% Calculate Change in Gibbs Free Energy 
+gprod_LHV = gEng(T,Patm,'h2ovap',mol_h2o) + gEng(T,Patm,'o2',mol_o2_prod) + gEng(T,Patm,'n2',mol_n2); % J, Gibbs Free Energy 
+gprod_HHV = gEng(T,Patm,'h2o',mol_h2o) + gEng(T,Patm,'o2',mol_o2_prod) + gEng(T,Patm,'n2',mol_n2);    
+greact = gEng(T,Patm,'h2',mol_h2) + gEng(T,Patm,'o2',mol_o2_rxn) + gEng(T,Patm,'n2',mol_n2);
 
 % Account for Gas/Liquid Mixture
 % SOURCE: LEC 8 Slide 24, LEC 9, Slide 29
@@ -103,15 +107,13 @@ y_h2ovap = mol_h2o/mol_total;
 y_o2 = mol_o2_prod/mol_total;
 y_n2 = mol_n2/mol_total;
 
-greact(i) = gEng(T(i),Patm,'h2',mol_h2) + gEng(T(i),Patm,'o2',mol_o2_rxn) + gEng(T(i),Patm,'n2',mol_n2);
-
-gprod(i) = ...
+gprod_LHV_mix(i) = ...
       gEng(T(i), Patm*y_h2ovap, 'h2ovap', mol_h2ovap(i))...
     + gEng(T(i), Patm,          'h2o',    mol_h2oliq(i))...
     + gEng(T(i), Patm*y_o2,     'o2',     mol_o2_prod)...   
     + gEng(T(i), Patm*y_n2,     'n2',     mol_n2);
 
-delG(i) = gprod(i) - greact(i);    
+delG_mix(i) = gprod_LHV_mix(i) - greact(i);    
 hprod(i) = ...
       hEng(T(i),'h2ovap', mol_h2ovap(i))...
     + hEng(T(i),'h2o',    mol_h2oliq(i))...
@@ -122,18 +124,19 @@ hreact(i) = ...
     + hEng(T(i),'o2',     mol_o2_rxn)...
     + hEng(T(i),'n2',     mol_n2);
 dh(i) = hprod(i) - hreact(i);
-
-eta_mix(i) = -mass_react*delG(i)/ dh(i);
-
+eta_mix(i) = -delG_mix(i)/ dh(i);
 iterations = iterations + 1;
 end
 iterations
 
-eta_HHV = -mass_react*delG / (HHV_h2 * mass_h2);
-eta_LHV = -mass_react*delG / (LHV_h2 * mass_h2);
+delG_HHV = gprod_HHV - greact;
+delG_LHV = gprod_LHV - greact;
+eta_HHV = -delG_HHV / (HHV_h2 * mass_h2 * KJ_TO_J);
+eta_LHV = -delG_LHV / (LHV_h2 * mass_h2 * KJ_TO_J);
 
 figure(1);
-plot(T,eta_HHV,'b--', T,eta_LHV,'m--',T,eta_mix,'go', T,eta_carnot,'c');
+plot(T,eta_HHV,'b--', T,eta_LHV);
+%'m--',T,eta_mix,'go', T,eta_carnot,'c');
 legend('\eta_{HHV}','\eta_{LHV}','\eta_{Mixed Liquid and Gas}','\eta_{Carnot}');
 xlabel('Temperature [K]');
 ylabel('Maximum 1st Law Efficiency');
