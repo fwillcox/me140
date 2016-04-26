@@ -24,7 +24,7 @@ MM_air = 28.85;
 
 % ----------------------------------------------------
 % Part 1 & 2: Efficiency of PEM Fuel Cells Found 3 Ways
-% ----------- then, varrying lambda & presssure
+% ----------- then, varying lambda & presssure
 % -----------------------------------------------------
 % ASSUME: isothermal, isobaric i.e. reversible
 % USE: First- Law Effiency, eta = (-m_reactants*dg_rxn)/(mfuel*HV) where HV = LHV or HHV
@@ -39,13 +39,13 @@ T = linspace(25+C_TO_K,1000+C_TO_K,npts);
 lambda = 2;                             % Equivalence Ratio(ASSUME: 100% excess air)        
 Patm = 101.3*KPA_TO_PA;                 % Pa,     Preact = Pprod = Patm 
 
-% % UNCOMMENT FOR PART 2a (varrying lambda)
+% % UNCOMMENT FOR PART 2a (varying lambda)
 % T_C = [80 220 650 800];
 % T = T_C + C_TO_K;
 % lambda = linspace(1,10,npts);       % (Comment back in for Part 2)         
 % Patm = 101.3*KPA_TO_PA;             % Pa,     Preact = Pprod = Patm 
 
-% % UNCOMMENT FOR PART 2b (varrying Patm)
+% % UNCOMMENT FOR PART 2b (varying Patm)
 % T_C = [80 220 650 800];
 % T = T_C + C_TO_K;
 % lambda = 2;                         % Equivalence Ratio(ASSUME: 100% excess air)     
@@ -106,16 +106,19 @@ for i = 1:length(Psat)
         mol_h2ovap(i) = (mol_o2_prod + mol_n2)*Pv_h2o(i)/(Ptotal-Pv_h2o(i)); % beta
         mol_h2oliq(i) = mol_h2o - mol_h2ovap(i);
     end
+<<<<<<< HEAD
 
     mol_total_prod(i)  = mol_o2_prod + mol_n2 + mol_h2ovap(i);
     y_h2ovap(i) = mol_h2ovap(i)/mol_total_prod(i);
     y_o2_prod(i) = mol_o2_prod/mol_total_prod(i);
     y_n2_prod(i) = mol_n2/mol_total_prod(i);
 
-    mol_total_react = mol_o2_react + mol_n2 + mol_h2;
+    mol_total_react = mol_o2_react + mol_n2;
     y_o2_react = mol_o2_react /mol_total_react;
     y_n2_react = mol_n2       /mol_total_react;
-    y_h2_react = mol_h2       /mol_total_react;
+    y_h2_react = mol_h2       /mol_h2; 
+    % because membrane separates h2 from air, partial pressures are
+    % separate
 
     greact(i) = gEng(T(i),Patm*y_h2_react,'h2',mol_h2) ...
               + gEng(T(i),Patm*y_o2_react,'o2',mol_o2_react) ...
@@ -142,8 +145,40 @@ for i = 1:length(Psat)
     eta_mix(i) = delG(i)/ dh(i);
 
     iterations = iterations + 1;
+=======
+iterations = iterations + 1;
+>>>>>>> f2799178fde7e9ca7df6140507635a99153148f4
 end
 iterations
+
+% DOUBLE CHECK THIS
+mol_total = mol_o2_prod + mol_n2 + mol_h2ovap;
+y_h2ovap = mol_h2ovap ./ mol_total;
+y_o2 = mol_o2_prod ./ mol_total;
+y_n2 = mol_n2 ./ mol_total;
+
+greact = gEng(T,Patm,'h2',mol_h2) + gEng(T,Patm .* y_o2,'o2',mol_o2_rxn) + gEng(T,Patm .* y_n2,'n2',mol_n2);
+
+gprod = ...
+      gEng(T, Patm.*y_h2ovap,   'h2ovap', mol_h2ovap)...
+    + gEng(T, Patm,             'h2o',    mol_h2oliq)...
+    + gEng(T, Patm.*y_o2,       'o2',     mol_o2_prod)...   
+    + gEng(T, Patm.*y_n2,       'n2',     mol_n2);
+
+delG = gprod - greact;    
+hprod = ...
+      hEng(T,'h2ovap', mol_h2ovap)...
+    + hEng(T,'h2o',    mol_h2oliq)...
+    + hEng(T,'o2',     mol_o2_prod)...
+    + hEng(T,'n2',     mol_n2);
+hreact = ...
+      hEng(T,'h2',     mol_h2)... 
+    + hEng(T,'o2',     mol_o2_rxn)...
+    + hEng(T,'n2',     mol_n2);
+dh = hprod - hreact;
+
+eta_mix = delG ./ dh;
+
 
 
 eta_HHV = -delG / (HHV_h2 * mass_h2);
