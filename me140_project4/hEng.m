@@ -1,8 +1,6 @@
 %hEng.m , wrapper for energyF
 % 4-22-16 created by Jon Renslo
 function H = hEng(T,spec,mol)
-    
-
     if(nargin == 2)
         mol = 1;
     end
