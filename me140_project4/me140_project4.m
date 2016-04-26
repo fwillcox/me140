@@ -112,10 +112,12 @@ for i = 1:length(Psat)
     y_o2_prod(i) = mol_o2_prod/mol_total_prod(i);
     y_n2_prod(i) = mol_n2/mol_total_prod(i);
 
-    mol_total_react = mol_o2_react + mol_n2 + mol_h2;
+    mol_total_react = mol_o2_react + mol_n2;
     y_o2_react = mol_o2_react /mol_total_react;
     y_n2_react = mol_n2       /mol_total_react;
-    y_h2_react = mol_h2       /mol_total_react;
+    y_h2_react = mol_h2       /mol_h2; 
+    % because membrane separates h2 from air, partial pressures are
+    % separate
 
     greact(i) = gEng(T(i),Patm*y_h2_react,'h2',mol_h2) ...
               + gEng(T(i),Patm*y_o2_react,'o2',mol_o2_react) ...
