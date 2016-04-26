@@ -37,7 +37,7 @@ function out = energyF(T,P,species,moles)
     hf{airConst} = 0;
     hf{h2} = 0;
     
-    sf{co2} = 213.8; %J/mol
+    sf{co2} = 213.8; %J/(mol * K)
     sf{h2ovap} = 188.83; 
     sf{h2o} = 69.92; % for liquid water
     sf{n2} = 191.61;
@@ -100,8 +100,8 @@ function out = energyF(T,P,species,moles)
     intCpbarOnT = a*log(T./T0) + b*(T - T0) + c*(T.^2 - T0.^2)/2 + d*(T.^3 - T0.^3)/3;
     delS = intCpbarOnT - R *log(P/P0); 
     
-    out.S = (sf{i} + delS)*moles;           % Entropy
-    out.H = (hf{i} + delH)*moles;           % Enthalpy 
+    out.S = (sf{i} + delS).*moles;           % Entropy
+    out.H = (hf{i} + delH).*moles;           % Enthalpy 
     out.G = out.H - T.*out.S; % Gibbs Free Energy
     %**double check this calculation
 end

@@ -65,9 +65,9 @@ mol_o2_prod = 0.5*(lambda-mol_h2)*mol_o2_react;
 mol_h2o = mol_h2;
 
 % Check Mass Balance
-mass_react = mass_h2 + mol_air*MM_air*G_TO_KG;
-mass_prod = (mol_o2_prod*2*MM_o*G_TO_KG) + (mol_n2*2*MM_n*G_TO_KG  ... 
-+mol_h2o*MM_h2o*G_TO_KG);
+% mass_react = mass_h2 + mol_air*MM_air*G_TO_KG;
+% mass_prod = (mol_o2_prod*2*MM_o*G_TO_KG) + (mol_n2*2*MM_n*G_TO_KG  ... 
+% +mol_h2o*MM_h2o*G_TO_KG);
 
 % Account for Gas/Liquid Mixture
 % SOURCE: LEC 8 Slide 24, LEC 9, Slide 29
@@ -93,6 +93,11 @@ hreact = zeros(size(Psat));
 dh = zeros(size(Psat));
 eta_mix = zeros(size(Psat));
 
+mol_total_react = mol_o2_react + mol_n2;
+y_o2_react = mol_o2_react /mol_total_react;
+y_n2_react = mol_n2       /mol_total_react;
+y_h2_react = mol_h2       /mol_h2; 
+
 for i = 1:length(Psat)
     if Pv_guess < Psat(i)
         % All H2O is vapor (beta = 1)
@@ -107,45 +112,41 @@ for i = 1:length(Psat)
         mol_h2oliq(i) = mol_h2o - mol_h2ovap(i);
     end
 
-    mol_total_prod(i)  = mol_o2_prod + mol_n2 + mol_h2ovap(i);
-    y_h2ovap(i) = mol_h2ovap(i)/mol_total_prod(i);
-    y_o2_prod(i) = mol_o2_prod/mol_total_prod(i);
-    y_n2_prod(i) = mol_n2/mol_total_prod(i);
-
-    mol_total_react = mol_o2_react + mol_n2;
-    y_o2_react = mol_o2_react /mol_total_react;
-    y_n2_react = mol_n2       /mol_total_react;
-    y_h2_react = mol_h2       /mol_h2; 
     % because membrane separates h2 from air, partial pressures are
     % separate
-
-    greact(i) = gEng(T(i),Patm*y_h2_react,'h2',mol_h2) ...
-              + gEng(T(i),Patm*y_o2_react,'o2',mol_o2_react) ...
-              + gEng(T(i),Patm*y_n2_react,'n2',mol_n2);
-
-    gprod(i) = ...
-          gEng(T(i), Patm*y_h2ovap(i), 'h2ovap', mol_h2ovap(i))...
-        + gEng(T(i), Patm,          'h2o',       mol_h2oliq(i))...
-        + gEng(T(i), Patm*y_o2_prod(i),     'o2',     mol_o2_prod)...   
-        + gEng(T(i), Patm*y_n2_prod(i),     'n2',     mol_n2);
-
-    delG(i) = gprod(i) - greact(i);    
-    hprod(i) = ...
-          hEng(T(i),'h2ovap', mol_h2ovap(i))...
-        + hEng(T(i),'h2o',    mol_h2oliq(i))...
-        + hEng(T(i),'o2',     mol_o2_prod)...
-        + hEng(T(i),'n2',     mol_n2);
-    hreact(i) = ...
-          hEng(T(i),'h2',     mol_h2)... 
-        + hEng(T(i),'o2',     mol_o2_react)...
-        + hEng(T(i),'n2',     mol_n2);
-    dh(i) = hprod(i) - hreact(i);
-
-    eta_mix(i) = delG(i)/ dh(i);
+% 
+%     greact(i) = gEng(T(i),Patm*y_h2_react,'h2',mol_h2) ...
+%               + gEng(T(i),Patm*y_o2_react,'o2',mol_o2_react) ...
+%               + gEng(T(i),Patm*y_n2_react,'n2',mol_n2);
+% 
+%     gprod(i) = ...
+%           gEng(T(i), Patm*y_h2ovap(i), 'h2ovap', mol_h2ovap(i))...
+%         + gEng(T(i), Patm,          'h2o',       mol_h2oliq(i))...
+%         + gEng(T(i), Patm*y_o2_prod(i),     'o2',     mol_o2_prod)...   
+%         + gEng(T(i), Patm*y_n2_prod(i),     'n2',     mol_n2);
+% 
+%     delG(i) = gprod(i) - greact(i);    
+%     hprod(i) = ...
+%           hEng(T(i),'h2ovap', mol_h2ovap(i))...
+%         + hEng(T(i),'h2o',    mol_h2oliq(i))...
+%         + hEng(T(i),'o2',     mol_o2_prod)...
+%         + hEng(T(i),'n2',     mol_n2);
+%     hreact(i) = ...
+%           hEng(T(i),'h2',     mol_h2)... 
+%         + hEng(T(i),'o2',     mol_o2_react)...
+%         + hEng(T(i),'n2',     mol_n2);
+%     dh(i) = hprod(i) - hreact(i);
+% 
+%     eta_mix(i) = delG(i)/ dh(i);
 
     iterations = iterations + 1;
 end
 iterations
+
+mol_total_prod  = mol_o2_prod + mol_n2 + mol_h2ovap;
+y_h2ovap = mol_h2ovap./mol_total_prod;
+y_o2_prod = mol_o2_prod./mol_total_prod;
+y_n2_prod = mol_n2./mol_total_prod;
 
 % DOUBLE CHECK THIS
 mol_total = mol_o2_prod + mol_n2 + mol_h2ovap;
@@ -153,7 +154,9 @@ y_h2ovap = mol_h2ovap ./ mol_total;
 y_o2 = mol_o2_prod ./ mol_total;
 y_n2 = mol_n2 ./ mol_total;
 
-greact = gEng(T,Patm,'h2',mol_h2) + gEng(T,Patm .* y_o2,'o2',mol_o2_react) + gEng(T,Patm .* y_n2,'n2',mol_n2);
+greact = gEng(T,Patm,'h2',mol_h2) ...
+    + gEng(T,Patm .* y_o2,'o2',mol_o2_react) ...
+    + gEng(T,Patm .* y_n2,'n2',mol_n2);
 
 gprod = ...
       gEng(T, Patm.*y_h2ovap,   'h2ovap', mol_h2ovap)...
@@ -163,8 +166,8 @@ gprod = ...
 
 delG = gprod - greact;    
 hprod = ...
-      hEng(T,'h2ovap', mol_h2ovap(i))...
-    + hEng(T,'h2o',    mol_h2oliq(i))...
+      hEng(T,'h2ovap', mol_h2ovap)...
+    + hEng(T,'h2o',    mol_h2oliq)...
     + hEng(T,'o2',     mol_o2_prod)...
     + hEng(T,'n2',     mol_n2);
 hreact = ...
@@ -193,41 +196,77 @@ plotfixer();
 % figure(2)
 % plot(T,mol_h2ovap);
 
-figure(3)
-plot(T,dh,'b',T,hreact,'g');
+% figure(3)
+% plot(T,dh,'b',T,hreact,'g');
+% plotfixer();
+
+
+
+
+%% Part 3
+% what humidity necesarry in inlet air to obtain saturated exit?
+% below certain temp, condensate forms, so add no water.
+% plot inlet air humidity vs T 25-100C
+
+% questions:
+% must we take into account the diffusion thru membrane? -> don't need to
+% worry about gas diffusion through MEA membrane
+lambda = 2; %as before
+Ptotal = Patm;
+% find psat at exit based on temp, 
+T = linspace(25,100,npts);
+psat = PsatW(T+273);
+
+% find mole fraction of water in products
+y_h2o = psat./Ptotal;
+mol_out = (mol_o2_prod + mol_h2o + mol_n2);
+mol_h2o_sat = mol_out*y_h2o;
+
+y_h2o_prod = mol_h2o/(mol_o2_prod + mol_h2o + mol_n2);
+
+
+% if less than what is formed, add the difference to dry air reagent
+% omega = Pv./(Ptotal-Pv)*(MM_h2o)/(MM_air); % DELETE? - formula from lecture does not seem to work.
+alpha = mol_h2o_sat - mol_h2o;
+alpha(alpha<0) = 0;
+y_h2o_react = alpha./(mol_o2_rxn + mol_n2 + alpha);  
+Pv_react = Ptotal*y_h2o_react;
+Pv_react(Pv_react>psat) = psat(Pv_react>psat); % if Pv > psat, Pv = psat 
+hum_rel = Pv_react./psat;
+hum_rel(Pv_react>psat) = 0; 
+
+% omega2 = alpha*(MM_h2o)/(mol_o2_rxn*MM_o*2 + mol_n2*MM_n*2); - DELETE
+%convert mol fraction to humidity
+% plot(T,alpha,T,omega2,T,hum_rel);
+% legend('Moles of H2O to Add','Relative Humidity, outlet?')
+plot(T,hum_rel)
+legend('Relative Humidity of Input Air');
+xlabel('Temperature - K');
+ylabel('Relative Humidity %');
 plotfixer();
 
+% calculate # mols of water in products at saturation (from mole fraction =
+% psat/p)--> mol_h2o_sat
+% then do atom balance - add water on reactant side - how many mols of
+% reactant water would u need to get result 
+% Pv/psat of products should be 1, then can use beta = alpha + 1 to relate
+% prods and reactants and find Pv of reactants w/ alpha, then just find
+% Pv/psat
+% relative humidity is just Pv/psat
 
-% %% Part 3
-% % SOURCE: LEC 10
-% % what humidity necesarry in inlet air to obtain saturated exit?
-% % below certain temp, condensate forms, so add no water.
-% % plot inlet air humidity vs T 25-100C
-% 
-% % questions:
-% % must we take into account the diffusion thru membrane?
-% lambda = 2; %as before
-% Ptotal = Patm;
-% % find psat at exit based on temp, 
-% T = linspace(25,100,npts);
-% psat = PsatW(T+273);
-% % find mole fraction of water
-% y_h2o = psat./Ptotal;
-% y_h2o_prod = mol_h2o/(mol_o2_prod + mol_h2o + mol_n2);
-% mol_out = (mol_o2_prod + mol_h2o + mol_n2);
-% mol_h2o_sat = mol_out*y_h2o;
+
+
+% DELETE
+% % find partial pressure of products
 % Pv = y_h2o_prod*Ptotal;
-% Pv(psat>Pv) = psat(psat>Pv);
-% 
-% % if less than what is formed, add the difference to dry air reagent
-% omega = Pv./(Ptotal-Pv)*(MM_h2o)/(MM_air); %formula from lecture does not seem to work.
-% diff = mol_h2o_sat - mol_h2o;
-% diff(diff<0) = 0;
-% omega2 = diff*(MM_h2o)/(mol_o2_react*MM_o*2 + mol_n2*MM_n*2);
-% %convert mol fraction to humidity
-% plot(T,diff,T,omega2);
-% legend('Moles of H2O to Add','Absolute Humidity')
+% Pv(Pv>psat) = psat(Pv>psat); % if Pv > psat, Pv = psat 
 
+%hum_rel = Pv./psat; % DELETE
+%hum_rel(Pv>psat) = 0; % DELETE
 
+% DELETE
+% figure();
+% plot(T,Pv./psat);
+% title('Pv/psat');
     
 
