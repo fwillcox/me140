@@ -46,14 +46,14 @@ function out = energyF(T,P,species,moles)
     sf{airConst} = sf{n2}*3.76/4.76 + sf{o2}/4.76; %** not in table
     sf{h2} = 130.68;
     
-    gf{co2} = -394360;      % J/mol
-    gf{h2ovap} = -228590; 
-    gf{h2o} = -237180;      % for liquid water
-    gf{n2} = 0;
-    gf{o2} = 0;
-    gf{air} = 0;
-    gf{airConst} = 0;
-    gf{h2} = 0;
+%     gf{co2} = -394360;      % J/mol
+%     gf{h2ovap} = -228590; 
+%     gf{h2o} = -237180;      % for liquid water
+%     gf{n2} = 0;
+%     gf{o2} = 0;
+%     gf{air} = 0;
+%     gf{airConst} = 0;
+%     gf{h2} = 0;
     
     m{co2} = 44; %g/mol
     m{h2ovap} = 18.02;
@@ -99,8 +99,8 @@ function out = energyF(T,P,species,moles)
     intCpbarOnT = a*log(T./T0) + b*(T - T0) + c/2*(T.^2 - T0.^2) + d/3*(T.^3 - T0.^3);
     delS = intCpbarOnT - R *log(P/P0); 
     
-    out.S = (sf{i} + delS)*moles;           % Entropy1
-    out.H = (hf{i} + delH)*moles;           % Enthalpy
+    out.S = (sf{i} + delS);           % Entropy1
+    out.H = (hf{i} + delH);           % Enthalpy
     out.G = (out.H - T.*out.S)*moles;       % Gibbs Free Energy
     %**double check this calculation
     % delH*moles -T.*out.S + gf{i}*moles seems to produce best results, why?
