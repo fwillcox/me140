@@ -28,9 +28,9 @@ function out = energyF(T,P,species,moles)
     fit{h2} =     [29.11, -.1916e-2,     0.4003e-5     -0.8704e-9];
 
     
-    hf{co2} = -393520; %J/mol
+    hf{co2} = -393520;      % J/mol
     hf{h2ovap} = -241820; 
-    hf{h2o} = -285830; % for liquid water
+    hf{h2o} = -285830;      % for liquid water
     hf{n2} = 0;
     hf{o2} = 0;
     hf{air} = 0;
@@ -46,9 +46,9 @@ function out = energyF(T,P,species,moles)
     sf{airConst} = sf{n2}*3.76/4.76 + sf{o2}/4.76; %** not in table
     sf{h2} = 130.68;
     
-    gf{co2} = -394360; %J/mol
+    gf{co2} = -394360;      % J/mol
     gf{h2ovap} = -228590; 
-    gf{h2o} = -237180; % for liquid water
+    gf{h2o} = -237180;      % for liquid water
     gf{n2} = 0;
     gf{o2} = 0;
     gf{air} = 0;
