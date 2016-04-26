@@ -24,7 +24,7 @@ MM_air = 28.85;
 
 % ----------------------------------------------------
 % Part 1 & 2: Efficiency of PEM Fuel Cells Found 3 Ways
-% ----------- then, varrying lambda & presssure
+% ----------- then, varying lambda & presssure
 % -----------------------------------------------------
 % ASSUME: isothermal, isobaric i.e. reversible
 % USE: First- Law Effiency, eta = (-m_reactants*dg_rxn)/(mfuel*HV) where HV = LHV or HHV
@@ -39,13 +39,13 @@ T = linspace(25+C_TO_K,1000+C_TO_K,npts);
 lambda = 2;                             % Equivalence Ratio(ASSUME: 100% excess air)        
 Patm = 101.3*KPA_TO_PA;                 % Pa,     Preact = Pprod = Patm 
 
-% % UNCOMMENT FOR PART 2a (varrying lambda)
+% % UNCOMMENT FOR PART 2a (varying lambda)
 % T_C = [80 220 650 800];
 % T = T_C + C_TO_K;
 % lambda = linspace(1,10,npts);       % (Comment back in for Part 2)         
 % Patm = 101.3*KPA_TO_PA;             % Pa,     Preact = Pprod = Patm 
 
-% % UNCOMMENT FOR PART 2b (varrying Patm)
+% % UNCOMMENT FOR PART 2b (varying Patm)
 % T_C = [80 220 650 800];
 % T = T_C + C_TO_K;
 % lambda = 2;                         % Equivalence Ratio(ASSUME: 100% excess air)     
