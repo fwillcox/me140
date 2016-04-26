@@ -77,26 +77,18 @@ beta = mol_h2;               % ASSUME: all vapor
 Ptotal = Patm;
 Psat = PsatW(T);
 Pv_guess = Ptotal*(beta./(beta + 0.5.*(lambda-1) +0.5.*lambda.*N_TO_O ));
+iterations =0;
+
 Pv_h2o = zeros(size(Psat));
 mol_h2oliq = zeros(size(Psat));
-iterations =0;
 mol_h2ovap = zeros(size(Psat));
-mol_total_prod = zeros(size(Psat));
-y_h2ovap = zeros(size(Psat));
-y_o2_prod = zeros(size(Psat));
-y_n2_prod = zeros(size(Psat));
-greact = zeros(size(Psat));
-gprod = zeros(size(Psat));
-delG = zeros(size(Psat));
-hprod = zeros(size(Psat));
-hreact = zeros(size(Psat));
-dh = zeros(size(Psat));
-eta_mix = zeros(size(Psat));
 
 mol_total_react = mol_o2_react + mol_n2;
 y_o2_react = mol_o2_react /mol_total_react;
 y_n2_react = mol_n2       /mol_total_react;
 y_h2_react = mol_h2       /mol_h2; 
+% because membrane separates h2 from air, partial pressures are
+% separate
 
 for i = 1:length(Psat)
     if Pv_guess < Psat(i)
@@ -111,34 +103,6 @@ for i = 1:length(Psat)
         mol_h2ovap(i) = (mol_o2_prod + mol_n2)*Pv_h2o(i)/(Ptotal-Pv_h2o(i)); % beta
         mol_h2oliq(i) = mol_h2o - mol_h2ovap(i);
     end
-
-    % because membrane separates h2 from air, partial pressures are
-    % separate
-% 
-%     greact(i) = gEng(T(i),Patm*y_h2_react,'h2',mol_h2) ...
-%               + gEng(T(i),Patm*y_o2_react,'o2',mol_o2_react) ...
-%               + gEng(T(i),Patm*y_n2_react,'n2',mol_n2);
-% 
-%     gprod(i) = ...
-%           gEng(T(i), Patm*y_h2ovap(i), 'h2ovap', mol_h2ovap(i))...
-%         + gEng(T(i), Patm,          'h2o',       mol_h2oliq(i))...
-%         + gEng(T(i), Patm*y_o2_prod(i),     'o2',     mol_o2_prod)...   
-%         + gEng(T(i), Patm*y_n2_prod(i),     'n2',     mol_n2);
-% 
-%     delG(i) = gprod(i) - greact(i);    
-%     hprod(i) = ...
-%           hEng(T(i),'h2ovap', mol_h2ovap(i))...
-%         + hEng(T(i),'h2o',    mol_h2oliq(i))...
-%         + hEng(T(i),'o2',     mol_o2_prod)...
-%         + hEng(T(i),'n2',     mol_n2);
-%     hreact(i) = ...
-%           hEng(T(i),'h2',     mol_h2)... 
-%         + hEng(T(i),'o2',     mol_o2_react)...
-%         + hEng(T(i),'n2',     mol_n2);
-%     dh(i) = hprod(i) - hreact(i);
-% 
-%     eta_mix(i) = delG(i)/ dh(i);
-
     iterations = iterations + 1;
 end
 iterations
@@ -148,21 +112,15 @@ y_h2ovap = mol_h2ovap./mol_total_prod;
 y_o2_prod = mol_o2_prod./mol_total_prod;
 y_n2_prod = mol_n2./mol_total_prod;
 
-% DOUBLE CHECK THIS
-mol_total = mol_o2_prod + mol_n2 + mol_h2ovap;
-y_h2ovap = mol_h2ovap ./ mol_total;
-y_o2 = mol_o2_prod ./ mol_total;
-y_n2 = mol_n2 ./ mol_total;
-
 greact = gEng(T,Patm,'h2',mol_h2) ...
-    + gEng(T,Patm .* y_o2,'o2',mol_o2_react) ...
-    + gEng(T,Patm .* y_n2,'n2',mol_n2);
+    + gEng(T,Patm .* y_o2_react,'o2',mol_o2_react) ...
+    + gEng(T,Patm .* y_n2_react,'n2',mol_n2);
 
 gprod = ...
       gEng(T, Patm.*y_h2ovap,   'h2ovap', mol_h2ovap)...
     + gEng(T, Patm,             'h2o',    mol_h2oliq)...
-    + gEng(T, Patm.*y_o2,       'o2',     mol_o2_prod)...   
-    + gEng(T, Patm.*y_n2,       'n2',     mol_n2);
+    + gEng(T, Patm.*y_o2_prod,       'o2',     mol_o2_prod)...   
+    + gEng(T, Patm.*y_n2_prod,       'n2',     mol_n2);
 
 delG = gprod - greact;    
 hprod = ...
@@ -177,8 +135,6 @@ hreact = ...
 dh = hprod - hreact;
 
 eta_mix = delG ./ dh;
-
-
 
 eta_HHV = -delG / (HHV_h2 * mass_h2);
 eta_LHV = -delG / (LHV_h2 * mass_h2);
@@ -199,9 +155,6 @@ plotfixer();
 % figure(3)
 % plot(T,dh,'b',T,hreact,'g');
 % plotfixer();
-
-
-
 
 %% Part 3
 % what humidity necesarry in inlet air to obtain saturated exit?
@@ -229,7 +182,7 @@ y_h2o_prod = mol_h2o/(mol_o2_prod + mol_h2o + mol_n2);
 % omega = Pv./(Ptotal-Pv)*(MM_h2o)/(MM_air); % DELETE? - formula from lecture does not seem to work.
 alpha = mol_h2o_sat - mol_h2o;
 alpha(alpha<0) = 0;
-y_h2o_react = alpha./(mol_o2_rxn + mol_n2 + alpha);  
+y_h2o_react = alpha./(mol_o2_react + mol_n2 + alpha);  
 Pv_react = Ptotal*y_h2o_react;
 Pv_react(Pv_react>psat) = psat(Pv_react>psat); % if Pv > psat, Pv = psat 
 hum_rel = Pv_react./psat;
@@ -239,6 +192,7 @@ hum_rel(Pv_react>psat) = 0;
 %convert mol fraction to humidity
 % plot(T,alpha,T,omega2,T,hum_rel);
 % legend('Moles of H2O to Add','Relative Humidity, outlet?')
+figure(2);
 plot(T,hum_rel)
 legend('Relative Humidity of Input Air');
 xlabel('Temperature - K');
