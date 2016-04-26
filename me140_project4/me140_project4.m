@@ -125,13 +125,13 @@ hreact(i) = ...
     + hEng(T(i),'n2',     mol_n2);
 dh(i) = hprod(i) - hreact(i);
 
-eta_mix(i) = -mass_react*delG(i)/ dh(i);
+eta_mix(i) = -mass_react*delG(i)/ dh(i);        % (kg*J)/J
 
 iterations = iterations + 1;
 end
 iterations
 
-eta_HHV = -mass_react*delG / (HHV_h2 * mass_h2);
+eta_HHV = -mass_react*delG / (HHV_h2 * mass_h2); % (kg*J)/ (J/kg * kg)
 eta_LHV = -mass_react*delG / (LHV_h2 * mass_h2);
 
 figure(1);
@@ -140,6 +140,9 @@ legend('\eta_{HHV}','\eta_{LHV}','\eta_{Mixed Liquid and Gas}','\eta_{Carnot}');
 xlabel('Temperature [K]');
 ylabel('Maximum 1st Law Efficiency');
 plotfixer();
+
+figure(2)
+plot(T,mol_h2ovap);
 
 
 % %% Part 3
