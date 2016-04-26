@@ -46,6 +46,7 @@ function out = energyF(T,P,species,moles)
     sf{airConst} = sf{n2}*3.76/4.76 + sf{o2}/4.76; %** not in table
     sf{h2} = 130.68;
     
+
 %     gf{co2} = -394360;      % J/mol
 %     gf{h2ovap} = -228590; 
 %     gf{h2o} = -237180;      % for liquid water

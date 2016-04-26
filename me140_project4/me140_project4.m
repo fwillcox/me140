@@ -79,7 +79,7 @@ beta = 1;               % ASSUME: all vapor
 Ptotal = Patm;
 Psat = PsatW(T);
 gamma = mol_h2o - beta;
-Pv_guess = Ptotal*(beta./(beta + 0.5.*(gamma-1) +0.5.*gamma.*N_TO_O ));
+Pv_guess = Ptotal*(beta./(beta + 0.5.*(lambda-1) +0.5.*lambda.*N_TO_O ));
 Pv_h2o = Psat;
 eta_carnot = carnotEff(T,T(1));      % ASSUME: Tcold = 25 degrees C
 
@@ -97,6 +97,7 @@ for i = 1:length(Psat)
         Pv_h2o(i) = Psat(i);
         mol_h2ovap(i) = (mol_o2_prod + mol_n2)*Pv_h2o(i)/(Ptotal-Pv_h2o(i)); % beta
         mol_h2oliq(i) = mol_h2o - mol_h2ovap(i);
+        i
     end
 
 % DOUBLE CHECK THIS
@@ -125,18 +126,20 @@ hreact(i) = ...
     + hEng(T(i),'n2',     mol_n2);
 dh(i) = hprod(i) - hreact(i);
 
-eta_mix(i) = -mass_react*delG(i)/ dh(i);
+eta_mix(i) = 2*delG(i)/ dh(i);
 
 iterations = iterations + 1;
 end
 iterations
 
-eta_HHV = -mass_react*delG / (HHV_h2 * mass_h2);
-eta_LHV = -mass_react*delG / (LHV_h2 * mass_h2);
+
+eta_HHV = -delG / (HHV_h2 * mass_h2);
+eta_LHV = -delG / (LHV_h2 * mass_h2);
+
 
 figure(1);
 plot(T,eta_HHV,'b--', T,eta_LHV,'m--',T,eta_mix,'go', T,eta_carnot,'c');
-legend('\eta_{HHV}','\eta_{LHV}','\eta_{Mixed Liquid and Gas}','\eta_{Carnot}');
+legend('\eta_{HHV}','\eta_{LHV}','\eta_{Mixed Liquid and Gas}','\eta_{Carnot}', 'Location', 'Best');
 xlabel('Temperature [K]');
 ylabel('Maximum 1st Law Efficiency');
 plotfixer();
