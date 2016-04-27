@@ -223,7 +223,7 @@ title({'Part 4: Maximum First Law Efficiency as a Function of Temperature',' for
 plotfixer;
 grid on;
 saveas(f,'../plots/Plot4','jpeg');
-return
+
 me140_project4_part2_pressures; %correct pressure plot from this file
 
 
