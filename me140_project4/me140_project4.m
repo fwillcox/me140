@@ -50,14 +50,14 @@ eta_LHV = -delG / (LHV_h2 * mass_h2);
 
 eta_carnot = carnotEff(T,T(1));      % ASSUME: Tcold = 25 degrees C
 
-% figure(1);
-% plot(T,eta_HHV,'b--', T,eta_LHV,'m--',T,eta,'g-', T,eta_carnot,'c');
-% legend('\eta_{HHV}','\eta_{LHV}','\eta_{Mixed Liquid and Gas}','\eta_{Carnot}', 'Location', 'Best');
-% xlabel('Temperature [K]');
-% ylabel('Maximum 1st Law Efficiency');
-% title('Part 1: First Law Efficiencies and Maximum Heat Engine Efficiency');
-% plotfixer();
-% grid on
+figure(1);
+plot(T,eta_HHV,'b--', T,eta_LHV,'m--',T,eta,'g-', T,eta_carnot,'c');
+legend('\eta_{HHV}','\eta_{LHV}','\eta_{Mixed Liquid and Gas}','\eta_{Carnot}', 'Location', 'Best');
+xlabel('Temperature [K]');
+ylabel('Maximum 1st Law Efficiency');
+title('Part 1: First Law Efficiencies and Maximum Heat Engine Efficiency');
+plotfixer();
+grid on
 
 % PART 2a (varying lambda)
 T_C = [80 220 650 800];
@@ -73,18 +73,23 @@ for Ti = 1:length(T)
 end
 mass_h2 = 1* (MM_h*2)*G_TO_KG;
 delH_LHV = LHV_h2 * mass_h2;
-etaLambda_LHV = -delGLambda/delH_LHV;
-% figure(2);
-% plot(lambda,etaLambda_LHV);
-% legend('80C','220C','650C','800C','Location','Best');
-% xlabel('Excess air coefficient \lambda');
-% ylabel('Efficiency on LHV basis \eta');
-% title('Part 2: Varying Lambda: Maximum Cell Efficiency')
-% plotfixer 
-% spec = Spec();
-% spec.mol_air = 5;
+etaLambda_LHV = -delGLambda/delH_LHV;q
 
-% PART 2b (varying Patm)
+%%part2.1 plot%%
+
+figure(2);
+plot(lambda,etaLambda_LHV);
+legend('80C','220C','650C','800C','Location','Best');
+xlabel('Excess air coefficient \lambda');
+ylabel('Efficiency on LHV basis \eta');
+title('Part 2: Varying Lambda: Maximum Cell Efficiency')
+plotfixer
+grid on;
+
+spec = Spec();
+spec.mol_air = 5;
+
+% % UNCOMMENT FOR PART 2b (varying Patm)
 T_C = [80 220 650 800];
 T = T_C + C_TO_K;
 lambda = 2;                         % Equivalence Ratio(ASSUME: 100% excess air)     
@@ -92,7 +97,7 @@ Patm = linspace(101.3*KPA_TO_PA,4053*KPA_TO_PA,npts);
 
 for Ti = 1:length(T)
     for pi = 1:length(Patm)
-        [etaPres(pi,Ti), pctVapPres(pi,Ti) ,delGPres(pi,Ti)] ...
+        [etaPres(pi,Ti), pctVapPres(pi,Ti) ,delGPres(pi,Ti),~] ...
             = PEMstoich(lambda,T(Ti),Patm(pi));
     end
 end
@@ -104,15 +109,8 @@ plot(Patm/101300,etaPres_LHV(:,1),Patm/101300,etaPres_LHV(:,2),...
 legend('80C','220C','650C','800C','Location','Best');
 xlabel('Pressure - Bar');
 ylabel('Efficiency on LHV basis \eta');
+title('Part 2: Varying Pressure: Maximum Cell Efficiency')
 grid on
-
-
-% figure(2)
-% plot(T,mol_h2ovap);
-
-% figure(3)
-% plot(T,dh,'b',T,hreact,'g');
-% plotfixer();
 
 %% Part 3
 % what humidity necesary for inlet air to obtain saturated exit?
@@ -154,12 +152,68 @@ Pv_react(Pv_react>psat) = psat(Pv_react>psat); % if Pv > psat, Pv = psat
 hum_rel = Pv_react./psat;
 
 % plot relative humidity
-% plot(T,alpha,T,omega2,T,hum_rel); - DELETE
-% legend('Moles of H2O to Add','Relative Humidity, outlet?') - DELETE
-% figure(4);
-% plot(T - C_TO_K,hum_rel)
-% xlabel('Temperature [Celsius]');
-% ylabel('Relative Humidity of Input Air [%]');
-% title('Part 3: Relative Humidity as a Function of Temperature')
-% plotfixer();
+figure(4);
+plot(T - C_TO_K,hum_rel)
+xlabel('Temperature [Celsius]');
+ylabel('Relative Humidity of Input Air [%]');
+title('Part 3: Relative Humidity as a Function of Temperature')
+plotfixer();
+grid on;
+
+%% Part 4
+% (1) part 1 plot, (2) part 1 plot except inlet humidity = 100%, (3) part 3
+% plot
+
+% Part 4 - 1
+
+delG = zeros(size(T));
+for i = 1:length(T) %loop temperature for new T
+    [~,~,delG(i),~] = PEMstoich(lambda,T(i),Patm);
+end
+%PEMstoich assumes per mol of h2, 1mol h2 burned
+eta_LHV = -delG / (LHV_h2 * mass_h2);
+
+% Part 4 - 2
+% T 25-100 C
+% P atm
+% lamdba = 2
+Patm = 101.3e3;
+lambda = 2;
+Psat = PsatW(T);
+y_h2o_react = Psat / Patm;
+% assume 1 mol h2 
+mol_air = lambda*4.76/2;
+alpha_2 = mol_air * (Psat) ./ (Patm - Psat); %alternatively y / 1-y;
+
+delG_3  = zeros(size(T));
+delG_2 = zeros(size(T));
+for i = 1:length(T)
+    [~, ~, delG_2(i), ~] = ...
+        PEMstoich(lambda,T(i),Patm,alpha_2(i));
+end
+
+eta_2  = -delG_2 ./delH_LHV;
+
+for i = 1:length(T)
+    [~, ~, delG_3(i), ~] = ...
+        PEMstoich(lambda,T(i),Patm,alpha(i));
+end
+
+eta_3  = -delG_3 ./delH_LHV;
+
+figure(5);
+plot(T-273,eta_LHV);
+hold on;
+plot(T-273,eta_2,'--');
+plot(T-273,eta_3,'.');
+legend('Dry H2 and Inlet Air','Saturated Inlet', 'Saturated Outlet','Location','best');
+xlabel('Temperature [C]');
+ylabel('\eta_{LHV}');
+title('Part 4: Comparing Max-1st-Law Efficiency in Varied Conditions');
+plotfixer;
+grid on;
+
+
+
+
 
