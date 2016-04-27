@@ -15,10 +15,9 @@ C_TO_K = 273.15;
 N_TO_O = 79/21;        % Engineering Air Molar Mass Ratio of Nitrogen to Oxygen
 
 % Molar Masses
-MM_c = 12;
-MM_h = 1.007940;
-MM_o = 16;
-MM_n = 14;
+MM_h = 1.00794;
+MM_o = 15.9994;
+MM_n = 14.0067;
 MM_h2o = 2*MM_h + MM_o;
 MM_air = 28.97;
 
@@ -73,7 +72,7 @@ for Ti = 1:length(T)
 end
 mass_h2 = 1* (MM_h*2)*G_TO_KG;
 delH_LHV = LHV_h2 * mass_h2;
-etaLambda_LHV = -delGLambda/delH_LHV;q
+etaLambda_LHV = -delGLambda/delH_LHV;
 
 %%part2.1 plot%%
 
