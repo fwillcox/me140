@@ -34,15 +34,20 @@ y_h2o_react = alpha       /mol_total_react;
 
 % because membrane separates h2 from air, partial pressures are separate
 
+
 if Pv_guess < Psat
     % All H2O is vapor (beta = 1)
     mol_h2ovap = beta;
     mol_h2oliq = 0;
+    
 else % i = 1-10
     % Some H2O is vapor, some liquid (beta not = 1)
     % LET: Pv = Psat, solve for beta
     Pv_h2o = Psat;
-    mol_h2ovap = (mol_o2_prod + mol_n2)*Pv_h2o/(Ptotal-Pv_h2o); %  = beta
+    y_h2o = Pv_h2o./Ptotal; %Assume Pv = Psat
+    beta = (4.26 .* y_h2o)./ (1 - y_h2o);
+    %beta = 1;
+    mol_h2ovap = beta; %  = beta
     mol_h2oliq = mol_h2o - mol_h2ovap;
 end
 
