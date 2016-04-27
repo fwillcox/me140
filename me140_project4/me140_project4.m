@@ -173,8 +173,12 @@ plotfixer();
 
 % Part 4 - 1
 
-figure(5);
-plot(T,eta_LHV);
+delG = zeros(size(T));
+for i = 1:length(T) %loop temperature for new T
+    [~,~,delG(i),~] = PEMstoich(lambda,T(i),Patm);
+end
+%PEMstoich assumes per mol of h2, 1mol h2 burned
+eta_LHV = -delG / (LHV_h2 * mass_h2);
 
 % Part 4 - 2
 % T 25-100 C
@@ -188,26 +192,33 @@ y_h2o_react = Psat / Patm;
 mol_air = lambda*4.76/2;
 alpha_2 = mol_air * (Psat) ./ (Patm - Psat); %alternatively y / 1-y;
 
-eta_2  = zeros(size(T));
+delG_3  = zeros(size(T));
 delG_2 = zeros(size(T));
 for i = 1:length(T)
-    [eta_2(i), ~, delG_2(i), ~] = ...
+    [~, ~, delG_2(i), ~] = ...
         PEMstoich(lambda,T(i),Patm,alpha_2(i));
 end
 
 eta_2  = -delG_2 ./delH_LHV;
 
-hold on;
-plot(T,eta_2);
-
 for i = 1:length(T)
-    [eta_3(i), ~, delG_3(i), ~] = ...
+    [~, ~, delG_3(i), ~] = ...
         PEMstoich(lambda,T(i),Patm,alpha(i));
 end
 
-eta_2  = -delG_3 ./delH_LHV;
+eta_3  = -delG_3 ./delH_LHV;
 
-plot(T,eta_3);
+figure(5);
+plot(T-273,eta_LHV);
+hold on;
+plot(T-273,eta_2,'--');
+plot(T-273,eta_3,'.');
+legend('Dry H2 and Inlet Air','Saturated Inlet', 'Saturated Outlet','Location','best');
+xlabel('Temperature [C]');
+ylabel('\eta_{LHV}');
+title('Part 4: Comparing Max-1st-Law Efficiency in Varied Conditions');
+plotfixer;
+
 
 
 

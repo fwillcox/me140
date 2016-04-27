@@ -58,7 +58,7 @@ y_n2_prod = mol_n2      ./ mol_total_prod;
 greact = gEng(T,Ptotal,'h2',mol_h2) ...
     + gEng(T,Ptotal .* y_o2_react,'o2',mol_o2_react) ...
     + gEng(T,Ptotal .* y_n2_react,'n2',mol_n2);
-if(alpha ~=0)
+if(alpha ~= 0 )
     greact = greact + gEng(T,Ptotal .* y_h2o_react,'h2ovap',alpha);
 end
 
@@ -79,6 +79,10 @@ hreact = ...
       hEng(T,'h2',     mol_h2)... 
     + hEng(T,'o2',     mol_o2_react)...
     + hEng(T,'n2',     mol_n2);
+if(alpha ~= 0 )
+    hreact = hreact + hEng(T,'h2ovap',alpha);
+end
+
 dh = hprod - hreact;
 
 eta = delG ./ dh;
