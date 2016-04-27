@@ -92,7 +92,7 @@ Patm = linspace(101.3*KPA_TO_PA,4053*KPA_TO_PA,npts);
 
 for Ti = 1:length(T)
     for pi = 1:length(Patm)
-        [etaPres(pi,Ti), pctVapPres(pi,Ti) ,delGPres(pi,Ti)] ...
+        [etaPres(pi,Ti), pctVapPres(pi,Ti) ,delGPres(pi,Ti),~] ...
             = PEMstoich(lambda,T(Ti),Patm(pi));
     end
 end
