@@ -4,7 +4,7 @@
 % Jon Renslo, Emily Bohl, Frankie Willcox, Natasha Berk, Kendall Fagan
 % 4/15/16 - Created Jon Renslo
 
-close all; clear; clc;
+close all; %clear; clc;
 
 % Constants
 G_TO_KG = 10^-3;
@@ -31,7 +31,7 @@ npts = 100;
 HHV_h2 = 141.8*10^6;                    % J/kg,  Higher Heating Value   
 LHV_h2 = 120.0*10^6;                    % J/kg,  Lower Heating Value  
 T = linspace(25+C_TO_K,1000+C_TO_K,npts);
-lambda = 4;                             % Equivalence Ratio(ASSUME: 100% excess air)        
+lambda = 2;                             % Equivalence Ratio(ASSUME: 100% excess air)        
 Patm = 101.3*KPA_TO_PA;                 % Pa,     Preact = Pprod = Patm 
 
 eta = zeros(size(T));
@@ -53,7 +53,7 @@ plot(T,eta_HHV,'r', T,eta_LHV,'y',T,eta,'g', T,eta_carnot,'b');
 legend('\eta_{HHV}','\eta_{LHV}','\eta_{Mixed Liquid and Gas}','\eta_{Carnot}', 'Location', 'Best');
 xlabel('Temperature [K]');
 ylabel('Maximum 1st Law Efficiency \eta');
-title('Part 1: First Law Efficiencies (LHV & HHV) and Maximum Heat Engine Efficiency as a Function of Temperature');
+title({'Part 1: First Law Efficiencies (LHV & HHV) and','Maximum Heat Engine Efficiency as a Function of Temperature'});
 plotfixer();
 grid on
 saveas(f,'../plots/Plot1','jpeg');
@@ -171,6 +171,10 @@ saveas(f,'../plots/Plot3','jpeg');
 % plot
 
 % Part 4 - 1
+lambda = 2;
+T_C = linspace(25,100,npts);
+T = T_C + C_TO_K;
+Patm = 101.3e3;
 
 delG = zeros(size(T));
 for i = 1:length(T) %loop temperature for new T
@@ -215,11 +219,11 @@ plot(T-273,eta_3,'g.');
 legend('Dry H_{2} and Inlet Air','Saturated Inlet', 'Saturated Outlet','Location','best');
 xlabel('Temperature [C]');
 ylabel('\eta_{LHV}');
-title('Part 4: Maximum First Law Efficiency as a Function of Temperature for Various Inlet and Outlet Conditions');
+title({'Part 4: Maximum First Law Efficiency as a Function of Temperature',' for Various Inlet and Outlet Conditions'});
 plotfixer;
 grid on;
 saveas(f,'../plots/Plot4','jpeg');
-
+return
 me140_project4_part2_pressures; %correct pressure plot from this file
 
 
