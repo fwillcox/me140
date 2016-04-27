@@ -13,7 +13,8 @@ mol_o2_react = mol_air/4.76;
 N_TO_O = 3.7619;        % Engineering Air Molar Mass Ratio of Nitrogen to Oxygen
 
 mol_n2 = mol_air*3.76/4.76;
-mol_o2_prod = 0.5*(lambda-1).*mol_o2_react;  
+mol_o2_prod = 0.5*(lambda-1).*mol_h2;  
+%double check o2prod? should be *mol_h2?
 
 mol_h2o = mol_h2;
 
