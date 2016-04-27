@@ -10,6 +10,7 @@ function out = energyF(T,P,species,moles)
     % P in Pa
     % cpbar in J/mol-K
     % cp in J/kg-K
+    
     P0 = 101.3e3;
     R = 8.314; %J/mol-K
     
@@ -104,4 +105,5 @@ function out = energyF(T,P,species,moles)
     out.H = (hf{i} + delH).*moles;           % Enthalpy 
     out.G = out.H - T.*out.S; % Gibbs Free Energy
     %**double check this calculation
+    
 end
