@@ -91,6 +91,8 @@ saveas(f,'../plots/Plot2-1','jpeg');
 
 spec = Spec();
 spec.mol_air = 5;
+me140_project4_part2_pressures;
+
 
 % % UNCOMMENT FOR PART 2b (varying Patm)
 T_C = [80 220 650 800];
@@ -115,7 +117,7 @@ ylabel('Efficiency on LHV basis \eta');
 title('Part 2: Varying Pressure: Maximum Cell Efficiency')
 grid on
 saveas(f,'../plots/Plot2-2','jpeg');
-
+return
 
 %% Part 3
 % what humidity necesary for inlet air to obtain saturated exit?

@@ -156,7 +156,7 @@ for j = 1:4
 end 
 
 P_range = linspace(1,Pmax,Pmax) * ATM_TO_PA; % [Pa]
-figure
+f = figure
 hold on
 plot(P_range,eta_press(1,:),'r',P_range,eta_press(2,:),'y',P_range,eta_press(3,:),'g',P_range,eta_press(4,:),'b')
 legend('T = 80šC','T = 220 C','T = 650 šC','T = 800 šC','location','southeast')
@@ -165,3 +165,4 @@ xlabel('Pressure [Pa]')
 ylabel('Efficiency \eta_{LHV}')
 plotfixer
 grid on
+saveas(f,'../plots/Part2-2','jpeg');
