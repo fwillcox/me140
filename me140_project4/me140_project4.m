@@ -29,7 +29,7 @@ MM_air = 28.97;
 % ASSUME: isothermal, isobaric i.e. reversible
 % USE: First- Law Effiency, eta = (-m_reactants*dg_react)/(mfuel*HV) where HV = LHV or HHV
 % SOURCE: LEC 8, SLIDE 13
-npts = 100;
+npts = 40;
 HHV_h2 = 141.8*10^6;                    % J/kg,  Higher Heating Value   
 LHV_h2 = 120.0*10^6;                    % J/kg,  Lower Heating Value  
 T = linspace(25+C_TO_K,1000+C_TO_K,npts);
@@ -89,7 +89,6 @@ T_C = [80 220 650 800];
 T = T_C + C_TO_K;
 lambda = 2;                         % Equivalence Ratio(ASSUME: 100% excess air)     
 Patm = linspace(101.3*KPA_TO_PA,4053*KPA_TO_PA,npts); 
-
 for Ti = 1:length(T)
     for pi = 1:length(Patm)
         [etaPres(pi,Ti), pctVapPres(pi,Ti) ,delGPres(pi,Ti),~] ...
@@ -98,11 +97,13 @@ for Ti = 1:length(T)
 end
 
 etaPres_LHV = -delGPres/delH_LHV;
+%etaPres_LHV = pctVapPres;
+etaPres_LHV = etaPres;
 figure(3);
 plot(Patm/101300,etaPres_LHV(:,1),Patm/101300,etaPres_LHV(:,2),...
      Patm/101300,etaPres_LHV(:,3),Patm/101300,etaPres_LHV(:,4));
 legend('80C','220C','650C','800C','Location','Best');
-xlabel('Pressure - Bar');
+xlabel('Pressure - Atm');
 ylabel('Efficiency on LHV basis \eta');
 grid on
 

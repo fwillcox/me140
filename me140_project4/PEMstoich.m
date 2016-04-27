@@ -22,8 +22,12 @@ mol_h2o = mol_h2;
 beta = mol_h2;               % ASSUME: all vapor
 % Ptotal = Patm; from before restructuring
 Psat = PsatW(T);
+
 Pv_guess = Ptotal*(beta./(beta + 0.5.*(lambda-1) +0.5.*lambda.*N_TO_O ));
 
+
+    
+    
 mol_total_react = mol_o2_react + mol_n2;
 y_o2_react = mol_o2_react /mol_total_react;
 y_n2_react = mol_n2       /mol_total_react;
@@ -34,11 +38,11 @@ if Pv_guess < Psat
     % All H2O is vapor (beta = 1)
     mol_h2ovap = beta;
     mol_h2oliq = 0;
-    
 else % i = 1-10
     % Some H2O is vapor, some liquid (beta not = 1)
     % LET: Pv = Psat, solve for beta
     Pv_h2o = Psat;
+    %Pv_h2o = Psat;
     y_h2o = Pv_h2o./Ptotal; %Assume Pv = Psat
     beta = (4.26 .* y_h2o)./ (1 - y_h2o);
     %beta = 1;
@@ -50,7 +54,7 @@ pctVap = mol_h2ovap/(mol_h2o);
 
 % With the moles of liquid and gas water products, calculate mole fractions
 % and deltaG and deltaH
-mol_total_prod  = mol_o2_prod + mol_n2 + mol_h2ovap;
+mol_total_prod  = mol_o2_prod + mol_n2 + mol_h2ovap ;
 y_h2ovap  = mol_h2ovap  ./ mol_total_prod;
 y_o2_prod = mol_o2_prod ./ mol_total_prod;
 y_n2_prod = mol_n2      ./ mol_total_prod;
@@ -75,10 +79,10 @@ hprod = ...
 hreact = ...
       hEng(T,'h2',     mol_h2)... 
     + hEng(T,'o2',     mol_o2_react)...
-    + hEng(T,'n2',     mol_n2);
+    + (hEng(T,'n2',     mol_n2));
 dh = hprod - hreact;
-
 eta = delG ./ dh;
+%eta = delG ./ 2.4191e5;
 specs.mol_air =         mol_air;
 specs.mol_o2_react =         mol_o2_react;
 specs.mol_n2 =         mol_n2;
