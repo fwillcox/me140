@@ -158,15 +158,12 @@ Pv_react = Ptotal.*y_h2o_react;
 Pv_react(Pv_react>psat) = psat(Pv_react>psat); % if Pv > psat, Pv = psat 
 hum_rel = Pv_react./psat;
 
-% plot relative humidity
-% plot(T,alpha,T,omega2,T,hum_rel); - DELETE
-% legend('Moles of H2O to Add','Relative Humidity, outlet?') - DELETE
-% figure(4);
-% plot(T - C_TO_K,hum_rel)
-% xlabel('Temperature [Celsius]');
-% ylabel('Relative Humidity of Input Air [%]');
-% title('Part 3: Relative Humidity as a Function of Temperature')
-% plotfixer();
+figure(4);
+plot(T - C_TO_K,hum_rel)
+xlabel('Temperature [Celsius]');
+ylabel('Relative Humidity of Input Air [%]');
+title('Part 3: Relative Humidity as a Function of Temperature')
+plotfixer();
 
 %% Part 4
 % (1) part 1 plot, (2) part 1 plot except inlet humidity = 100%, (3) part 3
