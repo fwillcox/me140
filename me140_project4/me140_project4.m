@@ -61,6 +61,7 @@ legend('\eta_{HHV}','\eta_{LHV}','\eta_{Mixed Liquid and Gas}','\eta_{Carnot}', 
 xlabel('Temperature [K]');
 ylabel('Maximum 1st Law Efficiency');
 plotfixer();
+grid on
 
 % % UNCOMMENT FOR PART 2a (varying lambda)
 T_C = [80 220 650 800];
@@ -82,6 +83,8 @@ plot(lambda,etaLambda_LHV);
 legend('80C','220C','650C','800C','Location','Best');
 xlabel('Excess air coefficient \lambda');
 ylabel('Efficiency on LHV basis \eta');
+plotfixer();
+grid on
 
 %%part2.1 plot%%
 
@@ -104,6 +107,8 @@ plot(Patm/101300,etaPres_LHV);
 legend('80C','220C','650C','800C','Location','Best');
 xlabel('Pressure - Bar');
 ylabel('Efficiency on LHV basis \eta');
+plotfixer();
+grid on
 return
 
 % figure(2)
