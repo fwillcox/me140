@@ -73,7 +73,7 @@ for Ti = 1:length(T)
 end
 mass_h2 = 1* (MM_h*2)*G_TO_KG;
 delH_LHV = LHV_h2 * mass_h2;
-etaLambda_LHV = -delGLambda/delH_LHV;
+etaLambda_LHV = -delGLambda/delH_LHV;q
 
 %%part2.1 plot%%
 
