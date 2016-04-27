@@ -12,15 +12,15 @@ KPA_TO_PA = 10^3;
 KJ_TO_J = 10^3;
 C_TO_K = 273.15;
 
-N_TO_O = 3.7619;        % Engineering Air Molar Mass Ratio of Nitrogen to Oxygen
+N_TO_O = 79/21;        % Engineering Air Molar Mass Ratio of Nitrogen to Oxygen
 
 % Molar Masses
 MM_c = 12;
-MM_h = 1;
+MM_h = 1.007940;
 MM_o = 16;
 MM_n = 14;
 MM_h2o = 2*MM_h + MM_o;
-MM_air = 28.85;
+MM_air = 28.97;
 
 % ----------------------------------------------------
 % Part 1 & 2: Efficiency of PEM Fuel Cells Found 3 Ways
@@ -32,17 +32,15 @@ MM_air = 28.85;
 npts = 100;
 HHV_h2 = 141.8*10^6;                    % J/kg,  Higher Heating Value   
 LHV_h2 = 120.0*10^6;                    % J/kg,  Lower Heating Value  
-% ------------------------------------------
-% UNCOMMENT FOR PART 1:
 T = linspace(25+C_TO_K,1000+C_TO_K,npts);
 lambda = 2;                             % Equivalence Ratio(ASSUME: 100% excess air)        
 Patm = 101.3*KPA_TO_PA;                 % Pa,     Preact = Pprod = Patm 
-% ------------------------------------------
 
 eta = zeros(size(T));
 pctVap = zeros(size(T));
 delG = zeros(size(T));
-for i = 1:length(T) %loop temperature (cols)
+
+for i = 1:length(T)                     %loop temperature (cols)
     [eta(i), pctVap(i),delG(i),~] = PEMstoich(lambda,T(i),Patm);
 end
 %PEMstoich assumes per mol of h2, 1mol h2 burned
@@ -52,17 +50,17 @@ eta_LHV = -delG / (LHV_h2 * mass_h2);
 
 eta_carnot = carnotEff(T,T(1));      % ASSUME: Tcold = 25 degrees C
 
-figure(1);
-plot(T,eta_HHV,'b--', T,eta_LHV,'m--',T,eta,'g-', T,eta_carnot,'c');
-legend('\eta_{HHV}','\eta_{LHV}','\eta_{Mixed Liquid and Gas}','\eta_{Carnot}', 'Location', 'Best');
-xlabel('Temperature [K]');
-ylabel('Maximum 1st Law Efficiency');
-title('Part 1: First Law Efficiencies and Maximum Heat Engine Efficiency');
-plotfixer();
-grid on
+% figure(1);
+% plot(T,eta_HHV,'b--', T,eta_LHV,'m--',T,eta,'g-', T,eta_carnot,'c');
+% legend('\eta_{HHV}','\eta_{LHV}','\eta_{Mixed Liquid and Gas}','\eta_{Carnot}', 'Location', 'Best');
+% xlabel('Temperature [K]');
+% ylabel('Maximum 1st Law Efficiency');
+% title('Part 1: First Law Efficiencies and Maximum Heat Engine Efficiency');
+% plotfixer();
+% grid on
 
-% % UNCOMMENT FOR PART 2a (varying lambda)
-T_C = [80 220 650 800];
+% PART 2a (varying lambda)
+T_C = [85 220 650 800];
 T = T_C + C_TO_K;
 lambda = linspace(1,10,npts);       % (Comment back in for Part 2)         
 Patm = 101.3*KPA_TO_PA;             % Pa,     Preact = Pprod = Patm 
@@ -76,24 +74,21 @@ end
 mass_h2 = 1* (MM_h*2)*G_TO_KG;
 delH_LHV = LHV_h2 * mass_h2;
 etaLambda_LHV = -delGLambda/delH_LHV;
-figure(2);
-plot(lambda,etaLambda_LHV);
-legend('80C','220C','650C','800C','Location','Best');
-xlabel('Excess air coefficient \lambda');
-ylabel('Efficiency on LHV basis \eta');
-title('Part 2: Varying Lambda: Maximum Cell Efficiency')
-plotfixer 
-spec = Spec();
-spec.mol_air = 5;
+% figure(2);
+% plot(lambda,etaLambda_LHV);
+% legend('80C','220C','650C','800C','Location','Best');
+% xlabel('Excess air coefficient \lambda');
+% ylabel('Efficiency on LHV basis \eta');
+% title('Part 2: Varying Lambda: Maximum Cell Efficiency')
+% plotfixer 
+% spec = Spec();
+% spec.mol_air = 5;
 
-
-%%part2.1 plot%%
-
-% % UNCOMMENT FOR PART 2b (varying Patm)
+% PART 2b (varying Patm)
 T_C = [80 220 650 800];
 T = T_C + C_TO_K;
 lambda = 2;                         % Equivalence Ratio(ASSUME: 100% excess air)     
-Patm = linspace(101.3*KPA_TO_PA,4053*KPA_TO_PA,npts); % Pa, (Comment back in for Part 2)
+Patm = linspace(101.3*KPA_TO_PA,4053*KPA_TO_PA,npts); 
 
 for Ti = 1:length(T)
     for pi = 1:length(Patm)
@@ -104,7 +99,8 @@ end
 
 etaPres_LHV = -delGPres/delH_LHV;
 figure(3);
-plot(Patm/101300,etaPres_LHV);
+plot(Patm/101300,etaPres_LHV(:,1),Patm/101300,etaPres_LHV(:,2),...
+     Patm/101300,etaPres_LHV(:,3),Patm/101300,etaPres_LHV(:,4));
 legend('80C','220C','650C','800C','Location','Best');
 xlabel('Pressure - Bar');
 ylabel('Efficiency on LHV basis \eta');
@@ -160,10 +156,10 @@ hum_rel = Pv_react./psat;
 % plot relative humidity
 % plot(T,alpha,T,omega2,T,hum_rel); - DELETE
 % legend('Moles of H2O to Add','Relative Humidity, outlet?') - DELETE
-figure(4);
-plot(T - C_TO_K,hum_rel)
-xlabel('Temperature [Celsius]');
-ylabel('Relative Humidity of Input Air [%]');
-title('Part 3: Relative Humidity as a Function of Temperature')
-plotfixer();
+% figure(4);
+% plot(T - C_TO_K,hum_rel)
+% xlabel('Temperature [Celsius]');
+% ylabel('Relative Humidity of Input Air [%]');
+% title('Part 3: Relative Humidity as a Function of Temperature')
+% plotfixer();
 

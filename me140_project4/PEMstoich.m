@@ -7,13 +7,13 @@ function [eta, pctVap,delG, specs] = PEMstoich(lambda,T,Ptotal)
 % do we want to return a mixture vector also?
 
 % all return values per mol of fuel burned (assuming 1 mol here)
+N_TO_O = 79/21;        % Engineering Air Molar Mass Ratio of Nitrogen to Oxygen
 specs = Spec(); %class initialization
 mol_h2 = 1; 
-mol_air = 4.76*lambda/2*mol_h2;
+mol_air = (1+N_TO_O)*lambda/2*mol_h2;
 mol_o2_react = mol_air/4.76;
-N_TO_O = 3.7619;        % Engineering Air Molar Mass Ratio of Nitrogen to Oxygen
 
-mol_n2 = mol_air*3.76/4.76;
+mol_n2 = mol_air*N_TO_O/(1+N_TO_O);
 mol_o2_prod = 0.5*(lambda-1).*mol_h2;  
 %double check o2prod? should be *mol_h2?
 
