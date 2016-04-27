@@ -108,6 +108,7 @@ plot(Patm/101300,etaPres_LHV(:,1),Patm/101300,etaPres_LHV(:,2),...
 legend('80C','220C','650C','800C','Location','Best');
 xlabel('Pressure - Bar');
 ylabel('Efficiency on LHV basis \eta');
+title('Part 2: Varying Pressure: Maximum Cell Efficiency')
 grid on
 
 
