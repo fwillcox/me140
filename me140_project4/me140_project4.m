@@ -75,6 +75,7 @@ end
 mass_h2 = 1* (MM_h*2)*G_TO_KG;
 delH_LHV = LHV_h2 * mass_h2;
 etaLambda_LHV = -delGLambda/delH_LHV;
+
 figure(2);
 plot(lambda,etaLambda_LHV);
 legend('80C','220C','650C','800C','Location','Best');
@@ -82,6 +83,7 @@ xlabel('Excess air coefficient \lambda');
 ylabel('Efficiency on LHV basis \eta');
 title('Part 2: Varying Lambda: Maximum Cell Efficiency')
 plotfixer 
+
 spec = Spec();
 spec.mol_air = 5;
 
@@ -142,8 +144,6 @@ for i = 1:length(T)
     mol_n2(i) = tempSpecs.mol_n2;
 end
 
-
-
 % find mole fraction of water in products
 y_h2o = psat./Ptotal; %Assume Pv = Psat
 beta = (4.26 .* y_h2o)./ (1 - y_h2o);
@@ -166,4 +166,49 @@ xlabel('Temperature [Celsius]');
 ylabel('Relative Humidity of Input Air [%]');
 title('Part 3: Relative Humidity as a Function of Temperature')
 plotfixer();
+
+%% Part 4
+% (1) part 1 plot, (2) part 1 plot except inlet humidity = 100%, (3) part 3
+% plot
+
+% Part 4 - 1
+
+figure(5);
+plot(T,eta_LHV);
+
+% Part 4 - 2
+% T 25-100 C
+% P atm
+% lamdba = 2
+Patm = 101.3e3;
+lambda = 2;
+Psat = PsatW(T);
+y_h2o_react = Psat / Patm;
+% assume 1 mol h2 
+mol_air = lambda*4.76/2;
+alpha_2 = mol_air * (Psat) ./ (Patm - Psat); %alternatively y / 1-y;
+
+eta_2  = zeros(size(T));
+delG_2 = zeros(size(T));
+for i = 1:length(T)
+    [eta_2(i), ~, delG_2(i), ~] = ...
+        PEMstoich(lambda,T(i),Patm,alpha_2(i));
+end
+
+eta_2  = -delG_2 ./delH_LHV;
+
+hold on;
+plot(T,eta_2);
+
+for i = 1:length(T)
+    [eta_3(i), ~, delG_3(i), ~] = ...
+        PEMstoich(lambda,T(i),Patm,alpha(i));
+end
+
+eta_2  = -delG_3 ./delH_LHV;
+
+plot(T,eta_3);
+
+
+
 
