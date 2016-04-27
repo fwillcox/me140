@@ -132,12 +132,14 @@ T = linspace(25,100,npts);
 T = T + C_TO_K;
 psat = PsatW(T);
 
+mol_air = zeros(size(T));
 mol_o2_react = zeros(size(T));
 mol_n2 = zeros(size(T));
 for i = 1:length(T)
-[~,~,~,tempSpecs] = PEMstoich(lambda, T(i), Ptotal);
-mol_o2_react(i) = tempSpecs.mol_o2_react ;
-mol_n2(i) = tempSpecs.mol_n2 ;
+    [~,~,~,tempSpecs] = PEMstoich(lambda, T(i), Ptotal);
+    mol_air(i) = tempSpecs.mol_air;
+    mol_o2_react(i) = tempSpecs.mol_o2_react;
+    mol_n2(i) = tempSpecs.mol_n2;
 end
 
 
