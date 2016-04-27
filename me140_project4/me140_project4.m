@@ -50,14 +50,14 @@ eta_LHV = -delG / (LHV_h2 * mass_h2);
 
 eta_carnot = carnotEff(T,T(1));      % ASSUME: Tcold = 25 degrees C
 
-% figure(1);
-% plot(T,eta_HHV,'b--', T,eta_LHV,'m--',T,eta,'g-', T,eta_carnot,'c');
-% legend('\eta_{HHV}','\eta_{LHV}','\eta_{Mixed Liquid and Gas}','\eta_{Carnot}', 'Location', 'Best');
-% xlabel('Temperature [K]');
-% ylabel('Maximum 1st Law Efficiency');
-% title('Part 1: First Law Efficiencies and Maximum Heat Engine Efficiency');
-% plotfixer();
-% grid on
+figure(1);
+plot(T,eta_HHV,'b--', T,eta_LHV,'m--',T,eta,'g-', T,eta_carnot,'c');
+legend('\eta_{HHV}','\eta_{LHV}','\eta_{Mixed Liquid and Gas}','\eta_{Carnot}', 'Location', 'Best');
+xlabel('Temperature [K]');
+ylabel('Maximum 1st Law Efficiency');
+title('Part 1: First Law Efficiencies and Maximum Heat Engine Efficiency');
+plotfixer();
+grid on
 
 % PART 2a (varying lambda)
 T_C = [80 220 650 800];
@@ -83,7 +83,8 @@ legend('80C','220C','650C','800C','Location','Best');
 xlabel('Excess air coefficient \lambda');
 ylabel('Efficiency on LHV basis \eta');
 title('Part 2: Varying Lambda: Maximum Cell Efficiency')
-plotfixer 
+plotfixer
+grid on;
 
 spec = Spec();
 spec.mol_air = 5;
@@ -110,14 +111,6 @@ xlabel('Pressure - Bar');
 ylabel('Efficiency on LHV basis \eta');
 title('Part 2: Varying Pressure: Maximum Cell Efficiency')
 grid on
-
-
-% figure(2)
-% plot(T,mol_h2ovap);
-
-% figure(3)
-% plot(T,dh,'b',T,hreact,'g');
-% plotfixer();
 
 %% Part 3
 % what humidity necesary for inlet air to obtain saturated exit?
@@ -158,12 +151,14 @@ Pv_react = Ptotal.*y_h2o_react;
 Pv_react(Pv_react>psat) = psat(Pv_react>psat); % if Pv > psat, Pv = psat 
 hum_rel = Pv_react./psat;
 
+% plot relative humidity
 figure(4);
 plot(T - C_TO_K,hum_rel)
 xlabel('Temperature [Celsius]');
 ylabel('Relative Humidity of Input Air [%]');
 title('Part 3: Relative Humidity as a Function of Temperature')
 plotfixer();
+grid on;
 
 %% Part 4
 % (1) part 1 plot, (2) part 1 plot except inlet humidity = 100%, (3) part 3
@@ -216,6 +211,7 @@ xlabel('Temperature [C]');
 ylabel('\eta_{LHV}');
 title('Part 4: Comparing Max-1st-Law Efficiency in Varied Conditions');
 plotfixer;
+grid on;
 
 
 
