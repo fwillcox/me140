@@ -11,7 +11,7 @@ N_TO_O = 79/21;        % Engineering Air Molar Mass Ratio of Nitrogen to Oxygen
 specs = Spec(); %class initialization
 mol_h2 = 1; 
 mol_air = (1+N_TO_O)*lambda/2*mol_h2;
-mol_o2_react = mol_air/4.76;
+mol_o2_react = mol_air/(1+N_TO_O);
 
 mol_n2 = mol_air*N_TO_O/(1+N_TO_O);
 mol_o2_prod = 0.5*(lambda-1).*mol_h2;  
