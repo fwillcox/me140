@@ -50,14 +50,14 @@ eta_LHV = -delG / (LHV_h2 * mass_h2);
 
 eta_carnot = carnotEff(T,T(1));      % ASSUME: Tcold = 25 degrees C
 
-% figure(1);
-% plot(T,eta_HHV,'b--', T,eta_LHV,'m--',T,eta,'g-', T,eta_carnot,'c');
-% legend('\eta_{HHV}','\eta_{LHV}','\eta_{Mixed Liquid and Gas}','\eta_{Carnot}', 'Location', 'Best');
-% xlabel('Temperature [K]');
-% ylabel('Maximum 1st Law Efficiency');
-% title('Part 1: First Law Efficiencies and Maximum Heat Engine Efficiency');
-% plotfixer();
-% grid on
+figure(1);
+plot(T,eta_HHV,'b--', T,eta_LHV,'m--',T,eta,'g-', T,eta_carnot,'c');
+legend('\eta_{HHV}','\eta_{LHV}','\eta_{Mixed Liquid and Gas}','\eta_{Carnot}', 'Location', 'Best');
+xlabel('Temperature [K]');
+ylabel('Maximum 1st Law Efficiency');
+title('Part 1: First Law Efficiencies and Maximum Heat Engine Efficiency');
+plotfixer();
+grid on
 
 % PART 2a (varying lambda)
 T_C = [80 220 650 800];
