@@ -3,6 +3,7 @@ classdef Spec
     %   Detailed explanation goes here
     
     properties
+        mol_air;
         mol_o2_react;
         mol_n2;
     end
