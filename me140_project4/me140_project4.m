@@ -59,6 +59,7 @@ xlabel('Temperature [K]');
 ylabel('Maximum 1st Law Efficiency');
 title('Part 1: First Law Efficiencies and Maximum Heat Engine Efficiency');
 plotfixer();
+grid on
 
 % % UNCOMMENT FOR PART 2a (varying lambda)
 T_C = [80 220 650 800];
@@ -85,6 +86,7 @@ plotfixer
 spec = Spec();
 spec.mol_air = 5;
 
+
 %%part2.1 plot%%
 
 % % UNCOMMENT FOR PART 2b (varying Patm)
@@ -106,8 +108,8 @@ plot(Patm/101300,etaPres_LHV);
 legend('80C','220C','650C','800C','Location','Best');
 xlabel('Pressure - Bar');
 ylabel('Efficiency on LHV basis \eta');
-title('Part 2: Varying Pressure: Maximum Cell Efficiency')
-plotfixer
+grid on
+
 
 % figure(2)
 % plot(T,mol_h2ovap);
@@ -141,8 +143,6 @@ for i = 1:length(T)
     mol_o2_react(i) = tempSpecs.mol_o2_react;
     mol_n2(i) = tempSpecs.mol_n2;
 end
-
-
 
 % find mole fraction of water in products
 y_h2o = psat./Ptotal; %Assume Pv = Psat
