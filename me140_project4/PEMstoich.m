@@ -1,12 +1,13 @@
 % PEMstoich.m
 % 4-26-16 Created Jon Renslo
-function [eta, pctVap,delG] = PEMstoich(lambda,T,Ptotal)
+function [eta, pctVap,delG, specs] = PEMstoich(lambda,T,Ptotal)
 % Calculates the stoichiometry for a PEM fuel cell, dry air and dry h2
 % Returns the efficiency and the % of water vapor in the products by mass
 
 % do we want to return a mixture vector also?
 
 % all return values per mol of fuel burned (assuming 1 mol here)
+specs = Spec(); %class initialization
 mol_h2 = 1; 
 mol_air = 4.76*lambda/2*mol_h2;
 mol_o2_react = mol_air/4.76;
@@ -73,4 +74,8 @@ hreact = ...
 dh = hprod - hreact;
 
 eta = delG ./ dh;
+
+specs.mol_o2_react =         mol_o2_react;
+specs.mol_n2 =         mol_n2;
+
 end
