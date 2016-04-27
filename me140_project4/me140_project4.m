@@ -32,7 +32,7 @@ npts = 100;
 HHV_h2 = 141.8*10^6;                    % J/kg,  Higher Heating Value   
 LHV_h2 = 120.0*10^6;                    % J/kg,  Lower Heating Value  
 T = linspace(25+C_TO_K,1000+C_TO_K,npts);
-lambda = 2;                             % Equivalence Ratio(ASSUME: 100% excess air)        
+lambda = 4;                             % Equivalence Ratio(ASSUME: 100% excess air)        
 Patm = 101.3*KPA_TO_PA;                 % Pa,     Preact = Pprod = Patm 
 
 eta = zeros(size(T));
@@ -103,10 +103,10 @@ end
 
 etaPres_LHV = -delGPres/delH_LHV;
 figure(3);
-plot(Patm/101300,etaPres_LHV(:,1),Patm/101300,etaPres_LHV(:,2),...
-     Patm/101300,etaPres_LHV(:,3),Patm/101300,etaPres_LHV(:,4));
+plot(Patm/101325,etaPres_LHV(:,1),Patm/101325,etaPres_LHV(:,2),...
+     Patm/101325,etaPres_LHV(:,3),Patm/101325,etaPres_LHV(:,4));
 legend('80C','220C','650C','800C','Location','Best');
-xlabel('Pressure - Bar');
+xlabel('Pressure - Atm');
 ylabel('Efficiency on LHV basis \eta');
 title('Part 2: Varying Pressure: Maximum Cell Efficiency')
 grid on
