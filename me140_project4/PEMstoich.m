@@ -73,13 +73,8 @@ hreact = ...
 dh = hprod - hreact;
 
 eta = delG ./ dh;
-specs.mol_h2 = mol_h2;
-specs.mol_air =         mol_air;
+
 specs.mol_o2_react =         mol_o2_react;
 specs.mol_n2 =         mol_n2;
-specs.mol_o2_prod =         mol_o2_prod;
-specs.mol_h2o =         mol_h2o;
-specs.mol_total_react =         mol_total_react;
-specs.mol_h2ovap =         mol_h2ovap;
-specs.mol_h2oliq =         mol_h2oliq;
+
 end

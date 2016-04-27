@@ -132,26 +132,12 @@ T = linspace(25,100,npts);
 T = T + C_TO_K;
 psat = PsatW(T);
 
-%mol_h2 = zeros(size(T));
-%mol_air = zeros(size(T));
 mol_o2_react = zeros(size(T));
 mol_n2 = zeros(size(T));
-%mol_o2_prod = zeros(size(T));
-mol_h2o = zeros(size(T));
-mol_total_react = zeros(size(T));
-mol_h2ovap = zeros(size(T));
-mol_h2oliq = zeros(size(T));
 for i = 1:length(T)
 [~,~,~,tempSpecs] = PEMstoich(lambda, T(i), Ptotal);
-mol_h2(i) = tempSpecs.mol_h2;
-mol_air(i) = tempSpecs.mol_air ;
 mol_o2_react(i) = tempSpecs.mol_o2_react ;
 mol_n2(i) = tempSpecs.mol_n2 ;
-mol_o2_prod(i) = tempSpecs.mol_o2_prod ;
-mol_h2o(i) = tempSpecs.mol_h2o ;
-mol_total_react(i) = tempSpecs.mol_total_react ;
-mol_h2ovap(i) = tempSpecs.mol_h2ovap ;
-mol_h2oliq(i) = tempSpecs.mol_h2oliq ;
 end
 
 
