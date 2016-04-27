@@ -115,7 +115,6 @@ ylabel('Efficiency on LHV basis \eta');
 title('Part 2: Varying Pressure: Maximum Cell Efficiency')
 grid on
 saveas(f,'../plots/Plot2-2','jpeg');
-me140_project4_part2_pressures; %correct pressure plot from this file
 
 %% Part 3
 % what humidity necesary for inlet air to obtain saturated exit?
@@ -220,6 +219,8 @@ title('Part 4: Maximum First Law Efficiency as a Function of Temperature for Var
 plotfixer;
 grid on;
 saveas(f,'../plots/Plot4','jpeg');
+
+me140_project4_part2_pressures; %correct pressure plot from this file
 
 
 
