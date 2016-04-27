@@ -60,7 +60,7 @@ eta_carnot = carnotEff(T,T(1));      % ASSUME: Tcold = 25 degrees C
 % grid on
 
 % PART 2a (varying lambda)
-T_C = [85 220 650 800];
+T_C = [80 220 650 800];
 T = T_C + C_TO_K;
 lambda = linspace(1,10,npts);       % (Comment back in for Part 2)         
 Patm = 101.3*KPA_TO_PA;             % Pa,     Preact = Pprod = Patm 
