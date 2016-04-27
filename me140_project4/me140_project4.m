@@ -21,10 +21,9 @@ MM_n = 14.0067;
 MM_h2o = 2*MM_h + MM_o;
 MM_air = 28.97;
 
-% ----------------------------------------------------
-% Part 1 & 2: Efficiency of PEM Fuel Cells Found 3 Ways
-% ----------- then, varying lambda & presssure
-% -----------------------------------------------------
+% --------------------------------------------------
+% Part 1: Efficiency of PEM Fuel Cells Found 3 Ways
+% --------------------------------------------------
 % ASSUME: isothermal, isobaric i.e. reversible
 % USE: First- Law Effiency, eta = (-m_reactants*dg_react)/(mfuel*HV) where HV = LHV or HHV
 % SOURCE: LEC 8, SLIDE 13
@@ -50,16 +49,18 @@ eta_LHV = -delG / (LHV_h2 * mass_h2);
 eta_carnot = carnotEff(T,T(1));      % ASSUME: Tcold = 25 degrees C
 
 f = figure(1);
-plot(T,eta_HHV,'b--', T,eta_LHV,'m--',T,eta,'g-', T,eta_carnot,'c');
+plot(T,eta_HHV,'r', T,eta_LHV,'y',T,eta,'g', T,eta_carnot,'b');
 legend('\eta_{HHV}','\eta_{LHV}','\eta_{Mixed Liquid and Gas}','\eta_{Carnot}', 'Location', 'Best');
 xlabel('Temperature [K]');
-ylabel('Maximum 1st Law Efficiency');
-title('Part 1: First Law Efficiencies and Maximum Heat Engine Efficiency');
+ylabel('Maximum 1st Law Efficiency \eta');
+title('Part 1: First Law Efficiencies (LHV & HHV) and Maximum Heat Engine Efficiency as a Function of Temperature');
 plotfixer();
 grid on
 saveas(f,'../plots/Plot1','jpeg');
 
-% PART 2a (varying lambda)
+% --------------------------------------------
+% PART 2a: Efficiency as a Function of Lambda
+% --------------------------------------------
 T_C = [80 220 650 800];
 T = T_C + C_TO_K;
 lambda = linspace(1,10,npts);       % (Comment back in for Part 2)         
@@ -78,11 +79,11 @@ etaLambda_LHV = -delGLambda/delH_LHV;
 %%part2.1 plot%%
 
 f = figure(2);
-plot(lambda,etaLambda_LHV);
-legend('80C','220C','650C','800C','Location','Best');
+plot(lambda,etaLambda_LHV(:,1),'r',lambda,etaLambda_LHV(:,2),'y',lambda,etaLambda_LHV(:,3),'g',lambda,etaLambda_LHV(:,4),'b');
+legend('80 C','220 C','650 C','800 C','Location','Best');
 xlabel('Excess air coefficient \lambda');
-ylabel('Efficiency on LHV basis \eta');
-title('Part 2: Varying Lambda: Maximum Cell Efficiency')
+ylabel('Efficiency on LHV basis \eta_{LHV}');
+title('Part 2a: Efficiency on a LHV basis as a Function of Excess Air ')
 plotfixer
 grid on;
 saveas(f,'../plots/Plot2-1','jpeg');
@@ -208,14 +209,14 @@ end
 eta_3  = -delG_3 ./delH_LHV;
 
 f = figure(5);
-plot(T-273,eta_LHV);
+plot(T-273,eta_LHV,'r');
 hold on;
-plot(T-273,eta_2,'--');
-plot(T-273,eta_3,'.');
-legend('Dry H2 and Inlet Air','Saturated Inlet', 'Saturated Outlet','Location','best');
+plot(T-273,eta_2,'b--');
+plot(T-273,eta_3,'g.');
+legend('Dry H_{2} and Inlet Air','Saturated Inlet', 'Saturated Outlet','Location','best');
 xlabel('Temperature [C]');
 ylabel('\eta_{LHV}');
-title('Part 4: Comparing Max-1st-Law Efficiency in Varied Conditions');
+title('Part 4: Maximum First Law Efficiency as a Function of Temperature for Various Inlet and Outlet Conditions');
 plotfixer;
 grid on;
 saveas(f,'../plots/Plot4','jpeg');
