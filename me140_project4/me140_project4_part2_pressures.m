@@ -118,7 +118,7 @@ for j = 1:4
        dS_n2_react(i) = sf_N2           + dS(Tref,T,Ppartial_N2_reactant(i),Patm,'N2');
        dS_o2_react(i) = sf_O2           + dS(Tref,T,Ppartial_O2_reactant(i),Patm,'O2');
        dS_h2o_react(i) = sf_H2OVAP      + dS(Tref,T,Pmix                   ,Patm,'H2Ovap');
-       
+       % This is different line here -JR
        % dG
        dG_h2_react(i) =     H2_dH(i)      - T*dS_h2_react(i);
        dG_o2_react(i) =     O2_dH(i)      - T*dS_o2_react(i);
