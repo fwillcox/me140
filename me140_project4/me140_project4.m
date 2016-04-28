@@ -4,7 +4,7 @@
 % Jon Renslo, Emily Bohl, Frankie Willcox, Natasha Berk, Kendall Fagan
 % 4/15/16 - Created Jon Renslo
 
-close all; clear; clc;
+close all; %clear; clc;
 
 % Constants
 G_TO_KG = 10^-3;
@@ -31,7 +31,7 @@ npts = 100;
 HHV_h2 = 141.8*10^6;                    % J/kg,  Higher Heating Value   
 LHV_h2 = 120.0*10^6;                    % J/kg,  Lower Heating Value  
 T = linspace(25+C_TO_K,1000+C_TO_K,npts);
-lambda = 4;                             % Equivalence Ratio(ASSUME: 100% excess air)        
+lambda = 2;                             % Equivalence Ratio(ASSUME: 100% excess air)        
 Patm = 101.3*KPA_TO_PA;                 % Pa,     Preact = Pprod = Patm 
 
 eta = zeros(size(T));
@@ -48,14 +48,15 @@ eta_LHV = -delG / (LHV_h2 * mass_h2);
 
 eta_carnot = carnotEff(T,T(1));      % ASSUME: Tcold = 25 degrees C
 
-figure(1);
+f = figure(1);
 plot(T,eta_HHV,'r', T,eta_LHV,'y',T,eta,'g', T,eta_carnot,'b');
 legend('\eta_{HHV}','\eta_{LHV}','\eta_{Mixed Liquid and Gas}','\eta_{Carnot}', 'Location', 'Best');
 xlabel('Temperature [K]');
 ylabel('Maximum 1st Law Efficiency \eta');
-title('Part 1: First Law Efficiencies (LHV & HHV) and Maximum Heat Engine Efficiency as a Function of Temperature');
+title({'Part 1: First Law Efficiencies (LHV & HHV) and','Maximum Heat Engine Efficiency as a Function of Temperature'});
 plotfixer();
 grid on
+saveas(f,'../plots/Plot1','jpeg');
 
 % --------------------------------------------
 % PART 2a: Efficiency as a Function of Lambda
@@ -75,7 +76,9 @@ mass_h2 = 1* (MM_h*2)*G_TO_KG;
 delH_LHV = LHV_h2 * mass_h2;
 etaLambda_LHV = -delGLambda/delH_LHV;
 
-figure(2);
+%%part2.1 plot%%
+
+f = figure(2);
 plot(lambda,etaLambda_LHV(:,1),'r',lambda,etaLambda_LHV(:,2),'y',lambda,etaLambda_LHV(:,3),'g',lambda,etaLambda_LHV(:,4),'b');
 legend('80 C','220 C','650 C','800 C','Location','Best');
 xlabel('Excess air coefficient \lambda');
@@ -83,9 +86,35 @@ ylabel('Efficiency on LHV basis \eta_{LHV}');
 title('Part 2a: Efficiency on a LHV basis as a Function of Excess Air ')
 plotfixer
 grid on;
+saveas(f,'../plots/Plot2-1','jpeg');
+
 
 spec = Spec();
 spec.mol_air = 5;
+
+% % UNCOMMENT FOR PART 2b (varying Patm)
+T_C = [80 220 650 800];
+T = T_C + C_TO_K;
+lambda = 2;                         % Equivalence Ratio(ASSUME: 100% excess air)     
+Ptotal = linspace(101.3*KPA_TO_PA,4052*KPA_TO_PA,npts); 
+
+for Ti = 1:length(T)
+    for pi = 1:length(Ptotal)
+        [etaPres(pi,Ti), pctVapPres(pi,Ti) ,delGPres(pi,Ti),~] ...
+            = PEMstoich(lambda,T(Ti),Ptotal(pi));
+    end
+end
+
+etaPres_LHV = -delGPres/delH_LHV;
+f = figure(3);
+plot(Ptotal/101325,etaPres_LHV(:,1),Ptotal/101325,etaPres_LHV(:,2),...
+     Ptotal/101325,etaPres_LHV(:,3),Ptotal/101325,etaPres_LHV(:,4));
+legend('80C','220C','650C','800C','Location','Best');
+xlabel('Pressure - Atm');
+ylabel('Efficiency on LHV basis \eta');
+title('Part 2: Varying Pressure: Maximum Cell Efficiency')
+grid on
+saveas(f,'../plots/Plot2-2','jpeg');
 
 %% Part 3
 % what humidity necesary for inlet air to obtain saturated exit?
@@ -127,19 +156,25 @@ Pv_react(Pv_react>psat) = psat(Pv_react>psat); % if Pv > psat, Pv = psat
 hum_rel = Pv_react./psat;
 
 % plot relative humidity
-figure(3);
+f = figure(4);
 plot(T - C_TO_K,hum_rel)
 xlabel('Temperature [Celsius]');
 ylabel('Relative Humidity of Input Air [%]');
 title('Part 3: Relative Humidity as a Function of Temperature')
 plotfixer();
 grid on;
+saveas(f,'../plots/Plot3','jpeg');
+
 
 %% Part 4
 % (1) part 1 plot, (2) part 1 plot except inlet humidity = 100%, (3) part 3
 % plot
 
 % Part 4 - 1
+lambda = 2;
+T_C = linspace(25,100,npts);
+T = T_C + C_TO_K;
+Patm = 101.3e3;
 
 delG = zeros(size(T));
 for i = 1:length(T) %loop temperature for new T
@@ -176,7 +211,7 @@ end
 
 eta_3  = -delG_3 ./delH_LHV;
 
-figure(4);
+f = figure(5);
 plot(T-273,eta_LHV,'r');
 hold on;
 plot(T-273,eta_2,'b--');
@@ -184,9 +219,13 @@ plot(T-273,eta_3,'g.');
 legend('Dry H_{2} and Inlet Air','Saturated Inlet', 'Saturated Outlet','Location','best');
 xlabel('Temperature [C]');
 ylabel('\eta_{LHV}');
-title('Part 4: Maximum First Law Efficiency as a Function of Temperature for Various Inlet and Outlet Conditions');
+title({'Part 4: Maximum First Law Efficiency as a Function of Temperature',' for Various Inlet and Outlet Conditions'});
 plotfixer;
 grid on;
+saveas(f,'../plots/Plot4','jpeg');
+
+me140_project4_part2_pressures; %correct pressure plot from this file
+
 
 
 

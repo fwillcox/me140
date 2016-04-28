@@ -118,6 +118,7 @@ for j = 1:4
        dS_n2_react(i) = sf_N2           + dS(Tref,T,Ppartial_N2_reactant(i),Patm,'N2');
        dS_o2_react(i) = sf_O2           + dS(Tref,T,Ppartial_O2_reactant(i),Patm,'O2');
        dS_h2o_react(i) = sf_H2OVAP      + dS(Tref,T,Pmix                   ,Patm,'H2Ovap');
+       % This is different line here -JR
        
        % dG
        dG_h2_react(i) =     H2_dH(i)      - T*dS_h2_react(i);
@@ -146,17 +147,17 @@ for j = 1:4
        
        G_react(i) = mol_h2_react*dG_h2_react(i) + mol_o2_react*dG_o2_react(i) + mol_n2_react*dG_n2_react(i) + alpha*dG_h2ovap_react(i);
        G_prod(i) = mol_o2_prod*dG_o2_prod(i) + mol_n2_prod*dG_n2_prod(i) + beta(i)*dG_h2ovap_prod(i) + gamma(i)*dG_h2oliq_prod(i);
-       dG_rxn(i) = G_prod(i) - G_react(i);
+       dG_rxn(j,i) = G_prod(i) - G_react(i);
        
-       eta_HHV(i) = -(dG_rxn(i))./(m_fuel*HHV);
-       eta_LHV(i) = -(dG_rxn(i))./(m_fuel*LHV);
+       eta_HHV(i) = -(dG_rxn(j,i))./(m_fuel*HHV);
+       eta_LHV(i) = -(dG_rxn(j,i))./(m_fuel*LHV);
        eta_carnot(i) = (T-Tref)./T;
     end
     eta_press(j,:) = eta_LHV;
 end 
 
 P_range = linspace(1,Pmax,Pmax) * ATM_TO_PA; % [Pa]
-figure
+f = figure;
 hold on
 plot(P_range,eta_press(1,:),'r',P_range,eta_press(2,:),'y',P_range,eta_press(3,:),'g',P_range,eta_press(4,:),'b')
 legend('T = 80šC','T = 220 C','T = 650 šC','T = 800 šC','location','southeast')
@@ -165,3 +166,4 @@ xlabel('Pressure [Pa]')
 ylabel('Efficiency \eta_{LHV}')
 plotfixer
 grid on
+saveas(f,'../plots/Part2-2-2','jpeg');
