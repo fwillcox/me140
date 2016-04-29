@@ -144,8 +144,13 @@ end
 
 % find mole fraction of water in products
 y_h2o = psat./Ptotal; %Assume Pv = Psat
-beta = (4.26 .* y_h2o)./ (1 - y_h2o);
+beta = (4.26 .* y_h2o)./ (1 - y_h2o); % what does this line do?
+% h2 + lambda * air + alpha * water ->
+%   h2o + beta * water + (lambda - 1) * air
+% from solving beta / (beta + air_products) = pvapor / ptotal = y_h2o_prod
+
 % if less than what is formed, add the difference to dry air reagent
+% 1 mol of h2o formed from 1 mol assumption h2 reacted
 alpha = beta - 1;
 %if condensation is forming just from what is formed, don't add any
 %humidity to reactants
