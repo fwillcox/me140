@@ -71,6 +71,7 @@ function out = energyF(T,P,species,moles)
             i = co2;
         case 'h2o'
             i = h2o;
+            P = P0; %no pressure term in liquid calc of entropy
         case'h2ovap'
             i = h2ovap;
         case 'n2'
