@@ -64,11 +64,11 @@ greact = gEng(T,Ptotal,'h2',mol_h2) ...
     + gEng(T,Ptotal .* y_o2_react,'o2',mol_o2_react) ...
     + gEng(T,Ptotal .* y_n2_react,'n2',mol_n2);
 if(alpha ~= 0 )
-    greact = greact + gEng(T,Ptotal*y_h2o_react,'h2ovap',alpha); %greact = greact + gEng(T,Ptotal .* y_h2o_react,'h2ovap',alpha);
+    greact = greact + gEng(T,Ptotal*y_h2o_react,'h2ovap',alpha); 
 end
 
 gprod = ...
-      gEng(T, Ptotal*y_h2ovap,    'h2ovap', mol_h2ovap)... %% THIS IS OFFENDING LINE IN PART 2
+      gEng(T, Ptotal*y_h2ovap,    'h2ovap', mol_h2ovap)...       %% THIS IS OFFENDING LINE IN PART 2
     + gEng(T, Ptotal,             'h2o',    mol_h2oliq)...
     + gEng(T, Ptotal.*y_o2_prod,       'o2',     mol_o2_prod)...   
     + gEng(T, Ptotal.*y_n2_prod,       'n2',     mol_n2);
@@ -93,8 +93,8 @@ dh = hprod - hreact;
 
 eta = delG ./ dh;
 specs.mol_air =         mol_air;
-specs.mol_o2_react =         mol_o2_react;
-specs.mol_n2 =         mol_n2;
+specs.mol_o2_react =    mol_o2_react;
+specs.mol_n2 =          mol_n2;
 % TODO update Spec to accomodate inlet water? (PLEASE CHECK KENDALL)
 
 end

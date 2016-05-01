@@ -16,7 +16,7 @@ function out = energyF(T,P,species,moles)
     
     
     if(~exist('moles','var')) moles = 1; end
-    T0 = 273 + 25; %standard conditions 25C
+    T0 = T1;                    % TODO: double check this change from project #4: used to be 273 + 25; %standard conditions 25C
     [co2, h2ovap, h2o, n2, o2, air, airConst,h2] = deal(1,2,3,4,5,6,7,8);
     
     fit{co2} =    [22.26, 5.981*10^-2,   -3.501 *10^-5, 7.469*10^-9  ];
