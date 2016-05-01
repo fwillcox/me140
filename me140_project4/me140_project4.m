@@ -54,9 +54,7 @@ legend('\eta_{HHV}','\eta_{LHV}','\eta_{Mixed Liquid and Gas}','\eta_{Carnot}', 
 xlabel('Temperature [K]');
 ylabel('Maximum 1st Law Efficiency \eta');
 title({'Part 1: First Law Efficiencies (LHV & HHV) and','Maximum Heat Engine Efficiency as a Function of Temperature'});
-plotfixer();
-grid on
-saveas(f,'../plots/Plot1','jpeg');
+plotfixer(); grid on; saveas(f,'../plots/Plot1','jpeg');
 
 % --------------------------------------------
 % PART 2a: Efficiency as a Function of Lambda
@@ -84,9 +82,7 @@ legend('80 C','220 C','650 C','800 C','Location','Best');
 xlabel('Excess air coefficient \lambda');
 ylabel('Efficiency on LHV basis \eta_{LHV}');
 title('Part 2a: Efficiency on a LHV basis as a Function of Excess Air ')
-plotfixer
-grid on;
-saveas(f,'../plots/Plot2-1','jpeg');
+plotfixer(); grid on; saveas(f,'../plots/Plot2-1','jpeg');
 
 
 spec = Spec();
@@ -113,8 +109,7 @@ legend('80C','220C','650C','800C','Location','Best');
 xlabel('Pressure - Atm');
 ylabel('Efficiency on LHV basis \eta');
 title('Part 2: Varying Pressure: Maximum Cell Efficiency')
-grid on
-saveas(f,'../plots/Plot2-2','jpeg');
+plotfixer(); grid on; saveas(f,'../plots/Plot2-2','jpeg');
 
 %% Part 3
 % what humidity necesary for inlet air to obtain saturated exit?
@@ -166,9 +161,7 @@ plot(T - C_TO_K,hum_rel)
 xlabel('Temperature [Celsius]');
 ylabel('Relative Humidity of Input Air [%]');
 title('Part 3: Relative Humidity as a Function of Temperature')
-plotfixer();
-grid on;
-saveas(f,'../plots/Plot3','jpeg');
+plotfixer(); grid on; saveas(f,'../plots/Plot3','jpeg');
 
 
 %% Part 4
@@ -225,9 +218,7 @@ legend('Dry H_{2} and Inlet Air','Saturated Inlet', 'Saturated Outlet','Location
 xlabel('Temperature [C]');
 ylabel('\eta_{LHV}');
 title({'Part 4: Maximum First Law Efficiency as a Function of Temperature',' for Various Inlet and Outlet Conditions'});
-plotfixer;
-grid on;
-saveas(f,'../plots/Plot4','jpeg');
+plotfixer; grid on; saveas(f,'../plots/Plot4','jpeg');
 
 me140_project4_part2_pressures; %correct pressure plot from this file
 
