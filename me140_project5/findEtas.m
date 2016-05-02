@@ -10,7 +10,6 @@
 function [eta_I, eta_II, Idot] = findEtas(T,Wdot)
 
 global PERMIN_TO_PERHR G_PER_KG LHV F N_TO_O
-defineGlobals();
 % Constants                                                  % Engineering Air Molar Mass Ratio of Nitrogen to Oxygen
 specs = Spec();                                                     % class initialization
 

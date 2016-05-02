@@ -6,7 +6,7 @@
 % (i)  mol_H2 = 1
 
 % Constants
-global PERMIN_TO_PERHR G_PER_KG LHV F N_TO_Of
+global PERMIN_TO_PERHR G_PER_KG LHV F N_TO_O
 defineGlobals();
 mol_H2 = 1;
 savePlots = 1;
