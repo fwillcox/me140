@@ -9,7 +9,7 @@
 
 function [eta_I, eta_II, Idot] = findEtas(T,Wdot)
 
-global PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS
+global PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS C_TO_K
 defineGlobals();
 % Constants                                                  % Engineering Air Molar Mass Ratio of Nitrogen to Oxygen
 specs = Spec();                                                     % class initialization
@@ -29,7 +29,7 @@ Ptotal =   [0.2 0.3 0.6 0.7 1.15 1.25 1.35 1.3 1.5];                % psi (gauge
 mdot_h2_scf =  [2.50 6.20 10.5 14.3 18.2 22.0 24.6 25.0 26.1];      % scf/hr (standard cubic feet/hour)
 mdot_h2 = mdot_h2_scf .* SCF_TO_MOLS * PERHR_TO_PERSEC;             % mols/s
 mdot_air_scf = [0.75 1.10 1.45 1.81 2.55 3.10 3.30 3.25 3.40];      % scf/min
-mdot_air = mdot_air_scf * SCF_TO_MOLS * PERMIN_TO_PERSEC;        % mols/s
+mdot_air = mdot_air_scf * SCF_TO_MOLS * PERMIN_TO_PERSEC;           % mols/s
 mdot_h2o = 40;                                                      % g/s (ASSUMPTION for Part 3) % TODO: convert this
 
 % Excess Air Coefficient (lambda)

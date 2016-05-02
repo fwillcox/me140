@@ -6,7 +6,16 @@
 % (i)  mol_H2 = 1
 
 % Constants
-global PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS
+G_TO_KG = 10^3;
+
+% Molar Masses
+MM_h = 1.00794; % g/mol
+MM_o = 15.9994;
+MM_n = 14.0067;
+MM_h2o = 2*MM_h + MM_o;
+MM_air = 28.97;
+
+global PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS C_TO_K
 defineGlobals();
 mol_H2 = 1;
 savePlots = 1;
@@ -15,30 +24,38 @@ savePlots = 1;
 % Part 1: Raw Data Plots vs. Load
 % --------------------------------
 % Currents (load & stack)
-i_load =  [0.00 15.06 27.25 36.48 45.1 52.1 56.3 57.6 56.4];        % Amps
+i_load =  [0.00 15.06 27.25 36.48 45.1 52.1 56.3 57.6 56.4];       % [Amps]
 i_stack = [4.82 21.40 35.65 47.20 59.8 69.7 77.0 79.0 80.0];
 
 % Potentials (load & stack)
-v_load =  [17.07 15.05 14.08 13.10 12.07 11.27 10.31 9.87  9.05 ];  % Volts
+v_load =  [17.07 15.05 14.08 13.10 12.07 11.27 10.31 9.87  9.05 ]; % [Volts]
 v_stack = [17.09 15.22 14.26 12.98 12.42 11.60 10.73 10.21 9.48];
 
 % Temperatures from Thermocouple Readings [C]
 % KEY: (Kendall please fill in with photo you took)
-T1 =     [42.8 42.9 46.1 48.5 50.5 52.8 54.8 55.8 56.5];            % T1, air into stack
-T2 =     [42.5 45.8 45.8 48.4 50.3 51.9 53.3 53.9 54.3];            % T2, air out of stack
-Tstack = [40.7 41.3 42.5 42.9 44.6 45.6 46.9 46.9 47.6];            
+T1_C = [42.8 42.9 46.1 48.5 50.5 52.8 54.8 55.8 56.5]; 
+T1 = T1_C + C_TO_K;                                                % [K],  T1, air into stack
+T2_C =     [42.5 45.8 45.8 48.4 50.3 51.9 53.3 53.9 54.3];         
+T2 = T2_C + C_TO_K;                                                % [K],  T2, air out of stack 
+Tstack_C = [40.7 41.3 42.5 42.9 44.6 45.6 46.9 46.9 47.6];  
+Tstack = Tstack_C + C_TO_K;
 
 % NOTE: T3-T5 are not needed for now
-%T3 =     [48.0 47.1 48.6 48.9 50.4 51.1 51.2 51.1 51.1];           % T3, water reservoir DON'T USE!
-%T4 =     [48.0 47.2 48.2 48.9 50.4 51.1 51.2 51.1 51.1];           % T4, water into stack
-%T5 =     [40.7 41.3 42.5 42.9 44.6 45.6 46.9 46.9 47.6];           % T5, water into heat exchanger
+% T3_C =     [48.0 47.1 48.6 48.9 50.4 51.1 51.2 51.1 51.1];       % T3, water reservoir DON'T USE!
+% T3 = T3_C + C_TO_K;
+% T4_C =     [48.0 47.2 48.2 48.9 50.4 51.1 51.2 51.1 51.1];       % T4, water into stack
+% T4 = T4_C + C_TO_K;
+% T5_C =     [40.7 41.3 42.5 42.9 44.6 45.6 46.9 46.9 47.6];       % T5, water into heat exchanger
+% T5 = T5_C + C_TO_K;
 
 % Mass Flow Rates (TODO: check what units the mdots should be in)
-mdot_h2_scf =  [2.50 6.20 10.5 14.3 18.2 22.0 24.6 25.0 26.1];      % scf/hr (standard cubic feet/hour)
-mdot_h2 = mdot_h2_scf .* SCF_TO_MOLS * PERHR_TO_PERSEC;             % mols/s
-mdot_air_scf = [0.75 1.10 1.45 1.81 2.55 3.10 3.30 3.25 3.40];      % scf/min
-mdot_air = mdot_air_scf * SCF_TO_MOLS * PERMIN_TO_PERSEC;        % mols/s
-mdot_h2o = 40;                                                      % g/s (ASSUMPTION for Part 3) % TODO: convert this
+mdot_h2_scf =  [2.50 6.20 10.5 14.3 18.2 22.0 24.6 25.0 26.1];     % scf/hr (standard cubic feet/hour)
+mdot_air_scf = [0.75 1.10 1.45 1.81 2.55 3.10 3.30 3.25 3.40];     % scf/min
+
+mdot_h2 = mdot_h2_scf   * SCF_TO_MOLS * PERHR_TO_PERSEC * MM_h2  / G_TO_KG;  % kg/s	
+mdot_air = mdot_air_scf * SCF_TO_MOLS * PERMIN_TO_PERSEC* MM_air / G_TO_KG;  % kg/s
+
+mdot_h2o = 40 /G_TO_KG;                                            % kg/s (ASSUMPTION for Part 3)
 
 
 % CALCULATIONS
