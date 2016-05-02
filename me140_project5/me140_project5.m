@@ -4,6 +4,7 @@
 
 % ASSUME:
 % (i)  mol_H2 = 1
+clear; close all;clc;
 
 global PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS ...
     C_TO_K PSI_TO_PA MM_h MM_h2 MM_o MM_n MM_h2o MM_air PATM
@@ -70,26 +71,26 @@ f1 = figure(1);
 plot(p_load,i_load,p_load,i_stack);
 title('Current as a Function of Load');
 xlabel('Load []'); ylabel('Current []');
-legend('I_{load}','I_{stack}'); plotfixer(); grid on;
+legend('I_{load}','I_{stack}','Location','best'); plotfixer(); grid on;
 
 f2 = figure(2); 
 plot(p_load,v_load,p_load,v_stack);
 title('Potential as a Function of Load');
 xlabel('Load []'); ylabel('Potential []');
-legend('V_{load}','V_{stack}'); plotfixer();grid on;
+legend('V_{load}','V_{stack}','Location','best'); plotfixer();grid on;
 
 f3 = figure(3);
 plot(p_load,p_stack,p_load,p_access);
 title('Stack and Accessory Power as a Function of Load');
 xlabel('Load []'); ylabel('Power []');
-legend('P_{stack}','P_{accessory}'); plotfixer();grid on;
+legend('P_{stack}','P_{accessory}','Location','best'); plotfixer();grid on;
 
 % TODO: plot lambda...
 f4 = figure(4);
 plot(p_load,mdot_fuel,p_load,mdot_total);
 title('Mass Flow Rate as a Function of Load');
 xlabel('Load []'); ylabel('Mass Flow Rate []');
-legend('mdot_{H}','mdot_{air}'); plotfixer();grid on
+legend('mdot_{H}','mdot_{air}','Location','best'); plotfixer();grid on
 
 % ---------------------------
 % Part 2: Reduced-Data Plots
@@ -107,21 +108,21 @@ f6 = figure(6);
 plot(p_load,lambda_load,p_load,lambda_stack);
 title('Air Equivalent as a Function of Load');
 xlabel('Load [Watts]'); ylabel('Lambda');
-legend('\lambda_{load}','\lambda_{stack}'); plotfixer();grid on
+legend('\lambda_{load}','\lambda_{stack}','Location','best'); plotfixer();grid on
 
 f5 = figure(5);
 plot(p_load,etaI_stack,'c',p_load,etaI_load,'bp--',...
     p_load,etaII_stack,'r',p_load,etaII_load,'gp--');
 title('Efficiency as a Function of Load');
 xlabel('Load [Watts]'); ylabel('Efficiency');
-legend('eta_{I,stack}','eta_{I,system}','eta_{II,stack}','eta_{II,system}'); 
-plotfixer(); grid on;
+legend('\eta_{I,stack}','\eta_{I,system}',...
+    '\eta_{II,stack}','\eta_{II,system}', 'Location','Best'); plotfixer(); grid on;
 
 f7 = figure(7);
 plot(p_load,p_stack,'c',p_load,p_load,'bp--');
 title('Power Loss/Inefficiences as a Function of Load');
 xlabel('Load [Watts]'); ylabel('Power Loss/Inefficiencies, Idot [Watts]');
-legend('Idot_{stack}','Idot_{system}'); plotfixer();grid on;
+legend('Idot_{stack}','Idot_{system}','Location','best'); plotfixer();grid on;
 
 
 if(savePlots ==1) 
@@ -149,11 +150,11 @@ hybridEff = 0.40;
 
 % Overall First Law Efficiency of the PEM Fuel Cell = Stack Efficiency
 % Plotting to compare
-figure(8)
+f8 = figure(8);
 plot(p_load, etaI_stack, 'c', p_load, dieselEff, 'bp--', p_load, hybridEff, 'gd');
 title('Comparing 1st Law Efficiency: PEM Fuel Cell, Diesel, and Gasoline Hybrid');
 xlabel('Load [Watts]'); ylabel('Efficiency, eta_{I}');
-legend('eta_{I,stack}','eta_{I,Diesel}', 'eta_{I,Hybrid}'); plotfixer(); grid on;
+legend('eta_{I,stack}','eta_{I,Diesel}', 'eta_{I,Hybrid}','Location','best'); plotfixer(); grid on;
 
 
 % TODO: FIGURE OUT SCALE-UP FOR TOYOTA HYBRID
