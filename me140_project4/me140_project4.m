@@ -27,7 +27,7 @@ MM_air = 28.97;
 % ASSUME: isothermal, isobaric i.e. reversible
 % USE: First- Law Effiency, eta = (-m_reactants*dg_react)/(mfuel*HV) where HV = LHV or HHV
 % SOURCE: LEC 8, SLIDE 13
-npts = 100;
+npts = 40;
 HHV_h2 = 141.8*10^6;                    % J/kg,  Higher Heating Value   
 LHV_h2 = 120.0*10^6;                    % J/kg,  Lower Heating Value  
 T = linspace(25+C_TO_K,1000+C_TO_K,npts);
@@ -59,6 +59,7 @@ plotfixer(); grid on; saveas(f,'../plots/Plot1','jpeg');
 % --------------------------------------------
 % PART 2a: Efficiency as a Function of Lambda
 % --------------------------------------------
+
 T_C = [80 220 650 800];
 T = T_C + C_TO_K;
 lambda = linspace(1,10,npts);       % (Comment back in for Part 2)         
@@ -76,6 +77,7 @@ etaLambda_LHV = -delGLambda/delH_LHV;
 
 %%part2.1 plot%%
 
+
 f = figure(2);
 plot(lambda,etaLambda_LHV(:,1),'r',lambda,etaLambda_LHV(:,2),'y',lambda,etaLambda_LHV(:,3),'g',lambda,etaLambda_LHV(:,4),'b');
 legend('80 C','220 C','650 C','800 C','Location','Best');
@@ -85,6 +87,7 @@ title('Part 2a: Efficiency on a LHV basis as a Function of Excess Air ')
 plotfixer(); grid on; saveas(f,'../plots/Plot2-1','jpeg');
 
 
+
 spec = Spec();
 spec.mol_air = 5;
 
@@ -92,6 +95,7 @@ spec.mol_air = 5;
 T_C = [80 220 650 800];
 T = T_C + C_TO_K;
 lambda = 2;                         % Equivalence Ratio(ASSUME: 100% excess air)     
+
 Ptotal = linspace(101.3*KPA_TO_PA,4052*KPA_TO_PA,npts); 
 
 for Ti = 1:length(T)
@@ -102,6 +106,9 @@ for Ti = 1:length(T)
 end
 
 etaPres_LHV = -delGPres/delH_LHV;
+%etaPres_LHV = pctVapPres;
+etaPres_LHV = etaPres; %this may or may not be right. weird conflict resolution
+
 f = figure(3);
 plot(Ptotal/101325,etaPres_LHV(:,1),Ptotal/101325,etaPres_LHV(:,2),...
      Ptotal/101325,etaPres_LHV(:,3),Ptotal/101325,etaPres_LHV(:,4));
@@ -174,6 +181,7 @@ T_C = linspace(25,100,npts);
 T = T_C + C_TO_K;
 Patm = 101.3e3;
 
+
 delG = zeros(size(T));
 for i = 1:length(T) %loop temperature for new T
     [~,~,delG(i),~] = PEMstoich(lambda,T(i),Patm);
@@ -209,6 +217,7 @@ end
 
 eta_3  = -delG_3 ./delH_LHV;
 
+
 f = figure(5);
 plot(T-273,eta_LHV,'r');
 hold on;
@@ -221,8 +230,6 @@ title({'Part 4: Maximum First Law Efficiency as a Function of Temperature',' for
 plotfixer; grid on; saveas(f,'../plots/Plot4','jpeg');
 
 me140_project4_part2_pressures; %correct pressure plot from this file
-
-
 
 
 

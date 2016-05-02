@@ -19,17 +19,12 @@ specs = Spec();                                                     % class init
 mol_h2 = 1; % ASSUME: 1 mol of H2
 mol_air_dry_react = mol_h2;
 mol_h2o_prod = mol_h2;
-mair = 0.5*(1+N_TO_O)*MM_air;
-mfuel = mol_h2*(2*MM_h);
-AFs = mair/mfuel;
+mairstoich = 0.5*(1+N_TO_O)*MM_air;
+mfuelstoich = mol_h2*(2*MM_h);
+AFs = mairstoich/mfuelstoich;
 
 AF = mdot_total./mdot_fuel;
 lambda = AF./AFs;
-
-% Fraction of Liquid H2O (alpha)
-% ASSUME: relative humidity = 100% = 1 --> alpha = Psat/Pair;
-Psat = PsatW(T);
-alpha = Ptotal./Psat; 
 
 % Mols of Each Species
 % --------------------
@@ -37,6 +32,11 @@ alpha = Ptotal./Psat;
 moldot_h2 = mdot_fuel / (MM_h2 / G_PER_KG);
 moldot_air_dry_react = (1+N_TO_O) .* lambda / 2 .* moldot_h2;
 moldot_n2 = moldot_air_dry_react .* N_TO_O/(1+N_TO_O);
+
+% Mols of H2O in Reactants (alpha)
+% ASSUME: relative humidity = 100% = 1 --> alpha = Psat/Pair;
+Psat = PsatW(T);
+alpha = Ptotal./Psat .* mol_h2; 
 
 % Reactants
 moldot_o2_react = moldot_air_dry_react./(1+N_TO_O);
@@ -130,6 +130,5 @@ eta_II = (Wdot) ./ (-dGdot);  % Watts / Watts
 specs.mol_air =      moldot_air_dry_react;
 specs.mol_o2_react = moldot_o2_react;
 specs.mol_n2 =       moldot_n2;
-% TODO update Spec to accomodate inlet water? (PLEASE CHECK KENDALL)
 
 end
