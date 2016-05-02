@@ -5,21 +5,11 @@
 % ASSUME:
 % (i)  mol_H2 = 1
 
-% Constants
-G_TO_KG = 10^3;
-
-% Molar Masses
-MM_h = 1.00794; % g/mol
-MM_h2 = 2* MM_h;
-MM_o = 15.9994;
-MM_n = 14.0067;
-MM_h2o = 2*MM_h + MM_o;
-MM_air = 28.97;
-
-global PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS C_TO_K PSI_TO_PA
+global PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS ...
+    C_TO_K PSI_TO_PA MM_h MM_h2 MM_o MM_n MM_h2o MM_air PATM
 defineGlobals();
 mol_H2 = 1;
-savePlots = 1;
+savePlots = 0;
 
 % --------------------------------
 % Part 1: Raw Data Plots vs. Load
@@ -57,16 +47,16 @@ Tstack = Tstack_C + C_TO_K;                                        % [K],  metal
 mdot_total_scf = [0.75 1.10 1.45 1.81 2.55 3.10 3.30 3.25 3.40];   % scf/min
 mdot_fuel_scf =  [2.50 6.20 10.5 14.3 18.2 22.0 24.6 25.0 26.1];   % scf/hr (standard cubic feet/hour)
 
-mdot_total = mdot_total_scf * SCF_TO_MOLS * PERMIN_TO_PERSEC* MM_air / G_TO_KG;  % kg/s
-mdot_fuel = mdot_fuel_scf * SCF_TO_MOLS * PERHR_TO_PERSEC * MM_h2  / G_TO_KG;  % kg/s	
-mdot_h2o = 40 /G_TO_KG;                                                        % kg/s
+mdot_total = mdot_total_scf * SCF_TO_MOLS * PERMIN_TO_PERSEC * ( MM_air / G_PER_KG);  % kg/s
+mdot_fuel = mdot_fuel_scf * SCF_TO_MOLS * PERHR_TO_PERSEC * (MM_h2  / G_PER_KG);  % kg/s	
+mdot_h2o = 40 /G_PER_KG;                                                        % kg/s
 
 
 % Pressures
 Pfuel_psi =  [2.9 2.9 3.1 3.3 3.30 3.20 3.00 3.0 3.1];              % [psi] (gauge)
 Ptotal_psi = [0.2 0.3 0.6 0.7 1.15 1.25 1.35 1.3 1.5];              % [psi] (gauge), pressure of combined air and H2O after humidifier
-Pfuel =  Pfuel_psi  .* PSI_TO_PA;                                   % [Pa] (gauge)
-Ptotal = Ptotal_psi .* PSI_TO_PA;                                   % [Pa] (gauge)
+Pfuel =  Pfuel_psi  .* PSI_TO_PA + PATM;                            % [Pa] 
+Ptotal = Ptotal_psi .* PSI_TO_PA + PATM;                            % [Pa] 
 
 % CALCULATIONS
 % ------------
