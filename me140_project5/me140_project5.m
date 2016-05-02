@@ -57,7 +57,7 @@ Tstack = Tstack_C + C_TO_K;                                        % [K],  metal
 mdot_total_scf = [0.75 1.10 1.45 1.81 2.55 3.10 3.30 3.25 3.40];   % scf/min
 mdot_fuel_scf =  [2.50 6.20 10.5 14.3 18.2 22.0 24.6 25.0 26.1];   % scf/hr (standard cubic feet/hour)
 
-mdot_total = mdot_air_scf * SCF_TO_MOLS * PERMIN_TO_PERSEC* MM_air / G_TO_KG;  % kg/s
+mdot_total = mdot_total_scf * SCF_TO_MOLS * PERMIN_TO_PERSEC* MM_air / G_TO_KG;  % kg/s
 mdot_fuel = mdot_fuel_scf * SCF_TO_MOLS * PERHR_TO_PERSEC * MM_h2  / G_TO_KG;  % kg/s	
 mdot_h2o = 40 /G_TO_KG;                                                        % kg/s
 
