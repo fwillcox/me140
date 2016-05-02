@@ -6,10 +6,12 @@
 % (i)  mol_H2 = 1
 
 % Constants
+global PERMIN_TO_PERHR;
 PERMIN_TO_PERHR = 60;
 LHV = 120.0*10^6;                                                   % J/kg,  Lower Heating Value 
 F = 96485;                                                          % C/(mol of e-), Faraday's Constant
 mol_H2 = 1;
+savePlots = 1;
 
 % --------------------------------
 % Part 1: Raw Data Plots vs. Load
@@ -53,28 +55,24 @@ plot(p_load,i_load,p_load,i_stack);
 title('Current as a Function of Load');
 xlabel('Load []'); ylabel('Current []');
 legend('I_{load}','I_{stack}'); plotfixer(); grid on;
-saveas(f1,'plots5/1-CurrentbyLoad','png');
 
-f2 = figure(2) 
+f2 = figure(2); 
 plot(p_load,v_load,p_load,v_stack);
 title('Potential as a Function of Load');
 xlabel('Load []'); ylabel('Potential []');
 legend('V_{load}','V_{stack}'); plotfixer();grid on;
-saveas(f2,'plots5/2-VbyLoad','png');
 
-f3 = figure(3)
+f3 = figure(3);
 plot(p_load,p_stack,p_load,p_access);
 title('Stack and Accessory Power as a Function of Load');
 xlabel('Load []'); ylabel('Power []');
 legend('P_{stack}','P_{accessory}'); plotfixer();grid on;
-saveas(f3,'plots5/3-PowerbyLoad','png');
 
 f4 = figure(4);
-plot(p_load,mdot_H,p_load,mdot_air);
+plot(p_load,mdot_h2,p_load,mdot_air);
 title('Mass Flow Rate as a Function of Load');
 xlabel('Load []'); ylabel('Mass Flow Rate []');
 legend('mdot_{H}','mdot_{air}'); plotfixer();grid on
-saveas(f4,'plots5/4-massbyload','png');
 
 % ---------------------------
 % Part 2: Reduced-Data Plots
@@ -88,23 +86,38 @@ saveas(f4,'plots5/4-massbyload','png');
 % Entire System (Load)
 [etaI_load ,etaII_load, Idot_load] =    findEtas(T2, p_load);
 
-figure(5)
+f5 = figure(5);
 plot(p_load,etaI_stack,'c',p_load,etaI_load,'bp--');
 title('First Law Efficiency as a Function of Load');
 xlabel('Load [Watts]'); ylabel('Efficiency, eta_{I}');
-legend('eta_{I,stack}','eta_{I,system}'); plotfixer(); grid on
+legend('eta_{I,stack}','eta_{I,system}'); plotfixer(); grid on;
 
-figure(6) 
+
+f6 = figure(6); 
 plot(p_load,etaII_stack,'c',p_load,etaII_load,'bp--');
 title('Second Law Efficiency as a Function of Load');
 xlabel('Load [Watts]'); ylabel('Efficiency, eta_{II}');
-legend('eta_{II,stack}','eta_{II,system}'); plotfixer(); grid on
+legend('eta_{II,stack}','eta_{II,system}'); plotfixer(); grid on;
 
-figure(7)
+
+f7 = figure(7);
 plot(p_load,p_stack,'c',p_load,p_load,'bp--');
 title('Power Loss/Inefficiences as a Function of Load');
 xlabel('Load [Watts]'); ylabel('Power Loss/Inefficiencies, Idot [Watts]');
-legend('Idot_{stack}','Idot_{system}'); plotfixer();grid on
+legend('Idot_{stack}','Idot_{system}'); plotfixer();grid on;
+
+
+
+if(savePlots ==1) 
+    saveas(f1,'plots5/1-CurrentbyLoad','png');
+    saveas(f2,'plots5/2-VbyLoad','png'); 
+    saveas(f3,'plots5/3-PowerbyLoad','png'); 
+    saveas(f4,'plots5/4-massbyload','png'); 
+    saveas(f5,'plots5/5-FirstLaw','png'); 
+    saveas(f6,'plots5/6-SecondLaw','png'); 
+    saveas(f7,'plots5/7-PowerLoss','png'); 
+end
+
 
 
 

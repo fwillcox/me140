@@ -42,7 +42,7 @@ lambda = AF./AFs;
 % Fraction of Liquid H2O (alpha)
 % ASSUME: relative humidity = 100% = 1 --> alpha = Psat/Pair;
 Psat = PsatW(T);
-alpha = Pair./Psat;                         
+alpha = Pair./Psat; 
 
 % Mols of Each Species
 % --------------------
