@@ -1,6 +1,7 @@
 function  defineGlobals( )
 
-global PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS C_TO_K PSI_TO_PA
+global PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS ...
+    C_TO_K PSI_TO_PA MM_h MM_h2 MM_o MM_n MM_h2o MM_air PATM
 % Temperature
 C_TO_K = 273.15;
 
@@ -22,6 +23,15 @@ LHV = 120.0*10^6;     % J/kg,  Lower Heating Value H2
 F = 96485;            % C/(mol of e-), Faraday's Constant
 N_TO_O = 79/21;  
 
+% Molar Masses
+MM_h = 1.00794; % g/mol
+MM_h2 = 2* MM_h;
+MM_o = 15.9994;
+MM_n = 14.0067;
+MM_h2o = 2*MM_h + MM_o;
+MM_air = 28.97;
+
+PATM = 101.3e3; %pascals
 
 
 end
