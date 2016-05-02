@@ -144,5 +144,58 @@ if(savePlots ==1)
 end
 
 
+%% Part A, Section 3 - Emily
+% Comparing First Law Efficiencies
+
+% Typical modern Diesel engine = 42% (chose diesel truck because it's
+% better than a car and worse than a freight ship)
+% Source: Slide 3, http://www.sae.org/events/gim/presentations/2011/RolandGravel.pdf
+dieselEff = 0.42;
+
+% Typical gasoline hybrid engine = max of 40%
+% Source: Toyota Hybrid Vehicles, http://www.toyota-global.com/innovation/environmental_technology/hybrid/
+hybridEff = 0.40;
+
+% Overall First Law Efficiency of the PEM Fuel Cell = Stack Efficiency
+% Plotting to compare
+figure(8)
+plot(p_load, etaI_stack, 'c', p_load, dieselEff, 'bp--', p_load, hybridEff, 'gd');
+title('Comparing 1st Law Efficiency: PEM Fuel Cell, Diesel, and Gasoline Hybrid');
+xlabel('Load [Watts]'); ylabel('Efficiency, eta_{I}');
+legend('eta_{I,stack}','eta_{I,Diesel}', 'eta_{I,Hybrid}'); plotfixer(); grid on;
 
 
+% TODO: FIGURE OUT SCALE-UP FOR TOYOTA HYBRID
+% TODO: COMMENT ON ACCESSORY/FUEL SYSTEMS REQUIRED FOR THAT SCALE UP
+
+%% Part B
+
+% Part B, Section 1 - Emily & Kendall
+% Calculating Kp Values
+% Formulas from https://coursework.stanford.edu/access/content/group/Sp16-ME-140-01/Lecture%20Slides/Lecture%2013.pdf
+
+% SMR: CH4 + H2O --> CO + 3H2
+% v values are stoichiometric coefficients
+v_CO_SMR = 1;
+v_H2_SMR = 3;
+v_H2O_SMR = 1;
+v_CH4_SMR = 1;
+
+% Calculating Kp for SMR
+Nv_CO = mm
+SMRnumKp = 
+
+
+
+
+% WGS: H2O + CO --> H2 + CO2
+v_H2_WGS = 1;
+v_CO2_WGS = 1;
+v_H2O_WGS = 1;
+v_CO_WGS = 1;
+
+
+T_B1 = linspace(25, 1200, 100); %Temperature for part B1 = T_B1
+P_ref = 
+
+gProducts_SMR = gEng(T_B1
