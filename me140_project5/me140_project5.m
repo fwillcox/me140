@@ -6,7 +6,7 @@
 % (i)  mol_H2 = 1
 
 % Constants
-global PERMIN_TO_PERHR G_PER_KG LHV F N_TO_Of
+global PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS
 defineGlobals();
 mol_H2 = 1;
 savePlots = 1;
@@ -34,9 +34,10 @@ Tstack = [40.7 41.3 42.5 42.9 44.6 45.6 46.9 46.9 47.6];
 %T5 =     [40.7 41.3 42.5 42.9 44.6 45.6 46.9 46.9 47.6];           % T5, water into heat exchanger
 
 % Mass Flow Rates (TODO: check what units the mdots should be in)
-mdot_h2 =  [2.50 6.20 10.5 14.3 18.2 22.0 24.6 25.0 26.1];          % scf/hr (standard cubic feet/hour)
-mdot_air_perMin = [0.75 1.10 1.45 1.81 2.55 3.10 3.30 3.25 3.40];   % scf/min
-mdot_air = mdot_air_perMin.*PERMIN_TO_PERHR;                        % scf/hr
+mdot_h2_scf =  [2.50 6.20 10.5 14.3 18.2 22.0 24.6 25.0 26.1];      % scf/hr (standard cubic feet/hour)
+mdot_h2 = mdot_h2_scf .* SCF_TO_MOLS * PERHR_TO_PERSEC;             % mols/s
+mdot_air_scf = [0.75 1.10 1.45 1.81 2.55 3.10 3.30 3.25 3.40];      % scf/min
+mdot_air = mdot_air_scf * SCF_TO_MOLS * PERMIN_TO_PERSEC;        % mols/s
 mdot_h2o = 40;                                                      % g/s (ASSUMPTION for Part 3) % TODO: convert this
 
 
@@ -79,10 +80,10 @@ legend('mdot_{H}','mdot_{air}'); plotfixer();grid on
 
 % 1st & 2nd Law Efficiencies (eta_I & eta_II) & Inefficiencies (Idot)
 % Stack
-[etaI_stack ,etaII_stack, Idot_stack] = findEtas(T2, p_stack);
+[etaI_stack ,etaII_stack, Idot_stack] = findEtas(Tstack, p_stack);
 
 % Entire System (Load)
-[etaI_load ,etaII_load, Idot_load] =    findEtas(T2, p_load);
+[etaI_load ,etaII_load, Idot_load] =    findEtas(Tstack, p_load);
 
 f5 = figure(5);
 plot(p_load,etaI_stack,'c',p_load,etaI_load,'bp--');
@@ -106,7 +107,7 @@ legend('Idot_{stack}','Idot_{system}'); plotfixer();grid on;
 
 
 if(savePlots ==1) 
-    saveas(f1,'../qplots5/1-CurrentbyLoad','png');
+    saveas(f1,'../plots5/1-CurrentbyLoad','png');
     saveas(f2,'../plots5/2-VbyLoad','png'); 
     saveas(f3,'../plots5/3-PowerbyLoad','png'); 
     saveas(f4,'../plots5/4-massbyload','png'); 
