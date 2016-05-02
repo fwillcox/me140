@@ -7,14 +7,15 @@
 % (i) 1 mol of H2                    
 % (ii) isothermal & isobaric      % TODO: CHECK THESE ASSUMPTIONS!
 
-function [eta_I, eta_II, Idot] = PEMstoich_rates(T)
-
+function [eta_I, eta_II, Idot] = PEMstoich_rates(T,Wdot)
+% Constants
+PERMIN_TO_PERHR = 60;
 N_TO_O = 79/21;                                                     % Engineering Air Molar Mass Ratio of Nitrogen to Oxygen
 specs = Spec();                                                     % class initialization
 
 % Pressures
 Pfuel =  [2.9 2.9 3.1 3.3 3.30 3.20 3.00 3.0 3.1];                  % psi (gauge)
-Pair =   [0.2 0.3 0.6 0.7 1.15 1.25 1.35 1.3 1.5];
+Pair =   [0.2 0.3 0.6 0.7 1.15 1.25 1.35 1.3 1.5];                  % psi (gauge), pressure of humid air after humidifier
 Pwater = Pair;
 
 % Mass Flow Rates (TODO: check what units the mdots should be in)
@@ -24,14 +25,14 @@ mdot_air = mdot_air_perMin.*PERMIN_TO_PERHR;                        % scf/hr
 mdot_h2o = 40;                                                      % g/s (ASSUMPTION for Part 3) % TODO: convert this
 
 % Excess Air Coefficient (lambda)
-AF = mdot_air./mdot_H2;
+AF = mdot_air./mdot_h2;
 AFs = [];                                                           % TODO: find this value from stoich
 lambda = AF./AFs;
 
 % Fraction of Liquid H2O (alpha)
 % ASSUME: relative humidity = 100% = 1 --> alpha = P(vapor H2O)/Psat
 Psat = PsatW(T);
-alpha = PhumidAir/Psat;
+alpha = Pair./Psat;
 beta = 1 - alpha;                                                   % TODO: correct way to find beta?                            
 
 % Mols of Each Species
@@ -57,24 +58,30 @@ y_n2_react = mol_n2       /mol_total_react;
 y_h2o_react = alpha       /mol_total_react;
 
 % Vapor Fraction of H2O 
-% --------------------------
-%beta = mol_h2o;                                                     %(ASSUME: All H2O is vapor in order to calculate Pv_guess)
-% does this line still apply???
+% ---------------------
+% Pv_guess = Ptotal*(beta./(beta + 0.5.*(lambda-1) +0.5.*lambda.*N_TO_O ));
+% if Pv_guess < Psat
+%     % All H2O is vapor (beta = 1)
+%     mol_h2ovap = beta;
+%     mol_h2oliq = 0;
+% else 
+%     % Some H2O is vapor, some liquid (beta not = 1)
+%     Pv_h2o = Psat;                                                  % LET: Pv = Psat to solve for beta
+%     y_h2o = Pv_h2o./Ptotal; 
+%     beta = (4.26 .* y_h2o)./ (1 - y_h2o);
+%     mol_h2ovap = beta; 
+%     mol_h2oliq = mol_h2o - mol_h2ovap;
+% end
+% pctVap = mol_h2ovap./(mol_h2o);                                     % Percent of H2O that is vapor (by mass)
 
 Pv_guess = Ptotal*(beta./(beta + 0.5.*(lambda-1) +0.5.*lambda.*N_TO_O ));
-if Pv_guess < Psat
-    % All H2O is vapor (beta = 1)
-    mol_h2ovap = beta;
-    mol_h2oliq = 0;
-else 
-    % Some H2O is vapor, some liquid (beta not = 1)
-    Pv_h2o = Psat;                                                  % LET: Pv = Psat to solve for beta
-    y_h2o = Pv_h2o./Ptotal; 
-    beta = (4.26 .* y_h2o)./ (1 - y_h2o);
-    mol_h2ovap = beta; 
-    mol_h2oliq = mol_h2o - mol_h2ovap;
-end
-pctVap = mol_h2ovap./(mol_h2o);                                     % Percent of H2O that is vapor (by mass)
+% Some H2O is vapor, some liquid (beta not = 1)
+Pv_h2o = Psat;                                                        % LET: Pv = Psat to solve for beta
+y_h2o = Pv_h2o./Ptotal; 
+%beta = ((1+N_TO_O) .* y_h2o)./ (1 - y_h2o);
+mol_h2ovap = beta; 
+mol_h2oliq = mol_h2o - mol_h2ovap;
+pctVap = mol_h2ovap./(mol_h2o);                                        % Percent of H2O that is vapor (by mass)
 
 
 % Mol Fractions of Products
@@ -126,8 +133,7 @@ dHdot = Hdot_prod - Hdot_react;
 % Rate of Work (Wdot)
 % -------------------
 Ndot = mol_H2 *mdot_H2;         
-Idot  = Ndot * F;              
-Wdot  = -dGdot - Idot;
+Idot = -Wdot - dGdot;              
 
 
 % Find First and Second Law Efficiencies (eta_I, eta_II)

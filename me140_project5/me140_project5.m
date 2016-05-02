@@ -3,7 +3,7 @@
 % Frankie Willcox, Jon Renslo, Kendall Fagan, Emily Bohl, Natasha Berke
 
 % ASSUME:
-% (i)  
+% (i)  mol_H2 = 1
 
 % Constants
 PERMIN_TO_PERHR = 60;
@@ -26,12 +26,18 @@ v_stack = [17.09 15.22 14.26 12.98 12.42 11.60 10.73 10.21 9.48];
 % KEY: (Kendall please fill in with photo you took)
 T1 =     [42.8 42.9 46.1 48.5 50.5 52.8 54.8 55.8 56.5];            % T1, air into stack
 T2 =     [42.5 45.8 45.8 48.4 50.3 51.9 53.3 53.9 54.3];            % T2, air out of stack
-Tstack = [40.7 41.3 42.5 42.9 44.6 45.6 46.9 46.9 47.6];            % **USE Tstack for Psat
+Tstack = [40.7 41.3 42.5 42.9 44.6 45.6 46.9 46.9 47.6];            
 
 % NOTE: T3-T5 are not needed for now
 %T3 =     [48.0 47.1 48.6 48.9 50.4 51.1 51.2 51.1 51.1];           % T3, water reservoir DON'T USE!
-%T4 =     [48.0 47.2 48.2 48.9 50.4 51.1 51.2 51.1 51.1];            % T4, water into stack
-%T5 =     [40.7 41.3 42.5 42.9 44.6 45.6 46.9 46.9 47.6];            % T5, water into heat exchanger
+%T4 =     [48.0 47.2 48.2 48.9 50.4 51.1 51.2 51.1 51.1];           % T4, water into stack
+%T5 =     [40.7 41.3 42.5 42.9 44.6 45.6 46.9 46.9 47.6];           % T5, water into heat exchanger
+
+% Mass Flow Rates (TODO: check what units the mdots should be in)
+mdot_h2 =  [2.50 6.20 10.5 14.3 18.2 22.0 24.6 25.0 26.1];          % scf/hr (standard cubic feet/hour)
+mdot_air_perMin = [0.75 1.10 1.45 1.81 2.55 3.10 3.30 3.25 3.40];   % scf/min
+mdot_air = mdot_air_perMin.*PERMIN_TO_PERHR;                        % scf/hr
+mdot_h2o = 40;                                                      % g/s (ASSUMPTION for Part 3) % TODO: convert this
 
 
 % CALCULATIONS
@@ -73,10 +79,10 @@ legend('mdot_{H}','mdot_{air}'); plotfixer();grid on
 
 % 1st & 2nd Law Efficiencies (eta_I & eta_II) & Inefficiencies (Idot)
 % Stack
-[etaI_stack ,etaII_stack, Idot_stack] = findEtas(Tstack);
+[etaI_stack ,etaII_stack, Idot_stack] = findEtas(T2, p_stack);
 
 % Entire System (Load)
-[etaI_load ,etaII_load, Idot_load] = findEtas(Tstack);
+[etaI_load ,etaII_load, Idot_load] =    findEtas(T2, p_load);
 
 figure(5)
 plot(p_load,etaI_stack,'c',p_load,etaI_load,'bp--');
