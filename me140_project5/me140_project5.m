@@ -92,21 +92,17 @@ title('First Law Efficiency as a Function of Load');
 xlabel('Load [Watts]'); ylabel('Efficiency, eta_{I}');
 legend('eta_{I,stack}','eta_{I,system}'); plotfixer(); grid on;
 
-
 f6 = figure(6); 
 plot(p_load,etaII_stack,'c',p_load,etaII_load,'bp--');
 title('Second Law Efficiency as a Function of Load');
 xlabel('Load [Watts]'); ylabel('Efficiency, eta_{II}');
 legend('eta_{II,stack}','eta_{II,system}'); plotfixer(); grid on;
 
-
 f7 = figure(7);
 plot(p_load,p_stack,'c',p_load,p_load,'bp--');
 title('Power Loss/Inefficiences as a Function of Load');
 xlabel('Load [Watts]'); ylabel('Power Loss/Inefficiencies, Idot [Watts]');
 legend('Idot_{stack}','Idot_{system}'); plotfixer();grid on;
-
-
 
 if(savePlots ==1) 
     saveas(f1,'plots5/1-CurrentbyLoad','png');
