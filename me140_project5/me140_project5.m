@@ -6,10 +6,8 @@
 % (i)  mol_H2 = 1
 
 % Constants
-global PERMIN_TO_PERHR;
-PERMIN_TO_PERHR = 60;
-LHV = 120.0*10^6;                                                   % J/kg,  Lower Heating Value 
-F = 96485;                                                          % C/(mol of e-), Faraday's Constant
+global PERMIN_TO_PERHR G_PER_KG LHV F N_TO_Of
+defineGlobals();
 mol_H2 = 1;
 savePlots = 1;
 
@@ -108,13 +106,13 @@ legend('Idot_{stack}','Idot_{system}'); plotfixer();grid on;
 
 
 if(savePlots ==1) 
-    saveas(f1,'plots5/1-CurrentbyLoad','png');
-    saveas(f2,'plots5/2-VbyLoad','png'); 
-    saveas(f3,'plots5/3-PowerbyLoad','png'); 
-    saveas(f4,'plots5/4-massbyload','png'); 
-    saveas(f5,'plots5/5-FirstLaw','png'); 
-    saveas(f6,'plots5/6-SecondLaw','png'); 
-    saveas(f7,'plots5/7-PowerLoss','png'); 
+    saveas(f1,'../qplots5/1-CurrentbyLoad','png');
+    saveas(f2,'../plots5/2-VbyLoad','png'); 
+    saveas(f3,'../plots5/3-PowerbyLoad','png'); 
+    saveas(f4,'../plots5/4-massbyload','png'); 
+    saveas(f5,'../plots5/5-FirstLaw','png'); 
+    saveas(f6,'../plots5/6-SecondLaw','png'); 
+    saveas(f7,'../plots5/7-PowerLoss','png'); 
 end
 
 
