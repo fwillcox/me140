@@ -71,7 +71,10 @@ title('Stack and Accessory Power as a Function of Load');
 f3 = figure(3)
 plot(load,p_stack,load,p_access);
 title('Stack and Accessory Power as a Function of Load'); end
+<<<<<<< HEAD
+=======
 >>>>>>> master
+>>>>>>> frankie
 xlabel('Load []'); ylabel('Power []');
 legend('P_{stack}','P_{accessory}'); plotfixer();grid on;
 
@@ -100,18 +103,26 @@ xlabel('Load [Watts]'); ylabel('Efficiency, eta_{I}');
 legend('eta_{I,stack}','eta_{I,system}'); plotfixer(); grid on;
 
 <<<<<<< HEAD
+
+=======
+<<<<<<< HEAD
 =======
 
 >>>>>>> master
+>>>>>>> frankie
 f6 = figure(6); 
 plot(p_load,etaII_stack,'c',p_load,etaII_load,'bp--');
 title('Second Law Efficiency as a Function of Load');
 xlabel('Load [Watts]'); ylabel('Efficiency, eta_{II}');
 legend('eta_{II,stack}','eta_{II,system}'); plotfixer(); grid on;
 <<<<<<< HEAD
+
+=======
+<<<<<<< HEAD
 =======
 
 >>>>>>> master
+>>>>>>> frankie
 
 f7 = figure(7);
 plot(p_load,p_stack,'c',p_load,p_load,'bp--');
@@ -120,10 +131,15 @@ xlabel('Load [Watts]'); ylabel('Power Loss/Inefficiencies, Idot [Watts]');
 legend('Idot_{stack}','Idot_{system}'); plotfixer();grid on;
 
 <<<<<<< HEAD
+
+
+=======
+<<<<<<< HEAD
 =======
 
 
 >>>>>>> master
+>>>>>>> frankie
 if(savePlots ==1) 
     saveas(f1,'plots5/1-CurrentbyLoad','png');
     saveas(f2,'plots5/2-VbyLoad','png'); 
