@@ -11,13 +11,9 @@ function out = energyF(T,P,species,moles)
     % cpbar in J/mol-K
     % cp in J/kg-K
     
-<<<<<<< HEAD
-    P0 = 101.3e3;
-    R = 8.314; %J/mol-K
-=======
+
     P0 = 101.3e3;   % Pa
     R = 8.314;      % J/mol-K
->>>>>>> master
     
     
     if(~exist('moles','var')) moles = 1; end
