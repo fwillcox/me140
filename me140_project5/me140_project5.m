@@ -6,6 +6,7 @@
 % (i)  mol_H2 = 1
 
 % Constants
+global PERMIN_TO_PERHR;
 PERMIN_TO_PERHR = 60;
 LHV = 120.0*10^6;                                                   % J/kg,  Lower Heating Value 
 F = 96485;                                                          % C/(mol of e-), Faraday's Constant
