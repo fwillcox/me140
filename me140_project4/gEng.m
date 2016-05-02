@@ -19,6 +19,6 @@ function G = gEng(T,P,spec,mol)
             a = energyF(T(i),P(j),spec,mol(k));
             G(i) = a.G;
         end
-    a = energyF(T,P,spec,mol);
-    G = a.G;
+%     a = energyF(T,P,spec,mol);
+%     G = a.G;
 end
