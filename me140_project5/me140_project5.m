@@ -57,20 +57,20 @@ xlabel('Load []'); ylabel('Current []');
 legend('I_{load}','I_{stack}'); plotfixer(); grid on;
 
 f2 = figure(2) 
-plot(load,v_load,load,v_stack);
+plot(p_load,v_load,load,v_stack);
 title('Potential as a Function of Load');
 xlabel('Load []'); ylabel('Potential []');
 legend('V_{load}','V_{stack}'); plotfixer();grid on;
 
 
-f3 = figure(3)
-plot(load,p_stack,load,p_access);
-title('Stack and Accessory Power as a Function of Load'); end
+f3 = figure(3);
+plot(p_load,p_stack,load,p_access);
+title('Stack and Accessory Power as a Function of Load');
 xlabel('Load []'); ylabel('Power []');
 legend('P_{stack}','P_{accessory}'); plotfixer();grid on;
 
 f4 = figure(4);
-plot(load,mdot_H,load,mdot_air);
+plot(p_load,mdot_H,load,mdot_air);
 title('Mass Flow Rate as a Function of Load');
 xlabel('Load []'); ylabel('Mass Flow Rate []');
 legend('mdot_{H}','mdot_{air}'); plotfixer();grid on
