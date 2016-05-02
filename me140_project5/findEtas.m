@@ -7,10 +7,10 @@
 % (i) 1 mol of H2                    
 % (ii) isothermal & isobaric      % TODO: CHECK THESE ASSUMPTIONS!
 
-function [eta_I, eta_II, Idot] = findEtas(T,Wdot)
+function [eta_I, eta_II, Idot] = findEtas(mdot_total, mdot_fuel, Ptotal, Pfuel, T, Wdot)
 
+global PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS C_TO_K PSI_TO_PA
 
-global PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS C_TO_K
 defineGlobals();
 % Constants                                                  % Engineering Air Molar Mass Ratio of Nitrogen to Oxygen
 specs = Spec();                                                     % class initialization
@@ -22,21 +22,10 @@ MM_n = 14.0067;
 MM_h2o = 2*MM_h + MM_o;
 MM_air = 28.97;
 
-% Pressures
-Pfuel =  [2.9 2.9 3.1 3.3 3.30 3.20 3.00 3.0 3.1];                  % psi (gauge)
-Ptotal =   [0.2 0.3 0.6 0.7 1.15 1.25 1.35 1.3 1.5];                % psi (gauge), pressure of combined air and H2O after humidifier
-
-% Mass Flow Rates (TODO: check what units the mdots should be in)
-mdot_h2_scf =  [2.50 6.20 10.5 14.3 18.2 22.0 24.6 25.0 26.1];      % scf/hr (standard cubic feet/hour)
-mdot_h2 = mdot_h2_scf .* SCF_TO_MOLS * PERHR_TO_PERSEC;             % mols/s
-mdot_air_scf = [0.75 1.10 1.45 1.81 2.55 3.10 3.30 3.25 3.40];      % scf/min
-mdot_air = mdot_air_scf * SCF_TO_MOLS * PERMIN_TO_PERSEC;           % mols/s
-mdot_h2o = 40;                                                      % g/s (ASSUMPTION for Part 3) % TODO: convert this
-
 % Excess Air Coefficient (lambda)
 mol_h2 = 1;
 mol_h2o_prod = mol_h2;
-AF = mdot_air./mdot_h2;
+AF = mdot_total./mdot_fuel;
 mair = 0.5*(1+N_TO_O)*MM_air;
 mfuel = mol_h2*(2*MM_h);
 AFs = mair/mfuel;
@@ -100,18 +89,18 @@ y_n2_prod = mol_n2      ./ mol_total_prod;
 % Change in Gibbs Free Energy (dG)
 % --------------------------------
 % Reactants
-Gdot_react = gEng(T, Pfuel,             'h2',mol_h2)      .* mdot_h2 ...
-           + gEng(T, Ptotal .* y_o2_react,'o2',mol_o2_react).* mdot_air ...
-           + gEng(T, Ptotal .* y_n2_react,'n2',mol_n2)      .* mdot_air;
+Gdot_react = gEng(T, Pfuel,             'h2'  ,mol_h2)      .* mdot_fuel ...   % [J*kg*s^-1]
+           + gEng(T, Ptotal .* y_o2_react,'o2',mol_o2_react).* mdot_total ...
+           + gEng(T, Ptotal .* y_n2_react,'n2',mol_n2)      .* mdot_total;
 if(alpha ~= 0 ) 
-    Gdot_react = Gdot_react + gEng(T,Ptotal.*y_h2o_react,'h2ovap',alpha).* mdot_h2o; 
+    Gdot_react = Gdot_react + gEng(T,Ptotal.*y_h2o_react,'h2ovap',alpha).* mdot_total; 
 end
 
 % Products
-Gdot_prod = gEng(T, Ptotal.*y_h2ovap,   'h2ovap', mol_h2ovap) .* mdot_h2o... %% THIS WAS THE PART 2 BUG FROM PROJECT #4!
-          + gEng(T, Ptotal,            'h2o',    mol_h2oliq) .* mdot_h2o...
-          + gEng(T, Ptotal.*y_o2_prod, 'o2',     mol_o2_prod).* mdot_air...   
-          + gEng(T, Ptotal.*y_n2_prod, 'n2',     mol_n2)     .* mdot_air;
+Gdot_prod = gEng(T, Ptotal.*y_h2ovap,   'h2ovap', mol_h2ovap) .* mdot_total... %% THIS WAS THE PART 2 BUG FROM PROJECT #4!
+          + gEng(T, Ptotal,            'h2o',    mol_h2oliq)  .* mdot_total...
+          + gEng(T, Ptotal.*y_o2_prod, 'o2',     mol_o2_prod) .* mdot_total...   
+          + gEng(T, Ptotal.*y_n2_prod, 'n2',     mol_n2)      .* mdot_total;
 
 dGdot = Gdot_prod - Gdot_react; 
 
@@ -119,32 +108,33 @@ dGdot = Gdot_prod - Gdot_react;
 % Change in Enthalpy (dH)
 % -----------------------
 % Reactants
-Hdot_react = hEng(T,'h2', mol_h2)       .* mdot_h2... 
-           + hEng(T, 'o2', mol_o2_react).* mdot_air...
-           + hEng(T, 'n2', mol_n2)      .* mdot_air;
+Hdot_react = hEng(T,'h2', mol_h2)       .* mdot_fuel... 
+           + hEng(T, 'o2', mol_o2_react).* mdot_total...
+           + hEng(T, 'n2', mol_n2)      .* mdot_total;
 if(alpha ~= 0 )
-    Hdot_react = Hdot_react + hEng(T,'h2ovap',alpha) .* mdot_h2o; 
+    Hdot_react = Hdot_react + hEng(T,'h2ovap',alpha) .* mdot_total; 
 end
 
 % Products
-Hdot_prod = hEng(T,'h2ovap', mol_h2ovap) .* mdot_h2o...
-          + hEng(T,'h2o',    mol_h2oliq) .* mdot_h2o...
-          + hEng(T,'o2',     mol_o2_prod).* mdot_air...
-          + hEng(T,'n2',     mol_n2)     .* mdot_air;
+Hdot_prod = hEng(T,'h2ovap', mol_h2ovap) .* mdot_total...
+          + hEng(T,'h2o',    mol_h2oliq) .* mdot_total...
+          + hEng(T,'o2',     mol_o2_prod).* mdot_total...
+          + hEng(T,'n2',     mol_n2)     .* mdot_total;
       
 dHdot = Hdot_prod - Hdot_react;
 
 
 % Rate of Work (Wdot)
 % -------------------
-Ndot = mol_h2 .*mdot_h2;         
+Ndot = mol_h2 .*mdot_fuel;         
 Idot = -Wdot - dGdot;              
 
 
 % Find First and Second Law Efficiencies (eta_I, eta_II)
 % ------------------------------------------------------
-eta_I  = Wdot ./ (-dHdot);
-eta_II = Wdot ./ (-dGdot);
+%eta_I = Wdot ./ (-dHdot);
+eta_I  = Wdot ./ (LHV*mdot_fuel);      % [ (kg*m^2*s^-3) /  (kg*m^2*s^-2)*(kg^-1)*(kg*s^-1)] 
+eta_II = (Wdot) ./ (-dGdot ./ mfuel); % [ (kg*m^2*s^-3) / ((kg*m^2*s^-2)*(kg*s^-1) / kg)
 
 
 specs.mol_air =      mol_air;
