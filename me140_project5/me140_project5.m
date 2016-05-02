@@ -51,26 +51,35 @@ p_stack = i_stack .* v_stack;
 p_access = p_stack - p_load;                                        % Acessory Power, i.e. power used to run controls. Pstack-Pload
 
 f1 = figure(1);
-plot(load,i_load,load,i_stack);
+plot(p_load,i_load,p_load,i_stack);
 title('Current as a Function of Load');
 xlabel('Load []'); ylabel('Current []');
 legend('I_{load}','I_{stack}'); plotfixer(); grid on;
 
-f2 = figure(2) 
-plot(load,v_load,load,v_stack);
+f2 = figure(2); 
+plot(p_load,v_load,p_load,v_stack);
 title('Potential as a Function of Load');
 xlabel('Load []'); ylabel('Potential []');
 legend('V_{load}','V_{stack}'); plotfixer();grid on;
 
+<<<<<<< HEAD
+f3 = figure(3);
+plot(p_load,p_stack,p_load,p_access);
+title('Stack and Accessory Power as a Function of Load');
+=======
 
 f3 = figure(3)
 plot(load,p_stack,load,p_access);
 title('Stack and Accessory Power as a Function of Load'); end
+<<<<<<< HEAD
+=======
+>>>>>>> master
+>>>>>>> frankie
 xlabel('Load []'); ylabel('Power []');
 legend('P_{stack}','P_{accessory}'); plotfixer();grid on;
 
 f4 = figure(4);
-plot(load,mdot_H,load,mdot_air);
+plot(p_load,mdot_h2,p_load,mdot_air);
 title('Mass Flow Rate as a Function of Load');
 xlabel('Load []'); ylabel('Mass Flow Rate []');
 legend('mdot_{H}','mdot_{air}'); plotfixer();grid on
@@ -93,13 +102,27 @@ title('First Law Efficiency as a Function of Load');
 xlabel('Load [Watts]'); ylabel('Efficiency, eta_{I}');
 legend('eta_{I,stack}','eta_{I,system}'); plotfixer(); grid on;
 
+<<<<<<< HEAD
 
+=======
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
+>>>>>>> frankie
 f6 = figure(6); 
 plot(p_load,etaII_stack,'c',p_load,etaII_load,'bp--');
 title('Second Law Efficiency as a Function of Load');
 xlabel('Load [Watts]'); ylabel('Efficiency, eta_{II}');
 legend('eta_{II,stack}','eta_{II,system}'); plotfixer(); grid on;
+<<<<<<< HEAD
 
+=======
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
+>>>>>>> frankie
 
 f7 = figure(7);
 plot(p_load,p_stack,'c',p_load,p_load,'bp--');
@@ -107,8 +130,16 @@ title('Power Loss/Inefficiences as a Function of Load');
 xlabel('Load [Watts]'); ylabel('Power Loss/Inefficiencies, Idot [Watts]');
 legend('Idot_{stack}','Idot_{system}'); plotfixer();grid on;
 
+<<<<<<< HEAD
 
 
+=======
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> master
+>>>>>>> frankie
 if(savePlots ==1) 
     saveas(f1,'plots5/1-CurrentbyLoad','png');
     saveas(f2,'plots5/2-VbyLoad','png'); 
