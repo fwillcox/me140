@@ -106,7 +106,7 @@ legend('Idot_{stack}','Idot_{system}'); plotfixer();grid on;
 
 
 if(savePlots ==1) 
-    saveas(f1,'../qplots5/1-CurrentbyLoad','png');
+    saveas(f1,'../plots5/1-CurrentbyLoad','png');
     saveas(f2,'../plots5/2-VbyLoad','png'); 
     saveas(f3,'../plots5/3-PowerbyLoad','png'); 
     saveas(f4,'../plots5/4-massbyload','png'); 
