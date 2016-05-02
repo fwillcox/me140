@@ -11,13 +11,8 @@ function out = energyF(T,P,species,moles)
     % cpbar in J/mol-K
     % cp in J/kg-K
     
-<<<<<<< HEAD
-    P0 = 101.3e3;
-    R = 8.314; %J/mol-K
-=======
     P0 = 101.3e3;   % Pa
     R = 8.314;      % J/mol-K
->>>>>>> master
     
     
     if(~exist('moles','var')) moles = 1; end
@@ -105,9 +100,8 @@ function out = energyF(T,P,species,moles)
     % integrate cp from t0 to t in j/mol kelvin
     delH = (a*(T - T0) + b*(T.^2 - T0.^2)/2 + c*(T.^3 - T0.^3)/3 + d*(T.^4 - T0.^4)/4); 
     intCpbarOnT = a*log(T./T0) + b*(T - T0) + c*(T.^2 - T0.^2)/2 + d*(T.^3 - T0.^3)/3;
-    fun = @(x) 75.96./x;
-    delS = integral(fun, T0, T) - R *log(P/P0); 
-    %delS = intCpbarOnT - R *log(P/P0); 
+    delS = intCpbarOnT - R *log(P/P0); 
+    
     out.S = (sf{i} + delS).*moles;           % Entropy
     out.H = (hf{i} + delH).*moles;           % Enthalpy 
     out.G = out.H - T.*out.S; % Gibbs Free Energy

@@ -28,11 +28,15 @@ Psat = PsatW(T);
 
 Pv_guess = Ptotal*(beta./(beta + 0.5.*(lambda-1) +0.5.*lambda.*N_TO_O ));
 
+<<<<<<< HEAD
 
     
     
 mol_total_react = mol_o2_react + mol_n2;
 
+=======
+mol_total_react = mol_o2_react + mol_n2 + alpha;
+>>>>>>> master
 y_o2_react = mol_o2_react /mol_total_react;
 y_n2_react = mol_n2       /mol_total_react;
 y_h2o_react = alpha       /mol_total_react;
@@ -69,14 +73,19 @@ greact = gEng(T,Ptotal,'h2',mol_h2) ...
     + gEng(T,Ptotal .* y_o2_react,'o2',mol_o2_react) ...
     + gEng(T,Ptotal .* y_n2_react,'n2',mol_n2);
 if(alpha ~= 0 )
+<<<<<<< HEAD
     greact = greact + gEng(T,Ptotal .* y_h2o_react,'h2ovap',alpha);
+=======
+    greact = greact + gEng(T,Ptotal*y_h2o_react,'h2ovap',alpha); 
+>>>>>>> master
 end
 
 gprod = ...
-      gEng(T, Ptotal.*y_h2ovap,   'h2ovap', mol_h2ovap)...
+      gEng(T, Ptotal*y_h2ovap,    'h2ovap', mol_h2ovap)...       %% THIS IS OFFENDING LINE IN PART 2
     + gEng(T, Ptotal,             'h2o',    mol_h2oliq)...
     + gEng(T, Ptotal.*y_o2_prod,       'o2',     mol_o2_prod)...   
     + gEng(T, Ptotal.*y_n2_prod,       'n2',     mol_n2);
+
 
 delG = gprod - greact; 
 
@@ -93,13 +102,23 @@ hreact = ...
 if(alpha ~= 0 )
     hreact = hreact + hEng(T,'h2ovap',alpha);
 end
+<<<<<<< HEAD
+=======
+
+dh = hprod - hreact;
+>>>>>>> master
 
 dh = hprod - hreact;
 eta = delG ./ dh;
 %eta = delG ./ 2.4191e5;
 specs.mol_air =         mol_air;
+<<<<<<< HEAD
 specs.mol_o2_react =         mol_o2_react;
 specs.mol_n2 =         mol_n2;
+=======
+specs.mol_o2_react =    mol_o2_react;
+specs.mol_n2 =          mol_n2;
+>>>>>>> master
 % TODO update Spec to accomodate inlet water? (PLEASE CHECK KENDALL)
 
 end
