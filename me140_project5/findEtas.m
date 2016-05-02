@@ -23,14 +23,13 @@ MM_h2o = 2*MM_h + MM_o;
 MM_air = 28.97;
 
 % Excess Air Coefficient (lambda)
-mol_h2 = 1;
+mol_h2 = 1; % ASSUME: 1 mol of H2
 mol_h2o_prod = mol_h2;
 AF = mdot_total./mdot_fuel;
 mair = 0.5*(1+N_TO_O)*MM_air;
 mfuel = mol_h2*(2*MM_h);
 AFs = mair/mfuel;
 lambda = AF./AFs;
-mol_air = mair ./ (MM_air / G_PER_KG);
 
 % Fraction of Liquid H2O (alpha)
 % ASSUME: relative humidity = 100% = 1 --> alpha = Psat/Pair;
@@ -43,7 +42,6 @@ alpha = Ptotal./Psat;
 mol_n2 = mol_air*N_TO_O/(1+N_TO_O);
 
 % Reactants
-mol_h2 = 1;                                                         % ASSUME: 1 mol of H2
 mol_air = (1+N_TO_O)*lambda/2*mol_h2;
 mol_o2_react = mol_air/(1+N_TO_O);
 mol_total_react = mol_o2_react + mol_n2 + alpha;
@@ -134,7 +132,7 @@ Idot = -Wdot - dGdot;
 % ------------------------------------------------------
 %eta_I = Wdot ./ (-dHdot);
 eta_I  = Wdot ./ (LHV*mdot_fuel);      % [ (kg*m^2*s^-3) /  (kg*m^2*s^-2)*(kg^-1)*(kg*s^-1)] 
-eta_II = (Wdot) ./ (-dGdot ./ mfuel); % [ (kg*m^2*s^-3) / ((kg*m^2*s^-2)*(kg*s^-1) / kg)
+eta_II = (Wdot) ./ (-dGdot ./ mfuel);  % [ (kg*m^2*s^-3) / ((kg*m^2*s^-2)*(kg*s^-1) / kg)
 
 
 specs.mol_air =      mol_air;
