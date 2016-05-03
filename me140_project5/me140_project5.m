@@ -248,7 +248,6 @@ if(~supressplots(3))
     ylim([0.001,1000]);
     plotfixer();grid on
 end
-
 %% Part B No. 2
 % Find the Equilibrium Composition (Mol Fractions) of the Steam Methane 
 % Reformation(SMR) Reaction 
@@ -262,7 +261,7 @@ pres = [1,10,100];
 soln = zeros(length(temps),4,length(pres));
 tic
 for i = 1:length(temps)
-    for j = 1:length(pres)
+    parfor j = 1:length(pres)
         p = pres(j);
         t = temps(i);
         
@@ -343,15 +342,15 @@ end
 syms nco nco2 nh2 nh2o;
 soln_wgs = zeros(length(temps),4,length(pres));
 tic
-for i = 1:length(temps)
+parfor i = 1:length(temps)
     t = temps(i);
     
-    eqs = [       1  == nco2   + nco;...carbon atom balance
-        4  == nco2*2 + nco + nh2o; ...  hydrogen atom balance
-        6  == nh2*2   + nh2o*2;...      oxygen atom balance
+    eqs = [       1  == nco2   + nco;...carbon atom balance  %POTENTIAL ERROR: shouldn't this be 2, not 1?
+        4  == nco2*2 + nco + nh2o; ...  oxygen atom balance
+        6  == nh2*2   + nh2o*2;...      hydrogen atom balance 
         nco.*nh2o./(nco2.*nh2) ... Nernst atom balance
-        == f_kp_SMR(t)];        %(note no pressure term, as nmols same on RHS and LHS)
-    % 4 eq, 4 unknown
+        == f_kp_WGS(t)];        %(note no pressure term, as nmols same on RHS and LHS)
+    % 4 eq, 4 unknown    
     [a,b,c,d] = vpasolve(eqs,[nco,nh2o,nco2,nh2],[1,1,1,1]);
     a(imag(a)~=0) = 0;
     a(a<0) = 0;
@@ -378,7 +377,7 @@ yh2_wgs = nh2_wgs./ntot_wgs;
 yh2o_wgs = nh2o_wgs./ntot_wgs;
 yco_wgs = nco_wgs./ntot_wgs;
 
-if(~supressplot(4))
+if(~supressplots(4))
     
     f12 = figure(12);
     semilogy(temps,yco_wgs,'b',...
@@ -421,8 +420,11 @@ end
 % Plot exit composition (mol fractions) vs. 3 system stations (Reformer,
 % Shift Reactor 1, Shift Reactor 2) 
 % Note: do this for 2 Different Assumptions: (1) isothermal, (2) adiabatic
-% SMR: CH4 + 3*H2O --> CO + 3*H2
-% WGS: CO  + 3*H2O --> CO2 + H2
+% SMR: CH4 + 3*H2O --> CO + 3*H2 + 2*H2O <-known because all assume all
+% methane is used
+% WGS: CO  + 2*H2O + 3*H2--> ?CO2 + (3+?)H2 + ?CO + ?H2O <- unknown because WGS
+% doens't go all the way to completition
+
 
 % NAMING CONVENTIONS: 
 % Station Location: 1=Reformer, 2 = 1st Shift Reactor, 3 = 2nd Shift
@@ -439,20 +441,48 @@ end
 % Take those products and do isothermal calcs on them
 
 % Inlet Temperatures 
-Tin_iso_C = [800 400 250];    % [C]
-Tin_adi_C = [800 NaN NaN];        % [C] TODO: solve for Tin_adi_C(2) & (3)
-Tin_iso = Tin_iso_C * C_TO_K; % [K]
-Tin_adi = Tin_adi_C * C_TO_K; % [K]
+Tin_C = [800 400 250];    % [C]
+Tin = Tin_iso_C + C_TO_K; % [K]
 
 % Exit Temperatures
-Tex_iso_C = [800 400 250];
-Tex_adi_C = [800 NaN NaN];
-Tex_iso = Tex_iso_C * C_TO_K;
-Tex_adi = Tex_adi_C * C_TO_K;
+Tex_iso_C = [800 400 250]; 
+Tex_adi_C = [800 NaN NaN]; %TODO: solve for Tin_adi_C(2) & (3)
+Tex_iso = Tex_iso_C + C_TO_K;
+Tex_adi = Tex_adi_C + C_TO_K;
 
 % Heat Addition for Isothermal Reaction (Qin, ASSUME: isothermal)
 Qin_iso = [NaN NaN NaN];             % [MJ/(kg of reactants)]
 
 % Percent Methane Burned to Heat Reformer (pct_CH4, ASSUME: adiabatic)
 pct_CH4 = [NaN]; % Note: only applies to Reformer! Not Shift Reactors!
+
+%Reformer 
+%Isothermal
+% WGS: CO  + 2*H2O + 3*H2--> ?CO2 + (3+?)H2 + ?CO + ?H2Osyms nco nco2 nh2 nh2o;
+soln_wgs = zeros(length(temps),4,length(pres));
+
+eqs = [  1  == nco2   + nco;...          carbon atom balance  %POTENTIAL ERROR: shouldn't this be 2, not 1?
+         3  == nco2*2 + nco + nh2o; ...  oxygen atom balance
+         10  == nh2*2   + nh2o*2;...      hydrogen atom balance
+         nco.*nh2o./(nco2.*nh2) ...      Nernst atom balance
+            == f_kp_WGS(Tin(1))];        %Tin(1) is the first temp in Tin vector, which is Tin(reformer)
+        
+% 4 eq, 4 unknown
+[a,b,c,d] = vpasolve(eqs,[nco,nh2o,nco2,nh2],[1,1,1,1]);
+a(imag(a)~=0) = 0;
+a(a<0) = 0;
+a(a>3) = 0;
+b(imag(b)~=0) = 0;
+b(b<0) = 0;
+b(b>3) = 0;
+c(imag(c)~=0) = 0;
+c(c<0) = 0;
+c(c>3) = 0;
+d(imag(d)~=0) = 0;
+d(d<0) = 0;
+d(d>3) = 0;
+nco_wgs(i) = double(min(a(a~=0)));
+nh2o_wgs(i) = double(min(b(b~=0)));
+nco2_wgs(i) = double(max(c(c~=0)));
+nh2_wgs(i) = double(max(d(d~=0)));
 
