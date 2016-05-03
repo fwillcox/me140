@@ -12,7 +12,7 @@ defineGlobals();
 mol_H2 = 1;
 savePlots = 1;
 % 1,2,3,4,5,6,7,8,9,10,11
-supressplots =   [1,      1,    1,  0];         % supresses plots by section
+supressplots =   [1,      1,    0,  0];         % supresses plots by section
 
 %% Part A, Section 1
 % Currents (load & stack)
@@ -131,33 +131,41 @@ end
 % Source Efficiency: Slide 3, http://www.sae.org/events/gim/presentations/2011/RolandGravel.pdf
 % Source Horsepower: https://cumminsengines.com/isx15-heavy-duty-truck-2013#overview
 eta_diesel = 0.42;
+eta_diesel = linspace(eta_diesel, eta_diesel, length(p_load)); %Make it a line instead of points
 Wdot_diesel = 400 * HORSEPOWER_TO_W;  % [W]
 
 % Typical gasoline hybrid engine (eta_hybrid = max of 40%)
 % Source Efficiency & Horsepower: Toyota Hybrid Vehicles, http://www.toyota-global.com/innovation/environmental_technology/hybrid/
 eta_hybrid = 0.40;
+eta_hybrid = linspace(eta_hybrid, eta_hybrid, length(p_load)); % Make it a line
 Wdot_hybrid = 121 * HORSEPOWER_TO_W;  % [W]
 
-% Calcuate Heat Removal (Qdot)
+% Calcuate Heat Removal (Qdot) --> 40 g/s necessary only for
+% intensive/extensive conversion
 for i = 1:length(T4)
     Qdot_fuelCell(i) = hEng(T4(i),'h2o') - hEng(T5(i),'h2o');
 end
-%TODO incorporate mass flow rate of water
 Qdot_fuelCell_max = max(Qdot_fuelCell);
 
 % Theoretical Number of Fuel Cells Needed
-% TODO Use electric power out here? Wload?
-num_fuelCells_diesel = Wdot_diesel ./ Qdot_fuelCell_max;
-num_fuelCells_hybrid = Wdot_hybrid ./ Qdot_fuelCell_max;
+% Finding total power of cell out = load power plus Qdot
+powerOut = p_load + Qdot_fuelCell_max;
+
+num_fuelCells_diesel = Wdot_diesel ./ powerOut
+num_fuelCells_hybrid = Wdot_hybrid ./ powerOut
 
 if(~supressplots(3))
     % Overall First Law Efficiency of the PEM Fuel Cell = Stack Efficiency
     f8 = figure(8);
-    plot(p_load, etaI_stack, 'c', p_load, eta_diesel, 'bp--', p_load, eta_hybrid, 'gd');
+    plot(p_load, etaI_stack, 'c', p_load, eta_diesel, 'b:', p_load, eta_hybrid, 'g');
     title('Comparing 1st Law Efficiency: PEM Fuel Cell, Diesel, and Gasoline Hybrid');
     xlabel('Load [Watts]'); ylabel('Efficiency, eta_{I}');
     legend('eta_{I,stack}','eta_{I,Diesel}', 'eta_{I,Hybrid}','Location','best'); plotfixer(); grid on;
 end
+
+% Comments: To scale this up, we would need somewhere between 280-540 fuel
+% cells to equal the diesel output, and 85-165 fuel cells to equal the
+% hybrid output.
 
 %% Part B, Section 1
 % Part B, Section 1 - Emily & Kendall
@@ -421,6 +429,15 @@ end
 % Assumption:       iso = isothermal, adi = adiabatic 
 % Inlet/Exit:       in = inlet, ex = exit
 
+% PSEUDO CODE
+% Start with Nernst atom balance for WGS reaction to get composition
+% "Start with isothermal cases - adiabatic is a whole different beast"
+% Assume first WGS uses up all CH4 and goes fully to completion
+% Figure out the products from the WGS
+% Use isothermal temperature values given to figure out Qdot
+% Go step by step through and get products for each following reaction, ...
+% Take those products and do isothermal calcs on them
+
 % Inlet Temperatures 
 Tin_iso_C = [800 400 250];    % [C]
 Tin_adi_C = [800 NaN NaN];        % [C] TODO: solve for Tin_adi_C(2) & (3)
@@ -443,3 +460,4 @@ pct_CH4 = [NaN]; % Note: only applies to Reformer! Not Shift Reactors!
 % eta = (LHV_h2*mass_h2) / (LHV_ch4*mass_ch4)
 eta_iso = [NaN];
 eta_adi = [NaN];
+
