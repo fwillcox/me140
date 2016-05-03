@@ -12,7 +12,7 @@ defineGlobals();
 mol_H2 = 1;
 savePlots = 1;
                 % 1,2,3,4,5,6,7,8,9,10,11
-supressplots =   [1,      1,    1,  0];         % supresses plots by section
+supressplots =   [0,      0,    0,  0];         % supresses plots by section
 
 %% Part A, Section 1
 % Currents (load & stack)
@@ -76,19 +76,19 @@ if(~supressplots(1))
     plot(p_load,v_load,p_load,v_stack);
     title('Potential as a Function of Load');
     xlabel('Load [Watts]'); ylabel('Potential [Volts]');
-    legend('V_{load}','V_{stack}','Location','best'); plotfixer();grid on;
+    legend('V_{load}','V_{stack}','Location','best'); plotfixer(); grid on;
     
     f3 = figure(3);
     plot(p_load,p_stack,p_load,p_access);
     title('Stack and Accessory Power as a Function of Load');
     xlabel('Load [Watts]'); ylabel('Power [Watts]');
-    legend('P_{stack}','P_{accessory}','Location','best'); plotfixer();grid on;
+    legend('P_{stack}','P_{accessory}','Location','best'); plotfixer(); grid on;
     
     f4 = figure(4);
-    plot(p_load,mdot_fuel,p_load,mdot_total);
+    plot(p_load, mdot_fuel*100, p_load, mdot_total);
     title('Mass Flow Rate as a Function of Load');
     xlabel('Load [Watts]'); ylabel('Mass Flow Rate [kg/s]');
-    legend('mdot_{H}','mdot_{air}','Location','best'); plotfixer(); grid on
+    legend('mdot_{H}*100','mdot_{air}','Location','best'); plotfixer(); grid on;
     
 end
 
@@ -107,7 +107,7 @@ if(~supressplots(2))
     plot(p_load,lambda_load);
     title('Air Equivalent as a Function of Load');
     xlabel('Load [Watts]'); ylabel('Lambda');
-    legend('\lambda','Location','best'); plotfixer();grid on
+    legend('\lambda','Location','best'); plotfixer(); grid on;
     
     f5 = figure(5);
     plot(p_load,etaI_stack,'c',p_load,etaI_load,'bp--',...
@@ -121,7 +121,7 @@ if(~supressplots(2))
     plot(p_load,p_stack,'c',p_load,p_load,'bp--');
     title('Power Loss/Inefficiences as a Function of Load');
     xlabel('Load [Watts]'); ylabel('Power Loss/Inefficiencies, Idot [Watts]');
-    legend('Idot_{stack}','Idot_{system}','Location','best'); plotfixer();grid on;
+    legend('Idot_{stack}','Idot_{system}','Location','best'); plotfixer(); grid on;
 end
 
 %% Part A, Section 3
@@ -160,7 +160,7 @@ if(~supressplots(3))
     plot(p_load, etaI_stack, 'c', p_load, eta_diesel, 'b:', p_load, eta_hybrid, 'g');
     title('Comparing 1st Law Efficiency: PEM Fuel Cell, Diesel, and Gasoline Hybrid');
     xlabel('Load [Watts]'); ylabel('Efficiency, eta_{I}');
-    legend('eta_{I,stack}','eta_{I,Diesel}', 'eta_{I,Hybrid}','Location','best'); plotfixer(); grid on;
+    legend('eta_{I,stack}','eta_{I,Diesel}', 'eta_{I,Hybrid}','Location','northwest'); plotfixer(); grid on;
 end
 
 % Comments: To scale this up, we would need somewhere between 280-540 fuel
@@ -253,7 +253,7 @@ if(~supressplots(3))
     legend('SMR', 'WGS')
     title('Part B.1: Equilibrium Constant vs. Temperature')
     ylim([0.001,1000]);
-    plotfixer();grid on
+    plotfixer(); grid on;
 end
 %% Part B No. 2
 % Find the Equilibrium Composition (Mol Fractions) of the Steam Methane 
@@ -397,7 +397,7 @@ if(~supressplots(4))
     ylabel('Mole Fraction');
     title('Water Gas Shift Composition');
     %ylim([0.001,1]);
-    plotfixer();
+    plotfixer(); grid on;
 end
 
 
