@@ -12,7 +12,7 @@ defineGlobals();
 mol_H2 = 1;
 savePlots = 1;
                 % 1,2,3,4,5,6,7,8,9,10,11
-supressplots =   [1,      1,    1,  0];         % supresses plots by section
+supressplots =   [1,      1,    0,  0];         % supresses plots by section
 
 %% Part A, Section 1
 % Currents (load & stack)
@@ -254,6 +254,8 @@ if(~supressplots(3))
     title('Part B.1: Equilibrium Constant vs. Temperature')
     ylim([0.001,1000]);
     plotfixer();grid on
+    patch([25,100,100,25],[10^-3,10^-3,10^3,10^3],'g','FaceAlpha',.5,'EdgeAlpha',0);
+    set(gca,'children',flipud(get(gca,'children')))
 end
 %% Part B No. 2
 % Find the Equilibrium Composition (Mol Fractions) of the Steam Methane 
