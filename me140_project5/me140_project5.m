@@ -456,4 +456,3 @@ Qin_iso = [NaN NaN NaN];             % [MJ/(kg of reactants)]
 % Percent Methane Burned to Heat Reformer (pct_CH4, ASSUME: adiabatic)
 pct_CH4 = [NaN]; % Note: only applies to Reformer! Not Shift Reactors!
 
-% Efficiency (eta of entire system: reformer & both shift reactors)
