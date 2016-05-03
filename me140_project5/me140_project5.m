@@ -165,7 +165,7 @@ end
 %% Part B, Section 1
 % Part B, Section 1 - Emily & Kendall
 % Calculating Kp Values
-% Formulas from https://coursework.stanford.edu/access/content/group/Sp16-ME-140-01/Lecture%20Slides/Lecture%2013.pdf
+% SOURCE Kp Formula: LECTURE 14, SLIDE 4
 
 % SMR: CH4 + H2O --> CO + 3H2
 % v values are stoichiometric coefficients
@@ -245,6 +245,9 @@ plotfixer();grid on
 end
 
 %% Part B No. 2
+% Find the Equilibrium Composition (Mol Fractions) of the Steam Methane 
+% Reformation(SMR) Reaction 
+% SOURCE Nernst Atom Balance: LECTURE 14, SLIDE 4 (equation in lower right corner)
 npts = 20;
 syms nco nch4 nh2 nh2o;
 
@@ -298,12 +301,55 @@ if(savePlots ==1)
     end
 end
 
-%% Part B No. 3
-% % Equations we'll need:
-%  eqs = [       1  == nco2   + nco;...          carbon atom balance
-%                4  == nco2*2 + nco + nh2o; ...  hydrogen atom balance
-%                6  == nh2*2   + nh2o*2;...      oxygen atom balance
-%                nco.*nh2o.^3./(nco2.*nh2).* ... Nernst atom balance
-%                   == f_kp_SMR(t)]; 
-%         % 4 eq, 4 unknown
-%         [a,b,c,d] = vpasolve(eqs,[nco,nh2o,nco2,nh2],[1,1,1,1]);
+% Part B No. 3
+Find the Equilibrium Composition (Mol Fractions) of the Water-Gas Shift 
+(WGS) Reaction 
+% Equations we'll need:
+ eqs = [       1  == nco2   + nco;...          % carbon atom balance
+               4  == nco2*2 + nco + nh2o; ...  % hydrogen atom balance
+               6  == nh2*2   + nh2o*2;...      % oxygen atom balance
+               nco.*nh2o.^3./(nco2.*nh2).* ... % Nernst atom balance 
+                  == f_kp_SMR(t)]; 
+        % 4 eq, 4 unknown
+        [a,b,c,d] = vpasolve(eqs,[nco,nh2o,nco2,nh2],[1,1,1,1]);
+
+
+%% Part B No. 4
+% Plot exit composition (mol fractions) vs. 3 system stations (Reformer,
+% Shift Reactor 1, Shift Reactor 2) 
+% Note: do this for 2 Different Assumptions: (1) isothermal, (2) adiabatic
+% SMR: CH4 + 3*H2O --> CO + 3*H2
+% WGS: CO  + 3*H2O --> CO2 + H2
+
+% NAMING CONVENTIONS: 
+% Station Location: 1=Reformer, 2 = 1st Shift Reactor, 3 = 2nd Shift
+% Assumption:       iso = isothermal, adi = adiabatic 
+% Inlet/Exit:       in = inlet, ex = exit
+
+% Inlet Temperatures 
+Tin_iso_C = [800 400 250];    % [C]
+Tin_adi_C = [800 0 0];        % [C] TODO: solve for Tin_adi_C(2) & (3)
+Tin_iso = Tin_iso_C * C_TO_K; % [K]
+Tin_adi = Tin_adi_C * C_TO_K; % [K]
+
+% Exit Temperatures
+Tex_iso_C = [800 400 250];
+Tex_adi_C = [800 0 0];
+Tex_iso = Tex_iso_C * C_TO_K;
+Tex_adi = Tex_adi_C * C_TO_K;
+
+% Heat Addition for Isothermal Reaction (Qin, ASSUME: isothermal)
+Qin_iso = [0 0 0];             % [MJ/(kg of reactants)]
+
+% Percent Methane Burned to Heat Reformer (pct_CH4, ASSUME: adiabatic)
+pct_CH4 = [0]; % Note: only applies to Reformer! Not Shift Reactors!
+
+% Efficiency (eta of entire system: reformer & both shift reactors)
+% eta = (LHV_h2*mass_h2) / (LHV_ch4*mass_ch4)
+eta_iso = [];
+eta_adi = [];
+
+
+
+
+
