@@ -142,9 +142,11 @@ Wdot_hybrid = 121 * HORSEPOWER_TO_W;  % [W]
 for i = 1:length(T4)
     Qdot_fuelCell(i) = hEng(T4(i),'h2o') - hEng(T5(i),'h2o');
 end
+%TODO incorporate mass flow rate of water
 Qdot_fuelCell_max = max(Qdot_fuelCell);
 
 % Theoretical Number of Fuel Cells Needed
+% TODO Use electric power out here? Wload?
 num_fuelCells_diesel = Wdot_diesel ./ Qdot_fuelCell_max;
 num_fuelCells_hybrid = Wdot_hybrid ./ Qdot_fuelCell_max;
 
@@ -318,6 +320,69 @@ if(~supressplots(4))
     plotfixer(); grid on;
 end
 
+%% Part B No. 3
+% % Equations we'll need:
+%  eqs = [       1  == nco2   + nco;...          carbon atom balance
+%                4  == nco2*2 + nco + nh2o; ...  hydrogen atom balance
+%                6  == nh2*2   + nh2o*2;...      oxygen atom balance
+%                nco.*nh2o.^3./(nco2.*nh2).* ... Nernst atom balance
+%                   == f_kp_SMR(t)];
+%         % 4 eq, 4 unknown
+%         [a,b,c,d] = vpasolve(eqs,[nco,nh2o,nco2,nh2],[1,1,1,1]);
+syms nco nco2 nh2 nh2o;
+soln_wgs = zeros(length(temps),4,length(pres));
+tic
+for i = 1:length(temps)
+    t = temps(i);
+    
+    eqs = [       1  == nco2   + nco;...carbon atom balance
+        4  == nco2*2 + nco + nh2o; ...  hydrogen atom balance
+        6  == nh2*2   + nh2o*2;...      oxygen atom balance
+        nco.*nh2o./(nco2.*nh2) ... Nernst atom balance
+        == f_kp_SMR(t)];        %(note no pressure term, as nmols same on RHS and LHS)
+    % 4 eq, 4 unknown
+    [a,b,c,d] = vpasolve(eqs,[nco,nh2o,nco2,nh2],[1,1,1,1]);
+    a(imag(a)~=0) = 0;
+    a(a<0) = 0;
+    a(a>3) = 0;
+    b(imag(b)~=0) = 0;
+    b(b<0) = 0;
+    b(b>3) = 0;
+    c(imag(c)~=0) = 0;
+    c(c<0) = 0;
+    c(c>3) = 0;
+    d(imag(d)~=0) = 0;
+    d(d<0) = 0;
+    d(d>3) = 0;
+    nco_wgs(i) = double(min(a(a~=0)));
+    nh2o_wgs(i) = double(min(b(b~=0)));
+    nco2_wgs(i) = double(max(c(c~=0)));
+    nh2_wgs(i) = double(max(d(d~=0)));
+    %          soln(i,:,j) = max(double(real([a,b,c,d]));
+    
+end
+ntot_wgs = nco_wgs + nh2_wgs + nh2o_wgs + nco2_wgs;
+yco2_wgs = nco2_wgs./ntot_wgs;
+yh2_wgs = nh2_wgs./ntot_wgs;
+yh2o_wgs = nh2o_wgs./ntot_wgs;
+yco_wgs = nco_wgs./ntot_wgs;
+
+if(~supressplot(4))
+    
+    f12 = figure(12);
+    semilogy(temps,yco_wgs,'b',...
+        temps,yco2_wgs,'m',...
+        temps,yh2_wgs,'--g',...
+        temps,yh2o_wgs,'r');
+    legend('CO','CO2','H2','H2O','location','southwest');
+    xlabel('Temperature [K]');
+    ylabel('Mole Fraction');
+    title('Water Gas Shift Composition');
+    ylim([0.001,1]);
+    plotfixer();
+end
+
+
 if(savePlots ==1)
     if(~supressplots(1))
         saveas(f1,'../plots5/1-CurrentbyLoad','png');
@@ -337,15 +402,7 @@ if(savePlots ==1)
     if(~supressplots(4))
         saveas(f10,'../plots5/10-SMRcompmol','png');
         saveas(f11,'../plots5/11-SMRcomp','png');
+        saveas(f12,'../plots5/12-WGScomp','png');
     end
 end
 
-%% Part B No. 3
-% % Equations we'll need:
-%  eqs = [       1  == nco2   + nco;...          carbon atom balance
-%                4  == nco2*2 + nco + nh2o; ...  hydrogen atom balance
-%                6  == nh2*2   + nh2o*2;...      oxygen atom balance
-%                nco.*nh2o.^3./(nco2.*nh2).* ... Nernst atom balance
-%                   == f_kp_SMR(t)];
-%         % 4 eq, 4 unknown
-%         [a,b,c,d] = vpasolve(eqs,[nco,nh2o,nco2,nh2],[1,1,1,1]);
