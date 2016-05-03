@@ -202,7 +202,7 @@ g_SMR = (gEng(T_B1, P_ref, 'co',v_CO_SMR) + gEng(T_B1, P_ref, 'h2',v_H2_SMR)) - 
 g_WGS = (gEng(T_B1, P_ref, 'h2',v_H2_WGS) + gEng(T_B1, P_ref, 'co2',v_CO2_WGS)) - ...
     (gEng(T_B1, P_ref, 'h2ovap',v_H2O_WGS) + gEng(T_B1, P_ref, 'co',v_CO_WGS));
 
-
+%Lecture 13 - Slide 15
 kp_SMR = exp(-g_SMR ./ (R_u .* T_B1)); %increases with temp
 kp_WGS = exp(-g_WGS ./ (R_u .* T_B1)); %decrease with temp
 
