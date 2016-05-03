@@ -143,7 +143,7 @@ hp_hybrid = 121 * HORSEPOWER_TO_W;  % [W]
 
 % Calcuate Heat Removal (Qdot)
 for i = 1:length(T4)
-Qdot_fuelCell = hEng(T4(i)) - hEng(T5(i));
+Qdot_fuelCell = hEng(T4(i),'h2o') - hEng(T5(i),'h2o');
 end
 
 if(~supressplots(plotNum))
@@ -249,7 +249,7 @@ syms nco nch4 nh2 nh2o;
 temps = linspace(25,1200,npts);
 temps = temps + C_TO_K;
 pres = [1,10,100];
-soln = zeros(length(temps),length(pres),4);
+soln = zeros(length(temps),4,length(pres));
 tic
 for i = 1:length(temps)
     for j = 1:length(pres)
@@ -264,13 +264,13 @@ for i = 1:length(temps)
                      == f_kp_SMR(t)]; 
         % 4 eq, 4 unknown
         [a,b,c,d] = vpasolve(eqs,[nco,nch4,nh2,nh2o]);
-        soln(i,j,:) = double(max(real([a,b,c,d])));
+        soln(i,:,j) = double(max(real([a,b,c,d])));
         
     end 
 end
 toc
 
-
+semilogy(temps,soln(:,:,1),'b',temps,soln(:,:,2),'o',temps,soln(:,:,3),'k')
 
 
 if(savePlots ==1) 
