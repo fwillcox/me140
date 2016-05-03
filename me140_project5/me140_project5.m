@@ -254,10 +254,10 @@ if(~supressplots(3))
     legend('SMR', 'WGS')
     title('Part B.1: Equilibrium Constant vs. Temperature')
     ylim([0.001,1000]);
+    text(50,5,{'H-Power','Operating Temp','25-100K'})
     plotfixer();grid on
     patch([25,100,100,25],[10^-3,10^-3,10^3,10^3],'g','FaceAlpha',.5,'EdgeAlpha',0);
-    set(gca,'children',flipud(get(gca,'children')))
-
+    set(gca,'children',flipud(get(gca,'children'))) %puts shading beneath lines
 end
 %% Part B No. 2
 % Find the Equilibrium Composition (Mol Fractions) of the Steam Methane 
@@ -336,7 +336,7 @@ if(~supressplots(4))
     xlabel('Temperature [K]');
     ylabel('Mole Fraction');
     title('Steam Methane Reforming Composition');
-    legend('1atm','10atm','100atm','CO','CH4','H2','H2O','location','NorthWest');
+    legend('1atm','10atm','100atm','CO','CH4','H2','H2O','location','West');
     %ylim([0.001,1]);
     plotfixer(); grid on;
 end
@@ -478,7 +478,8 @@ for i = 1:3
          (nco2.*nh2)./(nco.*nh2o) == f_kp_WGS(Tin(i))];  %Nernst atom balance % Tin(1) is the first temp in Tin vector, which is Tin(reformer)  
      syms nco nch4 nh2 nh2o;
      assume([nco,nh2o,nco2,nh2],'real'); assumeAlso([nco,nh2o,nco2,nh2] > 0); assumeAlso([nco,nh2o,nco2,nh2] < 20)
-     sol = vpasolve(eqs,[nco,nh2o,nco2,nh2],[1,1,1,1]);
-     compositions(:,i) = double(struct2array(sol))';
+     [a,b,c,d] = vpasolve(eqs,[nco,nh2o,nco2,nh2],[1,1,1,1]);
+     soln = [a,b,c,d]';
+     compositions(:,i) = double(soln)';
 end
 
