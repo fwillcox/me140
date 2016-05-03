@@ -12,7 +12,7 @@ defineGlobals();
 mol_H2 = 1;
 savePlots = 1;
 % 1,2,3,4,5,6,7,8,9,10,11
-supressplots =   [1,      1,    1,  0];         % supresses plots by section
+supressplots =   [1,      1,    0,  0];         % supresses plots by section
 
 %% Part A, Section 1
 % Currents (load & stack)
@@ -131,11 +131,13 @@ end
 % Source Efficiency: Slide 3, http://www.sae.org/events/gim/presentations/2011/RolandGravel.pdf
 % Source Horsepower: https://cumminsengines.com/isx15-heavy-duty-truck-2013#overview
 eta_diesel = 0.42;
+eta_diesel = linspace(eta_diesel, eta_diesel, length(p_load)); %Make it a line instead of points
 Wdot_diesel = 400 * HORSEPOWER_TO_W;  % [W]
 
 % Typical gasoline hybrid engine (eta_hybrid = max of 40%)
 % Source Efficiency & Horsepower: Toyota Hybrid Vehicles, http://www.toyota-global.com/innovation/environmental_technology/hybrid/
 eta_hybrid = 0.40;
+eta_hybrid = linspace(eta_hybrid, eta_hybrid, length(p_load)); % Make it a line
 Wdot_hybrid = 121 * HORSEPOWER_TO_W;  % [W]
 
 % Calcuate Heat Removal (Qdot) --> 40 g/s necessary only for
@@ -155,7 +157,7 @@ num_fuelCells_hybrid = Wdot_hybrid ./ powerOut;
 if(~supressplots(3))
     % Overall First Law Efficiency of the PEM Fuel Cell = Stack Efficiency
     f8 = figure(8);
-    plot(p_load, etaI_stack, 'c', p_load, eta_diesel, 'bp--', p_load, eta_hybrid, 'gd');
+    plot(p_load, etaI_stack, 'c', p_load, eta_diesel, 'b:', p_load, eta_hybrid, 'g');
     title('Comparing 1st Law Efficiency: PEM Fuel Cell, Diesel, and Gasoline Hybrid');
     xlabel('Load [Watts]'); ylabel('Efficiency, eta_{I}');
     legend('eta_{I,stack}','eta_{I,Diesel}', 'eta_{I,Hybrid}','Location','best'); plotfixer(); grid on;
