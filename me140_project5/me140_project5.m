@@ -92,12 +92,12 @@ plot(p_load,mdot_fuel,p_load,mdot_total);
 title('Mass Flow Rate as a Function of Load');
 xlabel('Load []'); ylabel('Mass Flow Rate []');
 legend('mdot_{H}','mdot_{air}','Location','best'); plotfixer();grid on
-<<<<<<< HEAD
 
 plotNum = plotNum+1;
 end
 
 %% Part A, Section 2
+
 % SOURCE: LEC 8, SLIDES 21 & 22
 
 % 1st & 2nd Law Efficiencies (eta_I & eta_II) & Inefficiencies (Idot)
@@ -143,17 +143,11 @@ hp_diesel = 400 * HORSEPOWER_TO_W;  % [W]
 eta_hybrid = 0.40;
 hp_hybrid = 121 * HORSEPOWER_TO_W;  % [W]
 
-<<<<<<< HEAD
 % Calcuate Heat Removal (Qdot)
 for i = 1:length(T4)
 Qdot_fuelCell = hEng(T4(i)) - hEng(T5(i));
 end
 
-=======
-% Typical gasoline hybrid engine = max of 40%
-% Source: Toyota Hybrid Vehicles, http://www.toyota-global.com/innovation/environmental_technology/hybrid/
-hybridEff = 0.40;
->>>>>>> master
 if(~supressplots(plotNum))
 % Overall First Law Efficiency of the PEM Fuel Cell = Stack Efficiency
 f8 = figure(8);
@@ -161,17 +155,12 @@ plot(p_load, etaI_stack, 'c', p_load, eta_diesel, 'bp--', p_load, eta_hybrid, 'g
 title('Comparing 1st Law Efficiency: PEM Fuel Cell, Diesel, and Gasoline Hybrid');
 xlabel('Load [Watts]'); ylabel('Efficiency, eta_{I}');
 legend('eta_{I,stack}','eta_{I,Diesel}', 'eta_{I,Hybrid}','Location','best'); plotfixer(); grid on;
-<<<<<<< HEAD
-=======
+
 plotNum = plotNum+1;
 end
->>>>>>> master
 
 % TODO: FIGURE OUT SCALE-UP FOR TOYOTA HYBRID
 % TODO: COMMENT ON ACCESSORY/FUEL SYSTEMS REQUIRED FOR THAT SCALE UP
-
-plotNum = plotNum+1;
-end
 
 %% Part B, Section 1
 % Part B, Section 1 - Emily & Kendall
@@ -217,14 +206,7 @@ g_WGS = (gEng(T_B1, P_ref, 'h2',v_H2_WGS) + gEng(T_B1, P_ref, 'co2',v_CO2_WGS)) 
 kp_SMR = exp(-g_SMR ./ (R_u .* T_B1)); %increases with temp
 kp_WGS = exp(-g_WGS ./ (R_u .* T_B1)); %decrease with temp
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> master
-=======
->>>>>>> master
+
 %functions for convenience
 f_kp_SMR = @(T_B1) exp(-((gEng(T_B1, P_ref, 'co',v_CO_SMR) ...
                         + gEng(T_B1, P_ref, 'h2',v_H2_SMR))  ...
@@ -238,13 +220,6 @@ f_kp_WGS = @(T_B1) exp(-((gEng(T_B1, P_ref, 'h2',v_H2_WGS) ...
                             + gEng(T_B1, P_ref, 'co',v_CO_WGS))) ...
                         ./ (R_u.*T_B1));
 
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> master
-=======
->>>>>>> master
-=======
->>>>>>> master
 %Prep for plot
 %convert back to celcius
 T_B1 = T_B1 - C_TO_K;
@@ -294,7 +269,6 @@ end
 soln = struct2dataset(soln);
 
 return
-
 
 if(savePlots ==1) 
     if(~supressplots(1))
