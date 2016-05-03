@@ -128,7 +128,6 @@ legend('Idot_{stack}','Idot_{system}','Location','best'); plotfixer();grid on;
 plotNum = plotNum+1;
 end
 
-
 %% Part A, Section 3
 % Comparing First Law Efficiencies of PEM Fuel Cell with Diesel & Hybrid Engines
 
@@ -149,23 +148,20 @@ Qdot_fuelCell = hEng(T4(i)) - hEng(T5(i));
 end
 
 if(~supressplots(plotNum))
-
 % Overall First Law Efficiency of the PEM Fuel Cell = Stack Efficiency
 f8 = figure(8);
 plot(p_load, etaI_stack, 'c', p_load, eta_diesel, 'bp--', p_load, eta_hybrid, 'gd');
 title('Comparing 1st Law Efficiency: PEM Fuel Cell, Diesel, and Gasoline Hybrid');
 xlabel('Load [Watts]'); ylabel('Efficiency, eta_{I}');
 legend('eta_{I,stack}','eta_{I,Diesel}', 'eta_{I,Hybrid}','Location','best'); plotfixer(); grid on;
-plotNum = plotNum+1;
-end
-
 
 % TODO: FIGURE OUT SCALE-UP FOR TOYOTA HYBRID
 % TODO: COMMENT ON ACCESSORY/FUEL SYSTEMS REQUIRED FOR THAT SCALE UP
 
+plotNum = plotNum+1;
+end
 
 %% Part B, Section 1
-
 % Part B, Section 1 - Emily & Kendall
 % Calculating Kp Values
 % Formulas from https://coursework.stanford.edu/access/content/group/Sp16-ME-140-01/Lecture%20Slides/Lecture%2013.pdf
@@ -210,7 +206,10 @@ kp_SMR = exp(-g_SMR ./ (R_u .* T_B1)); %increases with temp
 kp_WGS = exp(-g_WGS ./ (R_u .* T_B1)); %decrease with temp
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> master
 %functions for convenience
 f_kp_SMR = @(T_B1) exp(-((gEng(T_B1, P_ref, 'co',v_CO_SMR) ...
                         + gEng(T_B1, P_ref, 'h2',v_H2_SMR))  ...
@@ -224,6 +223,9 @@ f_kp_WGS = @(T_B1) exp(-((gEng(T_B1, P_ref, 'h2',v_H2_WGS) ...
                             + gEng(T_B1, P_ref, 'co',v_CO_WGS))) ...
                         ./ (R_u.*T_B1));
 
+<<<<<<< HEAD
+>>>>>>> master
+=======
 >>>>>>> master
 %Prep for plot
 %convert back to celcius
