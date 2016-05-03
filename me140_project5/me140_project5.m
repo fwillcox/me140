@@ -450,7 +450,7 @@ end
 
 % Inlet Temperatures 
 Tin_C = [800 400 250];    % [C]
-Tin = Tin_iso_C + C_TO_K; % [K]
+Tin = Tin_C + C_TO_K; % [K]
 
 % Exit Temperatures
 Tex_iso_C = [800 400 250]; 
@@ -464,33 +464,17 @@ Qin_iso = [NaN NaN NaN];             % [MJ/(kg of reactants)]
 % Percent Methane Burned to Heat Reformer (pct_CH4, ASSUME: adiabatic)
 pct_CH4 = [NaN]; % Note: only applies to Reformer! Not Shift Reactors!
 
-%Reformer 
+compositions = zeros(4,3); %co;h2o;c02;h2
 %Isothermal
-% WGS: CO  + 2*H2O--> ?CO2 + ?H2 + ?CO + ?H2O
-soln_wgs = zeros(length(temps),4,length(pres));
 
-eqs = [  1  == nco2   + nco;...          carbon atom balance  %POTENTIAL ERROR: shouldn't this be 2, not 1?
+for i = 1:3
+    eqs = [  1  == nco2   + nco;...          carbon atom balance  %POTENTIAL ERROR: shouldn't this be 2, not 1?
          3  == nco2*2 + nco + nh2o; ...  oxygen atom balance
          10  == nh2*2   + nh2o*2;...      hydrogen atom balance
-         nco.*nh2o./(nco2.*nh2) ...      Nernst atom balance
-            == f_kp_WGS(Tin(1))];        %Tin(1) is the first temp in Tin vector, which is Tin(reformer)
-        
-% 4 eq, 4 unknown
-[a,b,c,d] = vpasolve(eqs,[nco,nh2o,nco2,nh2],[1,1,1,1]);
-a(imag(a)~=0) = 0;
-a(a<0) = 0;
-a(a>3) = 0;
-b(imag(b)~=0) = 0;
-b(b<0) = 0;
-b(b>3) = 0;
-c(imag(c)~=0) = 0;
-c(c<0) = 0;
-c(c>3) = 0;
-d(imag(d)~=0) = 0;
-d(d<0) = 0;
-d(d>3) = 0;
-nco_wgs(i) = double(min(a(a~=0)));
-nh2o_wgs(i) = double(min(b(b~=0)));
-nco2_wgs(i) = double(max(c(c~=0)));
-nh2_wgs(i) = double(max(d(d~=0)));
+         (nco2.*nh2)./(nco.*nh2o) == f_kp_WGS(Tin(i))];  %Nernst atom balance % Tin(1) is the first temp in Tin vector, which is Tin(reformer)  
+     syms nco nch4 nh2 nh2o;
+     assume([nco,nh2o,nco2,nh2],'real'); assumeAlso([nco,nh2o,nco2,nh2] > 0); assumeAlso([nco,nh2o,nco2,nh2] < 20)
+     sol = vpasolve(eqs,[nco,nh2o,nco2,nh2],[1,1,1,1]);
+     compositions(:,i) = double(struct2array(sol))';
+end
 
