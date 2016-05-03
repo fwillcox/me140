@@ -12,7 +12,7 @@ defineGlobals();
 mol_H2 = 1;
 savePlots = 1;
                 %1,2,3,4,5,6,7,8,9
-supressplots = [0      ,0    ,0,0]; %supresses plots by section
+supressplots = [1      ,1    ,1,1]; %supresses plots by section
 plotNum = 1;
 
 %% Part A, Section 1
@@ -229,6 +229,7 @@ T_B1 = T_B1 - C_TO_K;
 [~,i_max_WGS] = min(abs(kp_WGS - 10^-3));
 
 %Plot
+if(~supressplots(4))
 f9 = figure(9);
 kpIsOne = ones(size(T_B1));
 semilogy(T_B1(i_min_SMR:i_max_SMR), kp_SMR(i_min_SMR:i_max_SMR), ...
@@ -239,13 +240,17 @@ legend('SMR', 'WGS')
 title('Part B.1: Equilibrium Constant vs. Temperature')
 ylim([0.001,1000]);
 plotfixer();grid on
+end
 
 %% Part B No. 2
 npts = 20;
 syms nco nch4 nh2 nh2o;
 
 temps = linspace(25,1200,npts);
+temps = temps + C_TO_K;
 pres = [1,10,100];
+soln = zeros(length(temps),length(pres),4);
+tic
 for i = 1:length(temps)
     for j = 1:length(pres)
         p = pres(j);
@@ -257,16 +262,16 @@ for i = 1:length(temps)
                nco.*nh2.^3./(nch4.*nh2o).* ...    Nernst atom balance
                        (p ./ (nco + nch4 + nh2 + nh2o)) ...
                      == f_kp_SMR(t)]; 
-                 
-         
         % 4 eq, 4 unknown
-        soln(i,j) = vpasolve(eqs,[nco,nch4,nh2,nh2o]);
+        [a,b,c,d] = vpasolve(eqs,[nco,nch4,nh2,nh2o]);
+        soln(i,j,:) = double(max(real([a,b,c,d])));
         
     end 
 end
-soln = struct2dataset(soln);
+toc
 
-return
+
+
 
 if(savePlots ==1) 
     if(~supressplots(1))
@@ -283,5 +288,7 @@ if(savePlots ==1)
     if(~supressplots(3))
     saveas(f8,'../plots5/8-CompareToGasoline','png');
     end
+    if(~supressplots(4))
     saveas(f9,'../plots5/9-KeqbyT','png');
+    end
 end
