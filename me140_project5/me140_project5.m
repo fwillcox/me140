@@ -138,17 +138,19 @@ Wdot_diesel = 400 * HORSEPOWER_TO_W;  % [W]
 eta_hybrid = 0.40;
 Wdot_hybrid = 121 * HORSEPOWER_TO_W;  % [W]
 
-% Calcuate Heat Removal (Qdot)
+% Calcuate Heat Removal (Qdot) --> 40 g/s necessary only for
+% intensive/extensive conversion
 for i = 1:length(T4)
     Qdot_fuelCell(i) = hEng(T4(i),'h2o') - hEng(T5(i),'h2o');
 end
-%TODO incorporate mass flow rate of water
 Qdot_fuelCell_max = max(Qdot_fuelCell);
 
 % Theoretical Number of Fuel Cells Needed
-% TODO Use electric power out here? Wload?
-num_fuelCells_diesel = Wdot_diesel ./ Qdot_fuelCell_max;
-num_fuelCells_hybrid = Wdot_hybrid ./ Qdot_fuelCell_max;
+% Finding total power of cell out = load power plus Qdot
+powerOut = p_load + Qdot_fuelCell_max;
+
+num_fuelCells_diesel = Wdot_diesel ./ powerOut;
+num_fuelCells_hybrid = Wdot_hybrid ./ powerOut;
 
 if(~supressplots(3))
     % Overall First Law Efficiency of the PEM Fuel Cell = Stack Efficiency
@@ -420,6 +422,15 @@ end
 % Station Location: 1=Reformer, 2 = 1st Shift Reactor, 3 = 2nd Shift
 % Assumption:       iso = isothermal, adi = adiabatic 
 % Inlet/Exit:       in = inlet, ex = exit
+
+% PSEUDO CODE
+% Start with Nernst atom balance for WGS reaction to get composition
+% "Start with isothermal cases - adiabatic is a whole different beast"
+% Assume first WGS uses up all CH4 and goes fully to completion
+% Figure out the products from the WGS
+% Use isothermal temperature values given to figure out Qdot
+% Go step by step through and get products for each following reaction, ...
+% Take those products and do isothermal calcs on them
 
 % Inlet Temperatures 
 Tin_iso_C = [800 400 250];    % [C]
