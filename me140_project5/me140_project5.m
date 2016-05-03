@@ -343,20 +343,6 @@ if(savePlots ==1)
     end
 end
 
-<<<<<<< HEAD
-% Part B No. 3
-Find the Equilibrium Composition (Mol Fractions) of the Water-Gas Shift 
-(WGS) Reaction 
-% Equations we'll need:
- eqs = [       1  == nco2   + nco;...          % carbon atom balance
-               4  == nco2*2 + nco + nh2o; ...  % hydrogen atom balance
-               6  == nh2*2   + nh2o*2;...      % oxygen atom balance
-               nco.*nh2o.^3./(nco2.*nh2).* ... % Nernst atom balance 
-                  == f_kp_SMR(t)]; 
-        % 4 eq, 4 unknown
-        [a,b,c,d] = vpasolve(eqs,[nco,nh2o,nco2,nh2],[1,1,1,1]);
-
-
 %% Part B No. 4
 % Plot exit composition (mol fractions) vs. 3 system stations (Reformer,
 % Shift Reactor 1, Shift Reactor 2) 
