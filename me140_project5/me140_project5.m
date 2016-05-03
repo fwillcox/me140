@@ -355,7 +355,7 @@ parfor i = 1:length(temps)
     eqs = [       1  == nco2   + nco;...carbon atom balance  %POTENTIAL ERROR: shouldn't this be 2, not 1?
         4  == nco2*2 + nco + nh2o; ...  oxygen atom balance
         10  == nh2*2   + nh2o*2;...      hydrogen atom balance 
-        nco2.*nh2./(nco.*nh2o) ... Nernst atom balance
+        (nco2.*nh2)./(nco.*nh2o) ... Nernst atom balance
         == f_kp_WGS(t)];        %(note no pressure term, as nmols same on RHS and LHS)
     % 4 eq, 4 unknown    
     [a,b,c,d] = vpasolve(eqs,[nco,nh2o,nco2,nh2],[1,1,1,1]);
@@ -466,7 +466,7 @@ pct_CH4 = [NaN]; % Note: only applies to Reformer! Not Shift Reactors!
 
 %Reformer 
 %Isothermal
-% WGS: CO  + 2*H2O + 3*H2--> ?CO2 + (3+?)H2 + ?CO + ?H2Osyms nco nco2 nh2 nh2o;
+% WGS: CO  + 2*H2O--> ?CO2 + ?H2 + ?CO + ?H2O
 soln_wgs = zeros(length(temps),4,length(pres));
 
 eqs = [  1  == nco2   + nco;...          carbon atom balance  %POTENTIAL ERROR: shouldn't this be 2, not 1?
