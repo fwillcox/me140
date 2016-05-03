@@ -254,13 +254,10 @@ if(~supressplots(3))
     legend('SMR', 'WGS')
     title('Part B.1: Equilibrium Constant vs. Temperature')
     ylim([0.001,1000]);
-<<<<<<< HEAD
     plotfixer();grid on
     patch([25,100,100,25],[10^-3,10^-3,10^3,10^3],'g','FaceAlpha',.5,'EdgeAlpha',0);
     set(gca,'children',flipud(get(gca,'children')))
-=======
-    plotfixer(); grid on;
->>>>>>> master
+
 end
 %% Part B No. 2
 % Find the Equilibrium Composition (Mol Fractions) of the Steam Methane 
