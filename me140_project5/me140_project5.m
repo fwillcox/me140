@@ -306,4 +306,4 @@ end
 %                nco.*nh2o.^3./(nco2.*nh2).* ... Nernst atom balance
 %                   == f_kp_SMR(t)]; 
 %         % 4 eq, 4 unknown
-%         [a,b,c,d] = vpasolve(eqs,[nco,nch4,nh2,nh2o],[1,1,1,1]);
+%         [a,b,c,d] = vpasolve(eqs,[nco,nh2o,nco2,nh2],[1,1,1,1]);
