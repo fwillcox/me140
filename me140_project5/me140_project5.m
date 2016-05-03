@@ -4,15 +4,15 @@
 
 % ASSUME:
 % (i)  mol_H2 = 1
-clear; close all;clc;
+clear; close all;clc;hold off;
 
 global PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS ...
     C_TO_K PSI_TO_PA MM_h MM_h2 MM_o MM_n MM_h2o MM_air PATM HORSEPOWER_TO_W
 defineGlobals();
 mol_H2 = 1;
 savePlots = 1;
-                % 1,2,3,4,5,6,7,8,9
-supressplots =   [1,1,0,1];         % supresses plots by section
+                % 1,2,3,4,5,6,7,8,9,10,11
+supressplots =   [1,      1,    1,  0];         % supresses plots by section
 plotNum = 1;
 
 %% Part A, Section 1
@@ -158,8 +158,6 @@ plot(p_load, etaI_stack, 'c', p_load, eta_diesel, 'bp--', p_load, eta_hybrid, 'g
 title('Comparing 1st Law Efficiency: PEM Fuel Cell, Diesel, and Gasoline Hybrid');
 xlabel('Load [Watts]'); ylabel('Efficiency, eta_{I}');
 legend('eta_{I,stack}','eta_{I,Diesel}', 'eta_{I,Hybrid}','Location','best'); plotfixer(); grid on;
-
-plotNum = plotNum+1;
 end
 
 %% Part B, Section 1
@@ -242,6 +240,7 @@ legend('SMR', 'WGS')
 title('Part B.1: Equilibrium Constant vs. Temperature')
 ylim([0.001,1000]);
 plotfixer();grid on
+plotNum = plotNum+1;
 end
 
 %% Part B No. 2
@@ -262,21 +261,76 @@ for i = 1:length(temps)
                10 == nh2*2 + nch4*4 + nh2o*2; ... hydrogen atom balance
                3  == nco   + nh2o;...             oxygen atom balance
                nco.*nh2.^3./(nch4.*nh2o).* ...    Nernst atom balance
-                       (p ./ (nco + nch4 + nh2 + nh2o)) ...
+                       (p ./ (nco + nch4 + nh2 + nh2o).^2) ...
                      == f_kp_SMR(t)]; 
         % 4 eq, 4 unknown
         [a,b,c,d] = vpasolve(eqs,[nco,nch4,nh2,nh2o],[1,1,1,1]);
-        soln(i,:,j) = double(max(real([a,b,c,d])));
+        %todo find value closest to 1
+        a(imag(a)~=0) = 0;
+        a(a<0) = 0;
+        a(a>3) = 0;
+        b(imag(b)~=0) = 0;
+        b(b<0) = 0;
+        b(b>3) = 0;
+        c(imag(c)~=0) = 0;
+        c(c<0) = 0;
+        c(c>3) = 0;
+        d(imag(d)~=0) = 0;
+        d(d<0) = 0;
+        d(d>3) = 0;
+        nco_sol(i,j) = double(max(a(a~=0)));
+        nch4_sol(i,j) = double(min(b(b~=0)));
+        nh2_sol(i,j) = double(max(c(c~=0)));
+        nh2o_sol(i,j) = double(min(d(d~=0)));
+%          soln(i,:,j) = max(double(real([a,b,c,d]));
         
     end 
 end
 toc
+if(~supressplots(plotnum))
+%unneeded but cool looking plot
+f10 = figure(10);
+plot(temps,nco_sol,'b',temps,nch4_sol,'m',temps,nh2_sol,'g',temps,nh2o_sol,'k');
+legend('CO','CH4','H2','H2O');
 
-semilogy(temps,soln(:,1,1),'b',temps,soln(:,1,2),'--b',temps,soln(:,1,3),'.b',...
-        temps,soln(:,2,1),'r',temps,soln(:,2,2),'--r',temps,soln(:,2,3),'.r',...
-        temps,soln(:,3,1),'k',temps,soln(:,3,2),'--k',temps,soln(:,3,3),'.k',...
-        temps,soln(:,4,1),'m',temps,soln(:,4,2),'--m',temps,soln(:,4,3),'.m');
+ntot = nch4_sol + nh2_sol + nh2o_sol + nco_sol;
+ych4 = nch4_sol./ntot;
+yh2 = nh2_sol./ntot;
+yh2o = nh2o_sol./ntot;
+yco = nco_sol./ntot;
+%mole fractions
+f11 = figure(11);
+linestyle = {'-','--',':'};
+hold on
+semilogy(1,0,'-k',1,0,'--k',1,0,':k');
+hold on
+for i = 1:length(pres)
+    semilogy(temps,yco(:,i),strcat(linestyle{i},'b'),...
+        temps,ych4(:,i),strcat(linestyle{i},'m'),...
+        temps,yh2(:,i),strcat(linestyle{i},'g'),...
+        temps,yh2o(:,i),strcat(linestyle{i},'r'));
+    hold on
+end
+hold off
+xlabel('Temperature [K]');
+ylabel('Mole Fraction');
+title('Steam Methane Reforming Composition');
+legend('1atm','10atm','100atm','CO','CH4','H2','H2O','location','best');
+ylim([0.001,1]);
+plotfixer(); grid on;
+plotnum = plotnum+1;
+end
 
+% semilogy(temps,soln(:,1,1),'b',temps,soln(:,1,2),'--b',temps,soln(:,1,3),'.b',...
+%         temps,soln(:,2,1),'r',temps,soln(:,2,2),'--r',temps,soln(:,2,3),'.r',...
+%         temps,soln(:,3,1),'k',temps,soln(:,3,2),'--k',temps,soln(:,3,3),'.k',...
+%         temps,soln(:,4,1),'m',temps,soln(:,4,2),'--m',temps,soln(:,4,3),'.m');
+
+% semilogy(temps,soln(:,1,1),'b',temps,soln(:,1,2),'--b',temps,soln(:,1,3),'.b',...
+%         temps,soln(:,2,1),'r',temps,soln(:,2,2),'--r',temps,soln(:,2,3),'.r',...
+%         temps,soln(:,3,1),'k',temps,soln(:,3,2),'--k',temps,soln(:,3,3),'.k',...
+%         temps,soln(:,4,1),'m',temps,soln(:,4,2),'--m',temps,soln(:,4,3),'.m');
+% 
 
 if(savePlots ==1) 
     if(~supressplots(1))
@@ -292,8 +346,10 @@ if(savePlots ==1)
     end
     if(~supressplots(3))
     saveas(f8,'../plots5/8-CompareToGasoline','png');
+    saveas(f9,'../plots5/9-KeqbyT','png');
     end
     if(~supressplots(4))
-    saveas(f9,'../plots5/9-KeqbyT','png');
+    saveas(f10,'../plots5/10-SMRcompmol','png');
+    saveas(f11,'../plots5/11-SMRcomp','png');
     end
 end
