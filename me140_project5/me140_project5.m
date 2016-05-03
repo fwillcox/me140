@@ -11,6 +11,9 @@ global PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS ...
 defineGlobals();
 mol_H2 = 1;
 savePlots = 1;
+                %1,2,3,4,5,6,7,8,9
+supressplots = [0      ,0    ,0,0]; %supresses plots by section
+plotNum = 1;
 
 %% Part A, Section 1
 % Currents (load & stack)
@@ -64,7 +67,7 @@ Ptotal = Ptotal_psi .* PSI_TO_PA + PATM;                            % [Pa]
 p_load =  i_load  .* v_load;                                        % [W] = [kg*m^2*s^-3], a.k.a. "load" (power delivered to resistor bank)
 p_stack = i_stack .* v_stack;
 p_access = p_stack - p_load;                                        % [W], Acessory Power, i.e. power used to run controls. Pstack-Pload
-
+if(~supressplots(plotNum))
 f1 = figure(1);
 plot(p_load,i_load,p_load,i_stack);
 title('Current as a Function of Load');
@@ -90,6 +93,9 @@ title('Mass Flow Rate as a Function of Load');
 xlabel('Load []'); ylabel('Mass Flow Rate []');
 legend('mdot_{H}','mdot_{air}','Location','best'); plotfixer();grid on
 
+plotNum = plotNum+1;
+end
+
 %% Part A, Section 2
 % SOURCE: LEC 8, SLIDES 21 & 22
 
@@ -99,12 +105,12 @@ legend('mdot_{H}','mdot_{air}','Location','best'); plotfixer();grid on
 
 % Entire System (Load)
 [etaI_load ,etaII_load, Idot_load,lambda_load] =    findEtas(mdot_total, mdot_fuel, Ptotal, Pfuel, T2, p_load);
-
+if(~supressplots(plotNum))
 f6 = figure(6);
-plot(p_load,lambda_load,p_load,lambda_stack);
+plot(p_load,lambda_load);
 title('Air Equivalent as a Function of Load');
 xlabel('Load [Watts]'); ylabel('Lambda');
-legend('\lambda_{load}','\lambda_{stack}','Location','best'); plotfixer();grid on
+legend('\lambda','Location','best'); plotfixer();grid on
 
 f5 = figure(5);
 plot(p_load,etaI_stack,'c',p_load,etaI_load,'bp--',...
@@ -119,29 +125,20 @@ plot(p_load,p_stack,'c',p_load,p_load,'bp--');
 title('Power Loss/Inefficiences as a Function of Load');
 xlabel('Load [Watts]'); ylabel('Power Loss/Inefficiencies, Idot [Watts]');
 legend('Idot_{stack}','Idot_{system}','Location','best'); plotfixer();grid on;
-
-
-if(savePlots ==1) 
-    saveas(f1,'../plots5/1-CurrentbyLoad','png');
-    saveas(f2,'../plots5/2-VbyLoad','png'); 
-    saveas(f3,'../plots5/3-PowerbyLoad','png'); 
-    saveas(f4,'../plots5/4-massbyload','png'); 
-    saveas(f5,'../plots5/5-Eff','png'); 
-    saveas(f6,'../plots5/6-lambda','png');
-    saveas(f7,'../plots5/7-PowerLoss','png'); 
+plotNum = plotNum+1;
 end
 
 
 %% Part A, Section 3
 % Comparing First Law Efficiencies of PEM Fuel Cell with Diesel & Hybrid Engines
 
-% Typical modern Diesel engine = 42% (chose diesel truck because it's better than a car and worse than a freight ship)
+% Typical modern Diesel engine (eta_disel = 42%) (chose diesel truck because it's better than a car and worse than a freight ship)
 % Source Efficiency: Slide 3, http://www.sae.org/events/gim/presentations/2011/RolandGravel.pdf
 % Source Horsepower: https://cumminsengines.com/isx15-heavy-duty-truck-2013#overview
 eta_diesel = 0.42;
 hp_diesel = 400 * HORSEPOWER_TO_W;  % [W]
 
-% Typical gasoline hybrid engine = max of 40%
+% Typical gasoline hybrid engine (eta_hybrid = max of 40%)
 % Source Efficiency & Horsepower: Toyota Hybrid Vehicles, http://www.toyota-global.com/innovation/environmental_technology/hybrid/
 eta_hybrid = 0.40;
 hp_hybrid = 121 * HORSEPOWER_TO_W;  % [W]
@@ -151,12 +148,17 @@ for i = 1:length(T4)
 Qdot_fuelCell = hEng(T4(i)) - hEng(T5(i));
 end
 
+if(~supressplots(plotNum))
+
 % Overall First Law Efficiency of the PEM Fuel Cell = Stack Efficiency
 f8 = figure(8);
 plot(p_load, etaI_stack, 'c', p_load, eta_diesel, 'bp--', p_load, eta_hybrid, 'gd');
 title('Comparing 1st Law Efficiency: PEM Fuel Cell, Diesel, and Gasoline Hybrid');
 xlabel('Load [Watts]'); ylabel('Efficiency, eta_{I}');
 legend('eta_{I,stack}','eta_{I,Diesel}', 'eta_{I,Hybrid}','Location','best'); plotfixer(); grid on;
+plotNum = plotNum+1;
+end
+
 
 % TODO: FIGURE OUT SCALE-UP FOR TOYOTA HYBRID
 % TODO: COMMENT ON ACCESSORY/FUEL SYSTEMS REQUIRED FOR THAT SCALE UP
@@ -191,7 +193,9 @@ T_B1 = T_B1 + C_TO_K;
 %we have standard presssure as 101300. Because the pressure needs to
 %cancel out, I have changed this pressure to 101300, however, we should
 %perhaps consider changing the reference pressure in energyF to 100,000Pa.
-P_ref = 101300; %This is the pressure defined for standard conditions. Standard conditions are what we need because that is what the little zero indicates in the equation for g. 
+P_ref = 101300; %This is the pressure defined for standard conditions. 
+                % Standard conditions are what we need because that is what 
+                % the little zero indicates in the equation for g. 
 R_u = 8.314; %Universal gas constant
 
 %G_reaction = G_products - G_reactants
@@ -205,6 +209,22 @@ g_WGS = (gEng(T_B1, P_ref, 'h2',v_H2_WGS) + gEng(T_B1, P_ref, 'co2',v_CO2_WGS)) 
 kp_SMR = exp(-g_SMR ./ (R_u .* T_B1)); %increases with temp
 kp_WGS = exp(-g_WGS ./ (R_u .* T_B1)); %decrease with temp
 
+<<<<<<< HEAD
+=======
+%functions for convenience
+f_kp_SMR = @(T_B1) exp(-((gEng(T_B1, P_ref, 'co',v_CO_SMR) ...
+                        + gEng(T_B1, P_ref, 'h2',v_H2_SMR))  ...
+                      - (gEng(T_B1, P_ref, 'h2ovap',v_H2O_SMR) ...
+                            + gEng(T_B1, P_ref, 'ch4',v_CH4_SMR)))...
+                    ./ (R_u.*T_B1));
+                
+f_kp_WGS = @(T_B1) exp(-((gEng(T_B1, P_ref, 'h2',v_H2_WGS) ...
+                            + gEng(T_B1, P_ref, 'co2',v_CO2_WGS)) ...
+                         -(gEng(T_B1, P_ref, 'h2ovap',v_H2O_WGS) ...
+                            + gEng(T_B1, P_ref, 'co',v_CO_WGS))) ...
+                        ./ (R_u.*T_B1));
+
+>>>>>>> master
 %Prep for plot
 %convert back to celcius
 T_B1 = T_B1 - C_TO_K;
@@ -216,11 +236,60 @@ T_B1 = T_B1 - C_TO_K;
 [~,i_max_WGS] = min(abs(kp_WGS - 10^-3));
 
 %Plot
-figure(9)
+f9 = figure(9);
+kpIsOne = ones(size(T_B1));
 semilogy(T_B1(i_min_SMR:i_max_SMR), kp_SMR(i_min_SMR:i_max_SMR), ...
          T_B1(i_min_WGS:i_max_WGS), kp_WGS(i_min_WGS:i_max_WGS));
 xlabel('Temperature [C]')
 ylabel('Equilibrium Constant')
 legend('SMR', 'WGS')
 title('Part B.1: Equilibrium Constant vs. Temperature')
+ylim([0.001,1000]);
+plotfixer();grid on
 
+%% Part B No. 2
+npts = 20;
+syms nco nch4 nh2 nh2o;
+
+temps = linspace(25,1200,npts);
+pres = [1,10,100];
+for i = 1:length(temps)
+    for j = 1:length(pres)
+        p = pres(j);
+        t = temps(i);
+        
+        eqs = [1  == nco   + nch4;...             carbon atom balance
+               10 == nh2*2 + nch4*4 + nh2o*2; ... hydrogen atom balance
+               3  == nco   + nh2o;...             oxygen atom balance
+               nco.*nh2.^3./(nch4.*nh2o).* ...    Nernst atom balance
+                       (p ./ (nco + nch4 + nh2 + nh2o)) ...
+                     == f_kp_SMR(t)]; 
+                 
+         
+        % 4 eq, 4 unknown
+        soln(i,j) = vpasolve(eqs,[nco,nch4,nh2,nh2o]);
+        
+    end 
+end
+soln = struct2dataset(soln);
+
+return
+
+
+if(savePlots ==1) 
+    if(~supressplots(1))
+    saveas(f1,'../plots5/1-CurrentbyLoad','png');
+    saveas(f2,'../plots5/2-VbyLoad','png'); 
+    saveas(f3,'../plots5/3-PowerbyLoad','png'); 
+    saveas(f4,'../plots5/4-massbyload','png'); 
+    end
+    if(~supressplots(2))
+    saveas(f5,'../plots5/5-Eff','png'); 
+    saveas(f6,'../plots5/6-lambda','png');
+    saveas(f7,'../plots5/7-PowerLoss','png');
+    end
+    if(~supressplots(3))
+    saveas(f8,'../plots5/8-CompareToGasoline','png');
+    end
+    saveas(f9,'../plots5/9-KeqbyT','png');
+end
