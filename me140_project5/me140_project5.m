@@ -12,7 +12,7 @@ defineGlobals();
 mol_H2 = 1;
 savePlots = 1;
                 %1,2,3,4,5,6,7,8,9
-supressplots = [1      ,1    ,1,0]; %supresses plots by section
+supressplots = [0      ,0    ,0,0]; %supresses plots by section
 plotNum = 1;
 
 % --------------------------------
@@ -109,10 +109,10 @@ end
 [etaI_load ,etaII_load, Idot_load,lambda_load] =    findEtas(mdot_total, mdot_fuel, Ptotal, Pfuel, T2, p_load);
 if(~supressplots(plotNum))
 f6 = figure(6);
-plot(p_load,lambda_load,p_load,lambda_stack);
+plot(p_load,lambda_load);
 title('Air Equivalent as a Function of Load');
 xlabel('Load [Watts]'); ylabel('Lambda');
-legend('\lambda_{load}','\lambda_{stack}','Location','best'); plotfixer();grid on
+legend('\lambda','Location','best'); plotfixer();grid on
 
 f5 = figure(5);
 plot(p_load,etaI_stack,'c',p_load,etaI_load,'bp--',...
@@ -204,6 +204,18 @@ g_WGS = (gEng(T_B1, P_ref, 'h2',v_H2_WGS) + gEng(T_B1, P_ref, 'co2',v_CO2_WGS)) 
 kp_SMR = exp(-g_SMR ./ (R_u .* T_B1)); %increases with temp
 kp_WGS = exp(-g_WGS ./ (R_u .* T_B1)); %decrease with temp
 
+%functions for convenience
+f_kp_SMR = @(T_B1) exp(-((gEng(T_B1, P_ref, 'co',v_CO_SMR) ...
+                        + gEng(T_B1, P_ref, 'h2',v_H2_SMR))  ...
+                      - (gEng(T_B1, P_ref, 'h2ovap',v_H2O_SMR) ...
+                            + gEng(T_B1, P_ref, 'ch4',v_CH4_SMR)))...
+                    ./ (R_u.*T_B1));
+                
+f_kp_WGS = @(T_B1) exp(-((gEng(T_B1, P_ref, 'h2',v_H2_WGS) ...
+                            + gEng(T_B1, P_ref, 'co2',v_CO2_WGS)) ...
+                         -(gEng(T_B1, P_ref, 'h2ovap',v_H2O_WGS) ...
+                            + gEng(T_B1, P_ref, 'co',v_CO_WGS))) ...
+                        ./ (R_u.*T_B1));
 
 %Prep for plot
 %convert back to celcius
@@ -217,12 +229,43 @@ T_B1 = T_B1 - C_TO_K;
 
 %Plot
 f9 = figure(9);
+kpIsOne = ones(size(T_B1));
 semilogy(T_B1(i_min_SMR:i_max_SMR), kp_SMR(i_min_SMR:i_max_SMR), ...
     T_B1(i_min_WGS:i_max_WGS), kp_WGS(i_min_WGS:i_max_WGS));
 xlabel('Temperature [C]')
 ylabel('Equilibrium Constant')
 legend('SMR', 'WGS')
 title('Part B.1: Equilibrium Constant vs. Temperature')
+ylim([0.001,1000]);
+plotfixer();grid on
+
+%% Part B No. 2
+npts = 20;
+syms nco nch4 nh2 nh2o;
+
+temps = linspace(25,1200,npts);
+pres = [1,10,100];
+for i = 1:length(temps)
+    for j = 1:length(pres)
+        p = pres(j);
+        t = temps(i);
+        
+        eqs = [1  == nco   + nch4;...             carbon atom balance
+               10 == nh2*2 + nch4*4 + nh2o*2; ... hydrogen atom balance
+               3  == nco   + nh2o;...             oxygen atom balance
+               nco.*nh2.^3./(nch4.*nh2o).* ...    Nernst atom balance
+                       (p ./ (nco + nch4 + nh2 + nh2o)) ...
+                     == f_kp_SMR(t)]; 
+                 
+         
+        % 4 eq, 4 unknown
+        soln(i,j) = vpasolve(eqs,[nco,nch4,nh2,nh2o]);
+        
+    end 
+end
+soln = struct2dataset(soln);
+
+return
 
 
 if(savePlots ==1) 
