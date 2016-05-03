@@ -151,8 +151,8 @@ Qdot_fuelCell_max = max(Qdot_fuelCell);
 % Finding total power of cell out = load power plus Qdot
 powerOut = p_load + Qdot_fuelCell_max;
 
-num_fuelCells_diesel = Wdot_diesel ./ powerOut;
-num_fuelCells_hybrid = Wdot_hybrid ./ powerOut;
+num_fuelCells_diesel = Wdot_diesel ./ powerOut
+num_fuelCells_hybrid = Wdot_hybrid ./ powerOut
 
 if(~supressplots(3))
     % Overall First Law Efficiency of the PEM Fuel Cell = Stack Efficiency
@@ -163,7 +163,9 @@ if(~supressplots(3))
     legend('eta_{I,stack}','eta_{I,Diesel}', 'eta_{I,Hybrid}','Location','best'); plotfixer(); grid on;
 end
 
-% Hello, it's me
+% Comments: To scale this up, we would need somewhere between 280-540 fuel
+% cells to equal the diesel output, and 85-165 fuel cells to equal the
+% hybrid output.
 
 %% Part B, Section 1
 % Part B, Section 1 - Emily & Kendall
