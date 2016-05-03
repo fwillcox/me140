@@ -4,6 +4,7 @@
 
 % ASSUME:
 % (i)  mol_H2 = 1
+clear; close all;clc;
 
 global PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS ...
     C_TO_K PSI_TO_PA MM_h MM_h2 MM_o MM_n MM_h2o MM_air PATM
@@ -70,26 +71,26 @@ f1 = figure(1);
 plot(p_load,i_load,p_load,i_stack);
 title('Current as a Function of Load');
 xlabel('Load []'); ylabel('Current []');
-legend('I_{load}','I_{stack}'); plotfixer(); grid on;
+legend('I_{load}','I_{stack}','Location','best'); plotfixer(); grid on;
 
 f2 = figure(2); 
 plot(p_load,v_load,p_load,v_stack);
 title('Potential as a Function of Load');
 xlabel('Load []'); ylabel('Potential []');
-legend('V_{load}','V_{stack}'); plotfixer();grid on;
+legend('V_{load}','V_{stack}','Location','best'); plotfixer();grid on;
 
 f3 = figure(3);
 plot(p_load,p_stack,p_load,p_access);
 title('Stack and Accessory Power as a Function of Load');
 xlabel('Load []'); ylabel('Power []');
-legend('P_{stack}','P_{accessory}'); plotfixer();grid on;
+legend('P_{stack}','P_{accessory}','Location','best'); plotfixer();grid on;
 
 % TODO: plot lambda...
 f4 = figure(4);
 plot(p_load,mdot_fuel,p_load,mdot_total);
 title('Mass Flow Rate as a Function of Load');
 xlabel('Load []'); ylabel('Mass Flow Rate []');
-legend('mdot_{H}','mdot_{air}'); plotfixer();grid on
+legend('mdot_{H}','mdot_{air}','Location','best'); plotfixer();grid on
 
 % ---------------------------
 % Part 2: Reduced-Data Plots
@@ -107,21 +108,21 @@ f6 = figure(6);
 plot(p_load,lambda_load,p_load,lambda_stack);
 title('Air Equivalent as a Function of Load');
 xlabel('Load [Watts]'); ylabel('Lambda');
-legend('\lambda_{load}','\lambda_{stack}'); plotfixer();grid on
+legend('\lambda_{load}','\lambda_{stack}','Location','best'); plotfixer();grid on
 
 f5 = figure(5);
 plot(p_load,etaI_stack,'c',p_load,etaI_load,'bp--',...
     p_load,etaII_stack,'r',p_load,etaII_load,'gp--');
 title('Efficiency as a Function of Load');
 xlabel('Load [Watts]'); ylabel('Efficiency');
-legend('eta_{I,stack}','eta_{I,system}','eta_{II,stack}','eta_{II,system}'); 
-plotfixer(); grid on;
+legend('\eta_{I,stack}','\eta_{I,system}',...
+    '\eta_{II,stack}','\eta_{II,system}', 'Location','Best'); plotfixer(); grid on;
 
 f7 = figure(7);
 plot(p_load,p_stack,'c',p_load,p_load,'bp--');
 title('Power Loss/Inefficiences as a Function of Load');
 xlabel('Load [Watts]'); ylabel('Power Loss/Inefficiencies, Idot [Watts]');
-legend('Idot_{stack}','Idot_{system}'); plotfixer();grid on;
+legend('Idot_{stack}','Idot_{system}','Location','best'); plotfixer();grid on;
 
 
 if(savePlots ==1) 
@@ -149,44 +150,79 @@ hybridEff = 0.40;
 
 % Overall First Law Efficiency of the PEM Fuel Cell = Stack Efficiency
 % Plotting to compare
-figure(8)
+f8 = figure(8);
 plot(p_load, etaI_stack, 'c', p_load, dieselEff, 'bp--', p_load, hybridEff, 'gd');
 title('Comparing 1st Law Efficiency: PEM Fuel Cell, Diesel, and Gasoline Hybrid');
 xlabel('Load [Watts]'); ylabel('Efficiency, eta_{I}');
-legend('eta_{I,stack}','eta_{I,Diesel}', 'eta_{I,Hybrid}'); plotfixer(); grid on;
+legend('eta_{I,stack}','eta_{I,Diesel}', 'eta_{I,Hybrid}','Location','best'); plotfixer(); grid on;
 
 
 % TODO: FIGURE OUT SCALE-UP FOR TOYOTA HYBRID
 % TODO: COMMENT ON ACCESSORY/FUEL SYSTEMS REQUIRED FOR THAT SCALE UP
 
 %% Part B
-% 
-% % Part B, Section 1 - Emily & Kendall
-% % Calculating Kp Values
-% % Formulas from https://coursework.stanford.edu/access/content/group/Sp16-ME-140-01/Lecture%20Slides/Lecture%2013.pdf
-% 
-% % SMR: CH4 + H2O --> CO + 3H2
-% % v values are stoichiometric coefficients
-% v_CO_SMR = 1;
-% v_H2_SMR = 3;
-% v_H2O_SMR = 1;
-% v_CH4_SMR = 1;
-% 
-% % Calculating Kp for SMR
-% Nv_CO = mm;
-% % SMRnumKp =
-% 
-% 
-% 
-% 
-% % WGS: H2O + CO --> H2 + CO2
-% v_H2_WGS = 1;
-% v_CO2_WGS = 1;
-% v_H2O_WGS = 1;
-% v_CO_WGS = 1;
-% 
-% % 
-% % T_B1 = linspace(25, 1200, 100); %Temperature for part B1 = T_B1
-% % P_ref = 
-% % 
-% % gProducts_SMR = gEng(T_B1
+
+% Part B, Section 1 - Emily & Kendall
+% Calculating Kp Values
+% Formulas from https://coursework.stanford.edu/access/content/group/Sp16-ME-140-01/Lecture%20Slides/Lecture%2013.pdf
+
+% SMR: CH4 + H2O --> CO + 3H2
+% v values are stoichiometric coefficients
+v_CO_SMR = 1;
+v_H2_SMR = 3;
+v_H2O_SMR = 1;
+v_CH4_SMR = 1;
+
+% Calculating Kp for SMR
+% Nv_CO = mm
+% SMRnumKp = 
+
+
+
+
+% WGS: H2O + CO --> H2 + CO2
+v_H2_WGS = 1;
+v_CO2_WGS = 1;
+v_H2O_WGS = 1;
+v_CO_WGS = 1;
+
+T_B1 = linspace(25, 1200, 100); %Temperature for part B1 = T_B1
+T_B1 = T_B1 + C_TO_K;
+%NOTE: Stanford pressure, is usually defined as 100,000, however in energyF
+%we have standard presssure as 101300. Because the pressure needs to
+%cancel out, I have changed this pressure to 101300, however, we should
+%perhaps consider changing the reference pressure in energyF to 100,000Pa.
+P_ref = 101300; %This is the pressure defined for standard conditions. Standard conditions are what we need because that is what the little zero indicates in the equation for g. 
+R_u = 8.314; %Universal gas constant
+
+%G_reaction = G_products - G_reactants
+g_SMR = (gEng(T_B1, P_ref, 'co',v_CO_SMR) + gEng(T_B1, P_ref, 'h2',v_H2_SMR)) - ...
+    (gEng(T_B1, P_ref, 'h2ovap',v_H2O_SMR) + gEng(T_B1, P_ref, 'ch4',v_CH4_SMR));
+
+g_WGS = (gEng(T_B1, P_ref, 'h2',v_H2_WGS) + gEng(T_B1, P_ref, 'co2',v_CO2_WGS)) - ...
+    (gEng(T_B1, P_ref, 'h2ovap',v_H2O_WGS) + gEng(T_B1, P_ref, 'co',v_CO_WGS));
+
+
+kp_SMR = exp(-g_SMR ./ (R_u .* T_B1)); %increases with temp
+kp_WGS = exp(-g_WGS ./ (R_u .* T_B1)); %decrease with temp
+
+
+%Prep for plot
+%convert back to celcius
+T_B1 = T_B1 - C_TO_K;
+%find index of where kp=10^-3 and kp = 10^3, as the problem asks that we
+%limit the graph to this range
+[~,i_min_SMR] = min(abs(kp_SMR - 10^-3));
+[~,i_max_SMR] = min(abs(kp_SMR - 10^3)); %yes, this is supposed to use min() to find the max ;P
+[~,i_min_WGS] = min(abs(kp_WGS - 10^3));
+[~,i_max_WGS] = min(abs(kp_WGS - 10^-3));
+
+%Plot
+figure(9)
+semilogy(T_B1(i_min_SMR:i_max_SMR), kp_SMR(i_min_SMR:i_max_SMR), ...
+    T_B1(i_min_WGS:i_max_WGS), kp_WGS(i_min_WGS:i_max_WGS));
+xlabel('Temperature [C]')
+ylabel('Equilibrium Constant')
+legend('SMR', 'WGS')
+title('Part B.1: Equilibrium Constant vs. Temperature')
+
