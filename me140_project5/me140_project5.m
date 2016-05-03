@@ -265,14 +265,17 @@ for i = 1:length(temps)
                        (p ./ (nco + nch4 + nh2 + nh2o)) ...
                      == f_kp_SMR(t)]; 
         % 4 eq, 4 unknown
-        [a,b,c,d] = vpasolve(eqs,[nco,nch4,nh2,nh2o]);
+        [a,b,c,d] = vpasolve(eqs,[nco,nch4,nh2,nh2o],[1,1,1,1]);
         soln(i,:,j) = double(max(real([a,b,c,d])));
         
     end 
 end
 toc
 
-semilogy(temps,soln(:,:,1),'b',temps,soln(:,:,2),'o',temps,soln(:,:,3),'k')
+semilogy(temps,soln(:,1,1),'b',temps,soln(:,1,2),'--b',temps,soln(:,1,3),'.b',...
+        temps,soln(:,2,1),'r',temps,soln(:,2,2),'--r',temps,soln(:,2,3),'.r',...
+        temps,soln(:,3,1),'k',temps,soln(:,3,2),'--k',temps,soln(:,3,3),'.k',...
+        temps,soln(:,4,1),'m',temps,soln(:,4,2),'--m',temps,soln(:,4,3),'.m');
 
 
 if(savePlots ==1) 
