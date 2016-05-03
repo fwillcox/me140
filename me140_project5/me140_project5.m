@@ -12,9 +12,7 @@ defineGlobals();
 mol_H2 = 1;
 savePlots = 1;
 
-% --------------------------------
-% Part 1: Raw Data Plots vs. Load
-% --------------------------------
+%% Part A, Section 1
 % Currents (load & stack)
 i_load =  [0.00 15.06 27.25 36.48 45.1 52.1 56.3 57.6 56.4];       % [Amps]
 i_stack = [4.82 21.40 35.65 47.20 59.8 69.7 77.0 79.0 80.0];
@@ -92,9 +90,7 @@ title('Mass Flow Rate as a Function of Load');
 xlabel('Load []'); ylabel('Mass Flow Rate []');
 legend('mdot_{H}','mdot_{air}','Location','best'); plotfixer();grid on
 
-% ---------------------------
-% Part 2: Reduced-Data Plots
-% ---------------------------
+%% Part A, Section 2
 % SOURCE: LEC 8, SLIDES 21 & 22
 
 % 1st & 2nd Law Efficiencies (eta_I & eta_II) & Inefficiencies (Idot)
@@ -136,7 +132,7 @@ if(savePlots ==1)
 end
 
 
-%% Part A, Section 3 - Emily
+%% Part A, Section 3
 % Comparing First Law Efficiencies
 
 % Typical modern Diesel engine = 42% (chose diesel truck because it's
@@ -160,7 +156,7 @@ legend('eta_{I,stack}','eta_{I,Diesel}', 'eta_{I,Hybrid}','Location','best'); pl
 % TODO: FIGURE OUT SCALE-UP FOR TOYOTA HYBRID
 % TODO: COMMENT ON ACCESSORY/FUEL SYSTEMS REQUIRED FOR THAT SCALE UP
 
-%% Part B
+%% Part B, Section 1
 
 % Part B, Section 1 - Emily & Kendall
 % Calculating Kp Values
@@ -176,9 +172,6 @@ v_CH4_SMR = 1;
 % Calculating Kp for SMR
 % Nv_CO = mm
 % SMRnumKp = 
-
-
-
 
 % WGS: H2O + CO --> H2 + CO2
 v_H2_WGS = 1;
@@ -205,7 +198,6 @@ g_WGS = (gEng(T_B1, P_ref, 'h2',v_H2_WGS) + gEng(T_B1, P_ref, 'co2',v_CO2_WGS)) 
 %Lecture 13 - Slide 15
 kp_SMR = exp(-g_SMR ./ (R_u .* T_B1)); %increases with temp
 kp_WGS = exp(-g_WGS ./ (R_u .* T_B1)); %decrease with temp
-
 
 %Prep for plot
 %convert back to celcius
