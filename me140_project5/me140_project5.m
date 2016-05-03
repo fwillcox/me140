@@ -13,7 +13,6 @@ mol_H2 = 1;
 savePlots = 1;
                 % 1,2,3,4,5,6,7,8,9,10,11
 supressplots =   [1,      1,    1,  0];         % supresses plots by section
-plotNum = 1;
 
 %% Part A, Section 1
 % Currents (load & stack)
@@ -66,7 +65,7 @@ Ptotal = Ptotal_psi .* PSI_TO_PA + PATM;                            % [Pa]
 p_load =  i_load  .* v_load;                                        % [W] = [kg*m^2*s^-3], a.k.a. "load" (power delivered to resistor bank)
 p_stack = i_stack .* v_stack;
 p_access = p_stack - p_load;                                        % [W], Acessory Power, i.e. power used to run controls. Pstack-Pload
-if(~supressplots(plotNum))
+if(~supressplots(1))
 f1 = figure(1);
 plot(p_load,i_load,p_load,i_stack);
 title('Current as a Function of Load');
@@ -91,7 +90,6 @@ title('Mass Flow Rate as a Function of Load');
 xlabel('Load [Watts]'); ylabel('Mass Flow Rate [kg/s]');
 legend('mdot_{H}','mdot_{air}','Location','best'); plotfixer(); grid on
 
-plotNum = plotNum+1;
 end
 
 %% Part A, Section 2
@@ -104,7 +102,7 @@ end
 
 % Entire System (Load)
 [etaI_load ,etaII_load, Idot_load,lambda_load] =    findEtas(mdot_total, mdot_fuel, Ptotal, Pfuel, T2, p_load);
-if(~supressplots(plotNum))
+if(~supressplots(2))
 f6 = figure(6);
 plot(p_load,lambda_load);
 title('Air Equivalent as a Function of Load');
@@ -124,7 +122,6 @@ plot(p_load,p_stack,'c',p_load,p_load,'bp--');
 title('Power Loss/Inefficiences as a Function of Load');
 xlabel('Load [Watts]'); ylabel('Power Loss/Inefficiencies, Idot [Watts]');
 legend('Idot_{stack}','Idot_{system}','Location','best'); plotfixer();grid on;
-plotNum = plotNum+1;
 end
 
 %% Part A, Section 3
@@ -151,7 +148,7 @@ Qdot_fuelCell_max = max(Qdot_fuelCell);
 num_fuelCells_diesel = Wdot_diesel ./ Qdot_fuelCell_max;
 num_fuelCells_hybrid = Wdot_hybrid ./ Qdot_fuelCell_max;
 
-if(~supressplots(plotNum))
+if(~supressplots(3))
 % Overall First Law Efficiency of the PEM Fuel Cell = Stack Efficiency
 f8 = figure(8);
 plot(p_load, etaI_stack, 'c', p_load, eta_diesel, 'bp--', p_load, eta_hybrid, 'gd');
@@ -229,7 +226,7 @@ T_B1 = T_B1 - C_TO_K;
 [~,i_max_WGS] = min(abs(kp_WGS - 10^-3));
 
 %Plot
-if(~supressplots(4))
+if(~supressplots(3))
 f9 = figure(9);
 kpIsOne = ones(size(T_B1));
 semilogy(T_B1(i_min_SMR:i_max_SMR), kp_SMR(i_min_SMR:i_max_SMR), ...
@@ -240,7 +237,6 @@ legend('SMR', 'WGS')
 title('Part B.1: Equilibrium Constant vs. Temperature')
 ylim([0.001,1000]);
 plotfixer();grid on
-plotNum = plotNum+1;
 end
 
 %% Part B No. 2
@@ -287,7 +283,7 @@ for i = 1:length(temps)
     end 
 end
 toc
-if(~supressplots(plotNum))
+if(~supressplots(4))
 %unneeded but cool looking plot
 f10 = figure(10);
 plot(temps,nco_sol,'b',temps,nch4_sol,'m',temps,nh2_sol,'g',temps,nh2o_sol,'k');
@@ -315,10 +311,9 @@ hold off
 xlabel('Temperature [K]');
 ylabel('Mole Fraction');
 title('Steam Methane Reforming Composition');
-legend('1atm','10atm','100atm','CO','CH4','H2','H2O','location','best');
+legend('1atm','10atm','100atm','CO','CH4','H2','H2O','location','NorthWest');
 ylim([0.001,1]);
 plotfixer(); grid on;
-plotNum = plotNum+1;
 end
 
 % semilogy(temps,soln(:,1,1),'b',temps,soln(:,1,2),'--b',temps,soln(:,1,3),'.b',...
