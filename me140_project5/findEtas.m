@@ -10,7 +10,7 @@
 function [eta_I, eta_II, Idot,lambda] = findEtas(mdot_wetair_react, mdot_fuel, Ptotal, Pfuel, T, Wdot)
 
 global PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS ...
-    C_TO_K PSI_TO_PA MM_h MM_h2 MM_o MM_n MM_h2o MM_air PATM
+    C_TO_K PSI_TO_PA MM_h MM_h2 MM_o MM_n MM_h2o MM_air PATM HORSEPOWER_TO_W
 defineGlobals();
 % Constants                                                  % Engineering Air Molar Mass Ratio of Nitrogen to Oxygen
 specs = Spec();                                                     % class initialization

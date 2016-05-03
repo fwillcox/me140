@@ -7,7 +7,7 @@
 clear; close all;clc;
 
 global PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS ...
-    C_TO_K PSI_TO_PA MM_h MM_h2 MM_o MM_n MM_h2o MM_air PATM
+    C_TO_K PSI_TO_PA MM_h MM_h2 MM_o MM_n MM_h2o MM_air PATM HORSEPOWER_TO_W
 defineGlobals();
 mol_H2 = 1;
 savePlots = 1;
@@ -36,10 +36,10 @@ Tstack = Tstack_C + C_TO_K;                                        % [K],  metal
 % NOTE: T3-T5 are not needed for now
 % T3_C =     [48.0 47.1 48.6 48.9 50.4 51.1 51.2 51.1 51.1];       % T3, water reservoir DON'T USE!
 % T3 = T3_C + C_TO_K;
-% T4_C =     [48.0 47.2 48.2 48.9 50.4 51.1 51.2 51.1 51.1];       % T4, water into stack
-% T4 = T4_C + C_TO_K;
-% T5_C =     [40.7 41.3 42.5 42.9 44.6 45.6 46.9 46.9 47.6];       % T5, water into heat exchanger
-% T5 = T5_C + C_TO_K;
+T4_C =     [48.0 47.2 48.2 48.9 50.4 51.1 51.2 51.1 51.1];       
+T5_C =     [40.7 41.3 42.5 42.9 44.6 45.6 46.9 46.9 47.6];       
+T4 = T4_C + C_TO_K;                                               % T4, water into stack
+T5 = T5_C + C_TO_K;                                               % T5, water into heat exchanger
 
 
 % Mass Flow Rates (TODO: check what units the mdots should be in)
@@ -133,28 +133,34 @@ end
 
 
 %% Part A, Section 3
-% Comparing First Law Efficiencies
+% Comparing First Law Efficiencies of PEM Fuel Cell with Diesel & Hybrid Engines
 
-% Typical modern Diesel engine = 42% (chose diesel truck because it's
-% better than a car and worse than a freight ship)
-% Source: Slide 3, http://www.sae.org/events/gim/presentations/2011/RolandGravel.pdf
-dieselEff = 0.42;
+% Typical modern Diesel engine = 42% (chose diesel truck because it's better than a car and worse than a freight ship)
+% Source Efficiency: Slide 3, http://www.sae.org/events/gim/presentations/2011/RolandGravel.pdf
+% Source Horsepower: https://cumminsengines.com/isx15-heavy-duty-truck-2013#overview
+eta_diesel = 0.42;
+hp_diesel = 400 * HORSEPOWER_TO_W;  % [W]
 
 % Typical gasoline hybrid engine = max of 40%
-% Source: Toyota Hybrid Vehicles, http://www.toyota-global.com/innovation/environmental_technology/hybrid/
-hybridEff = 0.40;
+% Source Efficiency & Horsepower: Toyota Hybrid Vehicles, http://www.toyota-global.com/innovation/environmental_technology/hybrid/
+eta_hybrid = 0.40;
+hp_hybrid = 121 * HORSEPOWER_TO_W;  % [W]
+
+% Calcuate Heat Removal (Qdot)
+for i = 1:length(T4)
+Qdot_fuelCell = hEng(T4(i)) - hEng(T5(i));
+end
 
 % Overall First Law Efficiency of the PEM Fuel Cell = Stack Efficiency
-% Plotting to compare
 f8 = figure(8);
-plot(p_load, etaI_stack, 'c', p_load, dieselEff, 'bp--', p_load, hybridEff, 'gd');
+plot(p_load, etaI_stack, 'c', p_load, eta_diesel, 'bp--', p_load, eta_hybrid, 'gd');
 title('Comparing 1st Law Efficiency: PEM Fuel Cell, Diesel, and Gasoline Hybrid');
 xlabel('Load [Watts]'); ylabel('Efficiency, eta_{I}');
 legend('eta_{I,stack}','eta_{I,Diesel}', 'eta_{I,Hybrid}','Location','best'); plotfixer(); grid on;
 
-
 % TODO: FIGURE OUT SCALE-UP FOR TOYOTA HYBRID
 % TODO: COMMENT ON ACCESSORY/FUEL SYSTEMS REQUIRED FOR THAT SCALE UP
+
 
 %% Part B, Section 1
 
@@ -212,7 +218,7 @@ T_B1 = T_B1 - C_TO_K;
 %Plot
 figure(9)
 semilogy(T_B1(i_min_SMR:i_max_SMR), kp_SMR(i_min_SMR:i_max_SMR), ...
-    T_B1(i_min_WGS:i_max_WGS), kp_WGS(i_min_WGS:i_max_WGS));
+         T_B1(i_min_WGS:i_max_WGS), kp_WGS(i_min_WGS:i_max_WGS));
 xlabel('Temperature [C]')
 ylabel('Equilibrium Constant')
 legend('SMR', 'WGS')
