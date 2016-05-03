@@ -287,7 +287,7 @@ for i = 1:length(temps)
     end 
 end
 toc
-if(~supressplots(plotnum))
+if(~supressplots(plotNum))
 %unneeded but cool looking plot
 f10 = figure(10);
 plot(temps,nco_sol,'b',temps,nch4_sol,'m',temps,nh2_sol,'g',temps,nh2o_sol,'k');
@@ -318,7 +318,7 @@ title('Steam Methane Reforming Composition');
 legend('1atm','10atm','100atm','CO','CH4','H2','H2O','location','best');
 ylim([0.001,1]);
 plotfixer(); grid on;
-plotnum = plotnum+1;
+plotNum = plotNum+1;
 end
 
 % semilogy(temps,soln(:,1,1),'b',temps,soln(:,1,2),'--b',temps,soln(:,1,3),'.b',...
