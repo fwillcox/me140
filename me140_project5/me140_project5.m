@@ -297,3 +297,13 @@ if(savePlots ==1)
     saveas(f9,'../plots5/9-KeqbyT','png');
     end
 end
+
+%% Part B No. 3
+% % Equations we'll need:
+%  eqs = [       1  == nco2   + nco;...          carbon atom balance
+%                4  == nco2*2 + nco + nh2o; ...  hydrogen atom balance
+%                6  == nh2*2   + nh2o*2;...      oxygen atom balance
+%                nco.*nh2o.^3./(nco2.*nh2).* ... Nernst atom balance
+%                   == f_kp_SMR(t)]; 
+%         % 4 eq, 4 unknown
+%         [a,b,c,d] = vpasolve(eqs,[nco,nch4,nh2,nh2o],[1,1,1,1]);
