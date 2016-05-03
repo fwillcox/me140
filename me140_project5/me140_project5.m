@@ -7,7 +7,7 @@
 clear; close all;clc;
 
 global PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS ...
-    C_TO_K PSI_TO_PA MM_h MM_h2 MM_o MM_n MM_h2o MM_air PATM
+    C_TO_K PSI_TO_PA MM_h MM_h2 MM_o MM_n MM_h2o MM_air PATM HORSEPOWER_TO_W
 defineGlobals();
 mol_H2 = 1;
 savePlots = 1;
@@ -15,9 +15,7 @@ savePlots = 1;
 supressplots = [0      ,0    ,0,0]; %supresses plots by section
 plotNum = 1;
 
-% --------------------------------
-% Part 1: Raw Data Plots vs. Load
-% --------------------------------
+%% Part A, Section 1
 % Currents (load & stack)
 i_load =  [0.00 15.06 27.25 36.48 45.1 52.1 56.3 57.6 56.4];       % [Amps]
 i_stack = [4.82 21.40 35.65 47.20 59.8 69.7 77.0 79.0 80.0];
@@ -41,10 +39,10 @@ Tstack = Tstack_C + C_TO_K;                                        % [K],  metal
 % NOTE: T3-T5 are not needed for now
 % T3_C =     [48.0 47.1 48.6 48.9 50.4 51.1 51.2 51.1 51.1];       % T3, water reservoir DON'T USE!
 % T3 = T3_C + C_TO_K;
-% T4_C =     [48.0 47.2 48.2 48.9 50.4 51.1 51.2 51.1 51.1];       % T4, water into stack
-% T4 = T4_C + C_TO_K;
-% T5_C =     [40.7 41.3 42.5 42.9 44.6 45.6 46.9 46.9 47.6];       % T5, water into heat exchanger
-% T5 = T5_C + C_TO_K;
+T4_C =     [48.0 47.2 48.2 48.9 50.4 51.1 51.2 51.1 51.1];       
+T5_C =     [40.7 41.3 42.5 42.9 44.6 45.6 46.9 46.9 47.6];       
+T4 = T4_C + C_TO_K;                                               % T4, water into stack
+T5 = T5_C + C_TO_K;                                               % T5, water into heat exchanger
 
 
 % Mass Flow Rates (TODO: check what units the mdots should be in)
@@ -94,11 +92,12 @@ plot(p_load,mdot_fuel,p_load,mdot_total);
 title('Mass Flow Rate as a Function of Load');
 xlabel('Load []'); ylabel('Mass Flow Rate []');
 legend('mdot_{H}','mdot_{air}','Location','best'); plotfixer();grid on
+
 plotNum = plotNum+1;
 end
-% ---------------------------
-% Part 2: Reduced-Data Plots
-% ---------------------------
+
+%% Part A, Section 2
+
 % SOURCE: LEC 8, SLIDES 21 & 22
 
 % 1st & 2nd Law Efficiencies (eta_I & eta_II) & Inefficiencies (Idot)
@@ -130,34 +129,40 @@ legend('Idot_{stack}','Idot_{system}','Location','best'); plotfixer();grid on;
 plotNum = plotNum+1;
 end
 
+%% Part A, Section 3
+% Comparing First Law Efficiencies of PEM Fuel Cell with Diesel & Hybrid Engines
 
-%% Part A, Section 3 - Emily
-% Comparing First Law Efficiencies
+% Typical modern Diesel engine (eta_disel = 42%) (chose diesel truck because it's better than a car and worse than a freight ship)
+% Source Efficiency: Slide 3, http://www.sae.org/events/gim/presentations/2011/RolandGravel.pdf
+% Source Horsepower: https://cumminsengines.com/isx15-heavy-duty-truck-2013#overview
+eta_diesel = 0.42;
+hp_diesel = 400 * HORSEPOWER_TO_W;  % [W]
 
-% Typical modern Diesel engine = 42% (chose diesel truck because it's
-% better than a car and worse than a freight ship)
-% Source: Slide 3, http://www.sae.org/events/gim/presentations/2011/RolandGravel.pdf
-dieselEff = 0.42;
+% Typical gasoline hybrid engine (eta_hybrid = max of 40%)
+% Source Efficiency & Horsepower: Toyota Hybrid Vehicles, http://www.toyota-global.com/innovation/environmental_technology/hybrid/
+eta_hybrid = 0.40;
+hp_hybrid = 121 * HORSEPOWER_TO_W;  % [W]
 
-% Typical gasoline hybrid engine = max of 40%
-% Source: Toyota Hybrid Vehicles, http://www.toyota-global.com/innovation/environmental_technology/hybrid/
-hybridEff = 0.40;
+% Calcuate Heat Removal (Qdot)
+for i = 1:length(T4)
+Qdot_fuelCell = hEng(T4(i)) - hEng(T5(i));
+end
+
 if(~supressplots(plotNum))
 % Overall First Law Efficiency of the PEM Fuel Cell = Stack Efficiency
-% Plotting to compare
 f8 = figure(8);
-plot(p_load, etaI_stack, 'c', p_load, dieselEff, 'bp--', p_load, hybridEff, 'gd');
+plot(p_load, etaI_stack, 'c', p_load, eta_diesel, 'bp--', p_load, eta_hybrid, 'gd');
 title('Comparing 1st Law Efficiency: PEM Fuel Cell, Diesel, and Gasoline Hybrid');
 xlabel('Load [Watts]'); ylabel('Efficiency, eta_{I}');
 legend('eta_{I,stack}','eta_{I,Diesel}', 'eta_{I,Hybrid}','Location','best'); plotfixer(); grid on;
+
 plotNum = plotNum+1;
 end
 
 % TODO: FIGURE OUT SCALE-UP FOR TOYOTA HYBRID
 % TODO: COMMENT ON ACCESSORY/FUEL SYSTEMS REQUIRED FOR THAT SCALE UP
 
-%% Part B
-
+%% Part B, Section 1
 % Part B, Section 1 - Emily & Kendall
 % Calculating Kp Values
 % Formulas from https://coursework.stanford.edu/access/content/group/Sp16-ME-140-01/Lecture%20Slides/Lecture%2013.pdf
@@ -172,9 +177,6 @@ v_CH4_SMR = 1;
 % Calculating Kp for SMR
 % Nv_CO = mm
 % SMRnumKp = 
-
-
-
 
 % WGS: H2O + CO --> H2 + CO2
 v_H2_WGS = 1;
@@ -204,6 +206,7 @@ g_WGS = (gEng(T_B1, P_ref, 'h2',v_H2_WGS) + gEng(T_B1, P_ref, 'co2',v_CO2_WGS)) 
 kp_SMR = exp(-g_SMR ./ (R_u .* T_B1)); %increases with temp
 kp_WGS = exp(-g_WGS ./ (R_u .* T_B1)); %decrease with temp
 
+
 %functions for convenience
 f_kp_SMR = @(T_B1) exp(-((gEng(T_B1, P_ref, 'co',v_CO_SMR) ...
                         + gEng(T_B1, P_ref, 'h2',v_H2_SMR))  ...
@@ -231,7 +234,7 @@ T_B1 = T_B1 - C_TO_K;
 f9 = figure(9);
 kpIsOne = ones(size(T_B1));
 semilogy(T_B1(i_min_SMR:i_max_SMR), kp_SMR(i_min_SMR:i_max_SMR), ...
-    T_B1(i_min_WGS:i_max_WGS), kp_WGS(i_min_WGS:i_max_WGS));
+         T_B1(i_min_WGS:i_max_WGS), kp_WGS(i_min_WGS:i_max_WGS));
 xlabel('Temperature [C]')
 ylabel('Equilibrium Constant')
 legend('SMR', 'WGS')
@@ -266,7 +269,6 @@ end
 soln = struct2dataset(soln);
 
 return
-
 
 if(savePlots ==1) 
     if(~supressplots(1))
