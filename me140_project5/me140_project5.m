@@ -12,7 +12,7 @@ defineGlobals();
 mol_H2 = 1;
 savePlots = 1;
                 % 1,2,3,4,5,6,7,8,9,10,11
-supressplots =   [1,      1,    0,  0    ];         % supresses plots by section
+supressplots =   [1,      1,    1,  0];         % supresses plots by section
 
 %% Part A, Section 1
 % Currents (load & stack)
@@ -235,14 +235,21 @@ T_B1 = T_B1 - C_TO_K;
 [~,i_min_WGS] = min(abs(kp_WGS - 10^3));
 [~,i_max_WGS] = min(abs(kp_WGS - 10^-3));
 
+[zero_smr,izero_smr] = min(abs(log(kp_SMR)));
+[zero_wgs,izero_wgs] = min(abs(log(kp_WGS)));
+
 %Plot
 if(~supressplots(3))
     f9 = figure(9);
     kpIsOne = ones(size(T_B1));
     semilogy(T_B1(i_min_SMR:i_max_SMR), kp_SMR(i_min_SMR:i_max_SMR), ...
-        T_B1(i_min_WGS:i_max_WGS), kp_WGS(i_min_WGS:i_max_WGS));
+        T_B1(i_min_WGS:i_max_WGS), kp_WGS(i_min_WGS:i_max_WGS),T_B1,kpIsOne,'k');
     xlabel('Temperature [C]')
     ylabel('Equilibrium Constant')
+    text(T_B1(izero_smr) -300 , 1.5,...
+        strcat('SMR equil @ ',num2str(round(T_B1(izero_smr))),'K'));
+    text(T_B1(izero_wgs), 1.5,...
+        strcat('WGS equil @ ',num2str(round(T_B1(izero_wgs))),'K'));
     legend('SMR', 'WGS')
     title('Part B.1: Equilibrium Constant vs. Temperature')
     ylim([0.001,1000]);
@@ -312,10 +319,10 @@ if(~supressplots(4))
     f11 = figure(11);
     linestyle = {'-','--',':'};
     hold on
-    semilogy(1,0,'-k',1,0,'--k',1,0,':k');
+    plot(1,0,'-k',1,0,'--k',1,0,':k');
     hold on
     for i = 1:length(pres)
-        semilogy(temps,yco(:,i),strcat(linestyle{i},'b'),...
+        plot(temps,yco(:,i),strcat(linestyle{i},'b'),...
             temps,ych4(:,i),strcat(linestyle{i},'m'),...
             temps,yh2(:,i),strcat(linestyle{i},'g'),...
             temps,yh2o(:,i),strcat(linestyle{i},'r'));
@@ -326,7 +333,7 @@ if(~supressplots(4))
     ylabel('Mole Fraction');
     title('Steam Methane Reforming Composition');
     legend('1atm','10atm','100atm','CO','CH4','H2','H2O','location','NorthWest');
-    ylim([0.001,1]);
+    %ylim([0.001,1]);
     plotfixer(); grid on;
 end
 
@@ -347,8 +354,8 @@ parfor i = 1:length(temps)
     
     eqs = [       1  == nco2   + nco;...carbon atom balance  %POTENTIAL ERROR: shouldn't this be 2, not 1?
         4  == nco2*2 + nco + nh2o; ...  oxygen atom balance
-        6  == nh2*2   + nh2o*2;...      hydrogen atom balance 
-        (nco2.*nh2)./nco.*nh2o ... Nernst atom balance
+        10  == nh2*2   + nh2o*2;...      hydrogen atom balance 
+        nco2.*nh2./(nco.*nh2o) ... Nernst atom balance
         == f_kp_WGS(t)];        %(note no pressure term, as nmols same on RHS and LHS)
     % 4 eq, 4 unknown    
     [a,b,c,d] = vpasolve(eqs,[nco,nh2o,nco2,nh2],[1,1,1,1]);
@@ -371,6 +378,7 @@ parfor i = 1:length(temps)
     %          soln(i,:,j) = max(double(real([a,b,c,d]));
     
 end
+toc;
 ntot_wgs = nco_wgs + nh2_wgs + nh2o_wgs + nco2_wgs;
 yco2_wgs = nco2_wgs./ntot_wgs;
 yh2_wgs = nh2_wgs./ntot_wgs;
@@ -380,7 +388,7 @@ yco_wgs = nco_wgs./ntot_wgs;
 if(~supressplots(4))
     
     f12 = figure(12);
-    semilogy(temps,yco_wgs,'b',...
+    plot(temps,yco_wgs,'b',...
         temps,yco2_wgs,'m',...
         temps,yh2_wgs,'--g',...
         temps,yh2o_wgs,'r');
@@ -388,7 +396,7 @@ if(~supressplots(4))
     xlabel('Temperature [K]');
     ylabel('Mole Fraction');
     title('Water Gas Shift Composition');
-    ylim([0.001,1]);
+    %ylim([0.001,1]);
     plotfixer();
 end
 
