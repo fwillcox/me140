@@ -11,8 +11,8 @@ global PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS ...
 defineGlobals();
 mol_H2 = 1;
 savePlots = 1;
-% 1,2,3,4,5,6,7,8,9,10,11
-supressplots =   [1,      1,    0,  0];         % supresses plots by section
+                % 1,2,3,4,5,6,7,8,9,10,11
+supressplots =   [1,      1,    0,  0    ];         % supresses plots by section
 
 %% Part A, Section 1
 % Currents (load & stack)
