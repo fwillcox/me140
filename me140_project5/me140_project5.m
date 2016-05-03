@@ -151,8 +151,8 @@ Qdot_fuelCell_max = max(Qdot_fuelCell);
 % Finding total power of cell out = load power plus Qdot
 powerOut = p_load + Qdot_fuelCell_max;
 
-num_fuelCells_diesel = Wdot_diesel ./ powerOut;
-num_fuelCells_hybrid = Wdot_hybrid ./ powerOut;
+num_fuelCells_diesel = Wdot_diesel ./ powerOut
+num_fuelCells_hybrid = Wdot_hybrid ./ powerOut
 
 if(~supressplots(3))
     % Overall First Law Efficiency of the PEM Fuel Cell = Stack Efficiency
@@ -163,7 +163,9 @@ if(~supressplots(3))
     legend('eta_{I,stack}','eta_{I,Diesel}', 'eta_{I,Hybrid}','Location','best'); plotfixer(); grid on;
 end
 
-% Hello, it's me
+% Comments: To scale this up, we would need somewhere between 280-540 fuel
+% cells to equal the diesel output, and 85-165 fuel cells to equal the
+% hybrid output.
 
 %% Part B, Section 1
 % Part B, Section 1 - Emily & Kendall
@@ -438,23 +440,19 @@ end
 
 % Inlet Temperatures 
 Tin_iso_C = [800 400 250];    % [C]
-Tin_adi_C = [800 0 0];        % [C] TODO: solve for Tin_adi_C(2) & (3)
+Tin_adi_C = [800 NaN NaN];        % [C] TODO: solve for Tin_adi_C(2) & (3)
 Tin_iso = Tin_iso_C * C_TO_K; % [K]
 Tin_adi = Tin_adi_C * C_TO_K; % [K]
 
 % Exit Temperatures
 Tex_iso_C = [800 400 250];
-Tex_adi_C = [800 0 0];
+Tex_adi_C = [800 NaN NaN];
 Tex_iso = Tex_iso_C * C_TO_K;
 Tex_adi = Tex_adi_C * C_TO_K;
 
 % Heat Addition for Isothermal Reaction (Qin, ASSUME: isothermal)
-Qin_iso = [0 0 0];             % [MJ/(kg of reactants)]
+Qin_iso = [NaN NaN NaN];             % [MJ/(kg of reactants)]
 
 % Percent Methane Burned to Heat Reformer (pct_CH4, ASSUME: adiabatic)
-pct_CH4 = [0]; % Note: only applies to Reformer! Not Shift Reactors!
+pct_CH4 = [NaN]; % Note: only applies to Reformer! Not Shift Reactors!
 
-% Efficiency (eta of entire system: reformer & both shift reactors)
-% eta = (LHV_h2*mass_h2) / (LHV_ch4*mass_ch4)
-eta_iso = [];
-eta_adi = [];
