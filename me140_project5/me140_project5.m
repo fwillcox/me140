@@ -39,20 +39,19 @@ Tstack = Tstack_C + C_TO_K;                                        % [K],  metal
 % NOTE: T3-T5 are not needed for now
 % T3_C =     [48.0 47.1 48.6 48.9 50.4 51.1 51.2 51.1 51.1];       % T3, water reservoir DON'T USE!
 % T3 = T3_C + C_TO_K;
-T4_C =     [48.0 47.2 48.2 48.9 50.4 51.1 51.2 51.1 51.1];       
+T4_C =     [48.0 47.2 48.2 48.9 50.4 51.1 51.2 51.1 51.1];         
 T5_C =     [40.7 41.3 42.5 42.9 44.6 45.6 46.9 46.9 47.6];       
-T4 = T4_C + C_TO_K;                                               % T4, water into stack
-T5 = T5_C + C_TO_K;                                               % T5, water into heat exchanger
+T4 = T4_C + C_TO_K;                                                % T4, water into stack
+T5 = T5_C + C_TO_K;                                                % T5, water into heat exchanger
 
 
 % Mass Flow Rates (TODO: check what units the mdots should be in)
-mdot_total_scf = [0.75 1.10 1.45 1.81 2.55 3.10 3.30 3.25 3.40];   % scf/min
-mdot_fuel_scf =  [2.50 6.20 10.5 14.3 18.2 22.0 24.6 25.0 26.1];   % scf/hr (standard cubic feet/hour)
+mdot_total_scf = [0.75 1.10 1.45 1.81 2.55 3.10 3.30 3.25 3.40];   % [scf/min]
+mdot_fuel_scf =  [2.50 6.20 10.5 14.3 18.2 22.0 24.6 25.0 26.1];   % [scf/hr] (standard cubic feet/hour)
 
-mdot_total = mdot_total_scf * SCF_TO_MOLS * PERMIN_TO_PERSEC * ( MM_air / G_PER_KG);  % kg/s
-mdot_fuel = mdot_fuel_scf * SCF_TO_MOLS * PERHR_TO_PERSEC * (MM_h2  / G_PER_KG);  % kg/s	
-mdot_h2o = 40 /G_PER_KG;                                                        % kg/s
-
+mdot_total = mdot_total_scf * SCF_TO_MOLS * PERMIN_TO_PERSEC * ( MM_air / G_PER_KG);  % [kg/s]
+mdot_fuel = mdot_fuel_scf * SCF_TO_MOLS * PERHR_TO_PERSEC * (MM_h2  / G_PER_KG);      % [kg/s]	
+mdot_h2o = 40 /G_PER_KG;                                                              % [kg/s]
 
 % Pressures
 Pfuel_psi =  [2.9 2.9 3.1 3.3 3.30 3.20 3.00 3.0 3.1];              % [psi] (gauge)
@@ -71,27 +70,26 @@ if(~supressplots(plotNum))
 f1 = figure(1);
 plot(p_load,i_load,p_load,i_stack);
 title('Current as a Function of Load');
-xlabel('Load []'); ylabel('Current []');
+xlabel('Load [Watts]'); ylabel('Current [Amps]');
 legend('I_{load}','I_{stack}','Location','best'); plotfixer(); grid on;
 
 f2 = figure(2); 
 plot(p_load,v_load,p_load,v_stack);
 title('Potential as a Function of Load');
-xlabel('Load []'); ylabel('Potential []');
+xlabel('Load [Watts]'); ylabel('Potential [Volts]');
 legend('V_{load}','V_{stack}','Location','best'); plotfixer();grid on;
 
 f3 = figure(3);
 plot(p_load,p_stack,p_load,p_access);
 title('Stack and Accessory Power as a Function of Load');
-xlabel('Load []'); ylabel('Power []');
+xlabel('Load [Watts]'); ylabel('Power [Watts]');
 legend('P_{stack}','P_{accessory}','Location','best'); plotfixer();grid on;
 
-% TODO: plot lambda...
 f4 = figure(4);
 plot(p_load,mdot_fuel,p_load,mdot_total);
 title('Mass Flow Rate as a Function of Load');
-xlabel('Load []'); ylabel('Mass Flow Rate []');
-legend('mdot_{H}','mdot_{air}','Location','best'); plotfixer();grid on
+xlabel('Load [Watts]'); ylabel('Mass Flow Rate [kg/s]');
+legend('mdot_{H}','mdot_{air}','Location','best'); plotfixer(); grid on
 
 plotNum = plotNum+1;
 end
