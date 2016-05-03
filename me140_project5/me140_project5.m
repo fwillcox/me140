@@ -11,8 +11,8 @@ global PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS ...
 defineGlobals();
 mol_H2 = 1;
 savePlots = 1;
-                %1,2,3,4,5,6,7,8,9
-supressplots = [1      ,1    ,1,1]; %supresses plots by section
+                % 1,2,3,4,5,6,7,8,9
+supressplots =   [1,1,0,1];         % supresses plots by section
 plotNum = 1;
 
 %% Part A, Section 1
@@ -134,17 +134,22 @@ end
 % Source Efficiency: Slide 3, http://www.sae.org/events/gim/presentations/2011/RolandGravel.pdf
 % Source Horsepower: https://cumminsengines.com/isx15-heavy-duty-truck-2013#overview
 eta_diesel = 0.42;
-hp_diesel = 400 * HORSEPOWER_TO_W;  % [W]
+Wdot_diesel = 400 * HORSEPOWER_TO_W;  % [W]
 
 % Typical gasoline hybrid engine (eta_hybrid = max of 40%)
 % Source Efficiency & Horsepower: Toyota Hybrid Vehicles, http://www.toyota-global.com/innovation/environmental_technology/hybrid/
 eta_hybrid = 0.40;
-hp_hybrid = 121 * HORSEPOWER_TO_W;  % [W]
+Wdot_hybrid = 121 * HORSEPOWER_TO_W;  % [W]
 
 % Calcuate Heat Removal (Qdot)
 for i = 1:length(T4)
-Qdot_fuelCell = hEng(T4(i),'h2o') - hEng(T5(i),'h2o');
+Qdot_fuelCell(i) = hEng(T4(i),'h2o') - hEng(T5(i),'h2o');
 end
+Qdot_fuelCell_max = max(Qdot_fuelCell);
+
+% Theoretical Number of Fuel Cells Needed
+num_fuelCells_diesel = Wdot_diesel ./ Qdot_fuelCell_max;
+num_fuelCells_hybrid = Wdot_hybrid ./ Qdot_fuelCell_max;
 
 if(~supressplots(plotNum))
 % Overall First Law Efficiency of the PEM Fuel Cell = Stack Efficiency
@@ -156,9 +161,6 @@ legend('eta_{I,stack}','eta_{I,Diesel}', 'eta_{I,Hybrid}','Location','best'); pl
 
 plotNum = plotNum+1;
 end
-
-% TODO: FIGURE OUT SCALE-UP FOR TOYOTA HYBRID
-% TODO: COMMENT ON ACCESSORY/FUEL SYSTEMS REQUIRED FOR THAT SCALE UP
 
 %% Part B, Section 1
 % Part B, Section 1 - Emily & Kendall
