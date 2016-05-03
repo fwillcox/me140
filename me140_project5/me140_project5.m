@@ -457,7 +457,3 @@ Qin_iso = [NaN NaN NaN];             % [MJ/(kg of reactants)]
 pct_CH4 = [NaN]; % Note: only applies to Reformer! Not Shift Reactors!
 
 % Efficiency (eta of entire system: reformer & both shift reactors)
-eta = (LHV_h2*mass_h2) / (LHV_ch4*mass_ch4)
-eta_iso = [NaN];
-eta_adi = [NaN];
-
