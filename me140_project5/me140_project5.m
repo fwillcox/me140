@@ -192,7 +192,7 @@ v_CO_WGS = 1;
 
 T_B1 = linspace(25, 1200, 100); %Temperature for part B1 = T_B1
 T_B1 = T_B1 + C_TO_K;
-%NOTE: Stanford pressure, is usually defined as 100,000, however in energyF
+%NOTE: Standard pressure, is usually defined as 100,000, however in energyF
 %we have standard presssure as 101300. Because the pressure needs to
 %cancel out, I have changed this pressure to 101300, however, we should
 %perhaps consider changing the reference pressure in energyF to 100,000Pa.
@@ -336,7 +336,7 @@ if(~supressplots(4))
     xlabel('Temperature [K]');
     ylabel('Mole Fraction');
     title('Steam Methane Reforming Composition');
-    legend('1atm','10atm','100atm','CO','CH4','H2','H2O','location','NorthWest');
+    legend('1atm','10atm','100atm','CO','CH4','H2','H2O','location','West');
     %ylim([0.001,1]);
     plotfixer(); grid on;
 end
@@ -471,14 +471,36 @@ pct_CH4 = [NaN]; % Note: only applies to Reformer! Not Shift Reactors!
 compositions = zeros(4,3); %co;h2o;c02;h2
 %Isothermal
 
+
 for i = 1:3
-    eqs = [  1  == nco2   + nco;...          carbon atom balance  %POTENTIAL ERROR: shouldn't this be 2, not 1?
-         3  == nco2*2 + nco + nh2o; ...  oxygen atom balance
-         10  == nh2*2   + nh2o*2;...      hydrogen atom balance
-         (nco2.*nh2)./(nco.*nh2o) == f_kp_WGS(Tin(i))];  %Nernst atom balance % Tin(1) is the first temp in Tin vector, which is Tin(reformer)  
-     syms nco nch4 nh2 nh2o;
-     assume([nco,nh2o,nco2,nh2],'real'); assumeAlso([nco,nh2o,nco2,nh2] > 0); assumeAlso([nco,nh2o,nco2,nh2] < 20)
-     sol = vpasolve(eqs,[nco,nh2o,nco2,nh2],[1,1,1,1]);
-     compositions(:,i) = double(struct2array(sol))';
+    compositions(:,i) = compositionsFun(f_kp_WGS(Tin(i)));
 end
+
+
+%Adiabatic
+
+error = 0.001;
+speedFactor = 1000;
+T_guess = zeros(1,3);
+comps_out = zeros(4,3);
+v_CH4_SMR = 1;
+v_H2O_SMR = 3;
+%h_in = [hEng(Tin(1), 'h2ovap',v_H2O_SMR) + hEng(Tin(1), 'ch4',v_CH4_SMR),0,0]; %define first stage, and allocate 2nd and 3rd stage
+h_in = [hEng(Tin(1), 'co',1) + hEng(Tin(1), 'h2ovap',2)+ hEng(Tin(1), 'h2',3),0,0]; %define first stage, and allocate 2nd and 3rd stage
+
+for s = 1:3 %three stages: reformer, hot shift reactor, cold shift reactor
+    T_guess(s) = Tin(s);
+    comps_out(:,s) = compositionsFun(f_kp_WGS(T_guess(s)));
+    h_out = hEng(T_guess(s), 'co',comps_out(1,s)) + hEng(T_guess(s), 'h2ovap',comps_out(2,s)) + hEng(T_guess(s), 'co2',comps_out(3,s)) + hEng(T_guess(s), 'h2',comps_out(4,s));
+    dh = h_out-h_in(s);    
+    while abs(dh) > error
+        comps_out(:,s) = compositionsFun(f_kp_WGS(T_guess(s)));
+        h_out = hEng(T_guess(s), 'co',comps_out(1,s)) + hEng(T_guess(s), 'h2ovap',comps_out(2,s)) + hEng(T_guess(s), 'co2',comps_out(3,s)) + hEng(T_guess(s), 'h2',comps_out(4,s));
+        dh = h_out-h_in(s)
+        T_guess(s) = T_guess(s) - dh/speedFactor;  %increased temp shifts towards reactants. We inteligently guessed this direction.
+        
+    end
+    h_in(s+1) = NaN;
+end
+
 
