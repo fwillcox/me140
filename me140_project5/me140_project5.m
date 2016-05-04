@@ -83,6 +83,7 @@ if(~supressplots(1))
     plot(p_load,p_stack,p_load,p_access);
     title('Stack and Accessory Power as a Function of Load');
     xlabel('Load [Watts]'); ylabel('Power [Watts]');
+    text(5,50,'Net Power = 0 @ 0 Load');
     legend('P_{stack}','P_{accessory}','Location','best'); plotfixer(); grid on;
     
     f4 = figure(4);
