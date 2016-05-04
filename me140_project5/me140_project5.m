@@ -506,6 +506,6 @@ for s = 1:3 %three stages: reformer, hot shift reactor, cold shift reactor
         T_guess(s) = T_guess(s) - dh/speedFactor;  %increased temp shifts towards reactants. We inteligently guessed this direction.
         
     end
-    h_in(s+1) = NaN;
+    h_in(s+1) = hEng(T_guess(s), 'co',comps_out(1,s)) + hEng(T_guess(s), 'h2ovap',comps_out(2,s)) + hEng(T_guess(s), 'co2',comps_out(3,s)) + hEng(T_guess(s), 'h2',comps_out(4,s));
 end
 
