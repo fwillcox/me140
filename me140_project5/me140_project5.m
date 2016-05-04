@@ -5,6 +5,7 @@
 % ASSUME:
 % (i)  mol_H2 = 1
 clear; close all;clc;hold off;
+entireTime = tic;
 
 global PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS ...
     C_TO_K PSI_TO_PA MM_h MM_h2 MM_o MM_n MM_h2o MM_air PATM HORSEPOWER_TO_W
@@ -13,7 +14,7 @@ mol_H2 = 1;
 savePlots = 1;
                 % 1,2,3,4,5,6,7,8,9,10,11
 
-supressplots =   [0,      0,    0,  0];         % supresses plots by section
+supressplots =   [1,      1,    1,  1];         % supresses plots by section
 
 %% Part A, Section 1
 % Currents (load & stack)
@@ -153,8 +154,8 @@ Qdot_fuelCell_max = max(Qdot_fuelCell);
 % Finding total power of cell out = load power plus Qdot
 powerOut = p_load + Qdot_fuelCell_max;
 
-num_fuelCells_diesel = Wdot_diesel ./ powerOut
-num_fuelCells_hybrid = Wdot_hybrid ./ powerOut
+num_fuelCells_diesel = Wdot_diesel ./ powerOut;
+num_fuelCells_hybrid = Wdot_hybrid ./ powerOut;
 
 if(~supressplots(3))
     % Overall First Law Efficiency of the PEM Fuel Cell = Stack Efficiency
@@ -266,6 +267,7 @@ end
 % SOURCE Nernst Atom Balance: LECTURE 14, SLIDE 4 (equation in lower right corner)
 npts = 20;
 syms nco nch4 nh2 nh2o;
+warning('off','symbolic:numeric:NumericalInstability');
 
 temps = linspace(25,1200,npts);
 temps = temps + C_TO_K;
@@ -274,6 +276,7 @@ soln = zeros(length(temps),4,length(pres));
 tic
 for i = 1:length(temps)
     parfor j = 1:length(pres)
+        warning('off','symbolic:numeric:NumericalInstability');
         p = pres(j);
         t = temps(i);
         
@@ -355,6 +358,7 @@ syms nco nco2 nh2 nh2o;
 soln_wgs = zeros(length(temps),4,length(pres));
 tic
 parfor i = 1:length(temps)
+    warning('off','symbolic:numeric:NumericalInstability');
     t = temps(i);
     
     eqs = [       1  == nco2   + nco;...carbon atom balance  %POTENTIAL ERROR: shouldn't this be 2, not 1?
@@ -428,6 +432,7 @@ if(savePlots ==1)
         saveas(f12,'../plots5/12-WGScomp','png');
     end
 end
+toc(entireTime);
 
 %% Part B No. 4
 % Plot exit composition (mol fractions) vs. 3 system stations (Reformer,
@@ -483,4 +488,5 @@ for i = 1:3
      soln = [a,b,c,d]';
      compositions(:,i) = double(soln)';
 end
+
 
