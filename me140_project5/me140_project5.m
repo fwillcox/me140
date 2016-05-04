@@ -145,6 +145,7 @@ Wdot_hybrid = 121 * HORSEPOWER_TO_W;  % [W]
 
 % Calcuate Heat Removal (Qdot) --> 40 g/s necessary only for
 % intensive/extensive conversion
+Qdot_fuelCell = zeros(length(T4));
 for i = 1:length(T4)
     Qdot_fuelCell(i) = hEng(T4(i),'h2o') - hEng(T5(i),'h2o');
 end
@@ -275,10 +276,10 @@ pres = [1,10,100];
 soln = zeros(length(temps),4,length(pres));
 tic
 for i = 1:length(temps)
+    t = temps(i);
     parfor j = 1:length(pres)
         warning('off','symbolic:numeric:NumericalInstability');
         p = pres(j);
-        t = temps(i);
         
         eqs = [1  == nco   + nch4;...             carbon atom balance
             10 == nh2*2 + nch4*4 + nh2o*2; ... hydrogen atom balance
