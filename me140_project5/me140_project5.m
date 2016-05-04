@@ -496,14 +496,17 @@ speedFactor = 1000;
 T_guess = zeros(1,3);
 comps_out = zeros(4,3);
 
+% PROBLEM IS THAT TEMPS ARE JUST CONVERGING TO TEMP AT H_IN - MISSING 
+% SOMETHING CONCEPTUAL. 
+step = 1;
 for s = 2:3 % two stages: hot shift reactor, cold shift reactor
-    T_guess(s) = Tin(s);
+    T_guess(s) = Tin(s) - step;
     comps_out(:,s) = compositionsFun(f_kp_WGS(T_guess(s)));
     h_out = hEng(T_guess(s), 'co',comps_out(1,s)) + hEng(T_guess(s), 'h2ovap',comps_out(2,s)) + hEng(T_guess(s), 'co2',comps_out(3,s)) + hEng(T_guess(s), 'h2',comps_out(4,s));
     dh = h_out-h_in;   
     
     while abs(dh) > error
-        T_guess(s) = T_guess(s) - dh/speedFactor;  %increased temp shifts towards reactants. We inteligently guessed this direction.
+        T_guess(s) = T_guess(s) - dh/speedFactor;  %increased temp shifts towards reactants. We inteligently guessed this direction - CHECK!
         comps_out(:,s) = compositionsFun(f_kp_WGS(T_guess(s)));
         h_out = hEng(T_guess(s), 'co',comps_out(1,s)) + hEng(T_guess(s), 'h2ovap',comps_out(2,s)) + hEng(T_guess(s), 'co2',comps_out(3,s)) + hEng(T_guess(s), 'h2',comps_out(4,s));
         dh = h_out-h_in
