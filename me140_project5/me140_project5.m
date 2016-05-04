@@ -99,10 +99,10 @@ end
 
 % 1st & 2nd Law Efficiencies (eta_I & eta_II) & Inefficiencies (Idot)
 % Stack
-[etaI_stack ,etaII_stack, Idot_stack,lambda_stack] = findEtas(mdot_total, mdot_fuel, Ptotal, Pfuel, T2, p_stack);
+[etaI_stack ,etaII_stack, Idot_stack,lambda_stack,dGstack] = findEtas(mdot_total, mdot_fuel, Ptotal, Pfuel, T2, p_stack);
 
 % Entire System (Load)
-[etaI_load ,etaII_load, Idot_load,lambda_load] =    findEtas(mdot_total, mdot_fuel, Ptotal, Pfuel, T2, p_load);
+[etaI_load ,etaII_load, Idot_load,lambda_load,dGload] =    findEtas(mdot_total, mdot_fuel, Ptotal, Pfuel, T2, p_load);
 if(~supressplots(2))
     f6 = figure(6);
     plot(p_load,lambda_load);
@@ -119,7 +119,7 @@ if(~supressplots(2))
         '\eta_{II,stack}','\eta_{II,system}', 'Location','Best'); plotfixer(); grid on;
     
     f7 = figure(7);
-    plot(p_load,p_stack,'c',p_load,p_load,'bp--');
+    plot(p_load,-dGstack-p_stack,'c',p_load,-dGload-p_load,'bp--');
     title('Power Loss/Inefficiences as a Function of Load');
     xlabel('Load [Watts]'); ylabel('Power Loss/Inefficiencies, Idot [Watts]');
     legend('Idot_{stack}','Idot_{system}','Location','best'); plotfixer(); grid on;
