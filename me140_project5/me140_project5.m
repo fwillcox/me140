@@ -466,6 +466,12 @@ end
 % Qin_MJkg = ?
 % TODO: GET Qin IN MJ/KG (CURRENTLY IN J. STORE IN NEW VARIABLE B/C Qin IS USED BELOW)
 
+% PSEUDOCODE APPROACH
+% Determine composition of each (CO H20vap CO2 H2) where we calculate Qin
+% Use molar mass to get kg of each
+% Divide Qin by kg total
+% Convert J to MJ by dividing by a constant (10^6)
+
 
 % Part 2: Adiabatic (only shift reactors)
 error = 0.0001;
