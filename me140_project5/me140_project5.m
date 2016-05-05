@@ -442,7 +442,6 @@ pct_CH4 = [NaN]; % Note: only applies to Reformer! Not Shift Reactors!
 
 
 % Part 1: Isothermal
-
 % find exit compositions
 compositions = zeros(4,3); %co;h2o;c02;h2
 for i = 1:3
@@ -456,18 +455,19 @@ end
 Qin = zeros(1,3);
 N_H20_in = 3; 
 N_CH4_in = 1;
-h_react =  hEng(Tin(1), 'h2ovap', N_H20_in) + hEng(Tin(1), 'ch4', N_CH4_in); % DOUBLE CHECK CH4 + 3H20 IS RIGHT
+h_react =  hEng(Tin(1), 'h2ovap', N_H20_in) + hEng(Tin(1), 'ch4', N_CH4_in); 
 for s = 1:3 % three stages: reformer and two reactors 
     h_prod = hEng(Tin(s), 'co', compositions(1,s)) + hEng(Tin(s), 'h2ovap', compositions(2,s)) + hEng(Tin(s), 'co2', compositions(3,s)) + hEng(Tin(s), 'h2', compositions(4,s));
     Qin(s) = h_prod - h_react;
     
-    h_react = h_prod;
+    if (s == 3) break; end
+    h_react = hEng(Tin(s+1), 'co', compositions(1,s)) + hEng(Tin(s+1), 'h2ovap', compositions(2,s)) + hEng(Tin(s+1), 'co2', compositions(3,s)) + hEng(Tin(s+1), 'h2', compositions(4,s));
 end
+% Qin_MJkg = ?
+% TODO: GET Qin IN MJ/KG (CURRENTLY IN J. STORE IN NEW VARIABLE B/C Qin IS USED BELOW)
 
 
 % Part 2: Adiabatic (only shift reactors)
-% Adiabatic (only shift reactors)
-
 error = 0.0001;
 speedFactor = 1000;
 T_guess = zeros(1,3);
@@ -488,8 +488,6 @@ tic
 % H_in occurs at stage 2
 % comps[species, stage]. Species order: CO, H20, CO2, H2
 comps_in(:) = compositions(:,1);
- % only need WGS
-% ^SHOULD BE -5.5e5 -> CORRECT
 tol = 0.0001;
 step = 1;
 for s = 2:3 % two stages: hot shift reactor, cold shift reactor
@@ -514,7 +512,7 @@ for s = 2:3 % two stages: hot shift reactor, cold shift reactor
     while abs(dh/h_in) > tol %use percentage error for robustness
         dhprime = (dh - dhlast) ./(T_guess(s) - tlast);
         tlast = T_guess(s);
-        T_guess(s) = T_guess(s) - dh ./ dhprime;  %increased temp shifts towards reactants. We inteligently guessed this direction - CHECK!
+        T_guess(s) = T_guess(s) - dh ./ dhprime; 
         comps_out_adi(:,s) = compositionsFun(f_kp_WGS(T_guess(s)));
         dhlast = dh;
         h_out = hEng(T_guess(s), 'co',comps_out_adi(1,s)) ...
@@ -530,6 +528,7 @@ pctCO = comps_out_adi(1,:)./sum(comps_out_adi)
 comps_out_adi(:,1) = compositions(:,1);
 y_out_adi = comps_out_adi./repmat(sum(comps_out_adi),4,1);
 y_iso = compositions./repmat(sum(compositions),4,1);
+% ^SHOULD GET 740, 569 K FOR T_guess
 
 % plot of exit composition vs system station (2x, isothermal and adiabatic)
 if(~supressplots(4))
@@ -558,32 +557,20 @@ set(f13, 'Position', [300 800 800 400]) %resize plot
 end
 
 
-
-
-% 673, 523 ARE JUST INITIAL TEMPS
-% SHOULD GET 740, 569 K
-
-
 % Part 3: Heating reformer w/ methane
+% find methane used by reformer - CHECK!
+molar_mass_meth = 16.043/1000; % [kg/mol]
+molar_mass_h2 = 2.016/1000; % [kg/mol]
+LHV_meth = 50050e3*molar_mass_meth; % [J/mol]
+LHV_h2 = 120000e3*molar_mass_h2; %[J/mol]
+N_meth_burned = Qin(1)/LHV_meth;
+perc_meth_burned = N_meth_burned*100;
 
-% find methane used by reformer
-% JUST USE HEAT ADDITION FOR ISOTHERMAL REACTION, PRETTY SURE 
-Q = Qin(1);
-% N_meth_burned = Q/LHV_meth % DO EITHER PER MOL OR MASS, FIGURE OUT
-% perc_meth_burned = N_meth_burned/(N_meth_burned + N_meth_rxn) * 100;
-% FIGURE OUT HOW MUCH METH IS USED IN RXN
-
-% find LHV ratio
-% LHV_ratio = LHV_h2*h2_exit/(LHV_meth*(N_meth_burned + N_meth_rxn) * 100;
-
-% -how much heat is required by reformer?
-% -> do CV around reformer - know enthalpy in and out, difference is heat reqd
-% -what fraction of total methane used would be consumed to do the heating?
-% ->use energy density of methane to find how much methane is reqd
-% -find LHV (@ standard ref conditions) of hydrogen produced to LHV of
-% methane reqd to produce it (methane going into reactors and methane reqd
-% to heat reformer)
-
+% find LHV ratio - CHECK!
+N_meth_rxn = 1;
+LHV_ratio_isoth = LHV_h2*compositions(4,3)/(LHV_meth*(N_meth_burned + N_meth_rxn)) * 100;
+LHV_ratio_adia = LHV_h2*comps_out_adi(4,3)/(LHV_meth*(N_meth_burned + N_meth_rxn)) * 100; 
+ 
 
 % NEED FOR TABLE:
 % isothermal:
