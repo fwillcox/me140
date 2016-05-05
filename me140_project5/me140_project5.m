@@ -515,8 +515,11 @@ for s = 2:3 % two stages: hot shift reactor, cold shift reactor
         T_guess(s) = T_guess(s) - dh ./ dhprime;  %increased temp shifts towards reactants. We inteligently guessed this direction - CHECK!
         comps_out(:,s) = compositionsFun(f_kp_WGS(T_guess(s)));
         dhlast = dh;
-        h_out = hEng(T_guess(s), 'co',comps_out(1,s)) + hEng(T_guess(s), 'h2ovap',comps_out(2,s)) + hEng(T_guess(s), 'co2',comps_out(3,s)) + hEng(T_guess(s), 'h2',comps_out(4,s));
-        dh = h_out-h_in
+        h_out = hEng(T_guess(s), 'co',comps_out(1,s)) ...
+            + hEng(T_guess(s), 'h2ovap',comps_out(2,s)) ...
+            + hEng(T_guess(s), 'co2',comps_out(3,s)) ...
+            + hEng(T_guess(s), 'h2',comps_out(4,s));
+        dh = h_out-h_in;
     end
     comps_in = comps_out(:,s);
 end
