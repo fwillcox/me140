@@ -2,9 +2,13 @@
 % FUEL CELL EVALUATION & HYRDOGEN PRODUCTION ANALYSIS
 % Frankie Willcox, Jon Renslo, Kendall Fagan, Emily Bohl, Natasha Berk
 
+%Jon's todo list
+% double check power loss (inefficiencies)
+% ask about starting from STP (extra methane used?)
+
 % ASSUME:
 % (i)  mol_H2 = 1
-clear; close all;clc;
+clear; close all; clc;
 format compact;
 entireTime = tic;
 
@@ -15,7 +19,7 @@ mol_H2 = 1;
 savePlots = 1;
                 % 1,2,3,4,5,6,7,8,9,10,11
 
-supressplots =   [1,      1,    0,  0];         % supresses plots by section
+supressplots =   [0,      0,    0,  0];         % supresses plots by section
 
 %% Part A, Section 1
 % Currents (load & stack)
@@ -74,26 +78,26 @@ if(~supressplots(1))
     plot(p_load,i_load,p_load,i_stack);
     title('Current as a Function of Load');
     xlabel('Load [Watts]'); ylabel('Current [Amps]');
-    legend('I_{load}','I_{stack}','Location','best'); plotfixer(); grid on;
+    legend('I_{load}','I_{stack}','Location','best'); grid on;
     
     f2 = figure(2);
     plot(p_load,v_load,p_load,v_stack);
     title('Potential as a Function of Load');
     xlabel('Load [Watts]'); ylabel('Potential [Volts]');
-    legend('V_{load}','V_{stack}','Location','best'); plotfixer(); grid on;
+    legend('V_{load}','V_{stack}','Location','best'); grid on;
     
     f3 = figure(3);
     plot(p_load,p_stack,p_load,p_access);
     title('Stack and Accessory Power as a Function of Load');
     xlabel('Load [Watts]'); ylabel('Power [Watts]');
     text(5,50,'Net Power = 0 @ 0 Load');
-    legend('P_{stack}','P_{accessory}','Location','best'); plotfixer(); grid on;
+    legend('P_{stack}','P_{accessory}','Location','best'); grid on;
     
     f4 = figure(4);
     plot(p_load, mdot_fuel*100, p_load, mdot_total);
     title('Mass Flow Rate as a Function of Load');
     xlabel('Load [Watts]'); ylabel('Mass Flow Rate [kg/s]');
-    legend('mdot_{H}*100','mdot_{air}','Location','best'); plotfixer(); grid on;
+    legend('mdot_{H}*100','mdot_{air}','Location','best'); grid on;
     
 end
 
@@ -112,7 +116,7 @@ if(~supressplots(2))
     plot(p_load,lambda_load);
     title('Air Equivalent as a Function of Load');
     xlabel('Load [Watts]'); ylabel('Lambda');
-    legend('\lambda','Location','best'); plotfixer(); grid on;
+    legend('\lambda','Location','best');  grid on;
     
     f5 = figure(5);
     plot(p_load,etaI_stack,'c',p_load,etaI_load,'bp--',...
@@ -120,13 +124,13 @@ if(~supressplots(2))
     title('Efficiency as a Function of Load');
     xlabel('Load [Watts]'); ylabel('Efficiency');
     legend('\eta_{I,stack}','\eta_{I,system}',...
-        '\eta_{II,stack}','\eta_{II,system}', 'Location','Best'); plotfixer(); grid on;
+        '\eta_{II,stack}','\eta_{II,system}', 'Location','Best');grid on;
     
     f7 = figure(7);
     plot(p_load,-dGstack-p_stack,'c',p_load,-dGload-p_load,'bp--');
     title('Power Loss/Inefficiences as a Function of Load');
     xlabel('Load [Watts]'); ylabel('Power Loss/Inefficiencies, Idot [Watts]');
-    legend('Idot_{stack}','Idot_{system}','Location','best'); plotfixer(); grid on;
+    legend('Idot_{stack}','Idot_{system}','Location','best'); grid on;
 end
 
 %% Part A, Section 3
@@ -166,7 +170,7 @@ if(~supressplots(3))
     plot(p_load, etaI_stack, 'c', p_load, eta_diesel, 'b:', p_load, eta_hybrid, 'g');
     title('Comparing 1st Law Efficiency: PEM Fuel Cell, Diesel, and Gasoline Hybrid');
     xlabel('Load [Watts]'); ylabel('Efficiency, eta_{I}');
-    legend('eta_{I,stack}','eta_{I,Diesel}', 'eta_{I,Hybrid}','Location','northwest'); plotfixer(); grid on;
+    legend('eta_{I,stack}','eta_{I,Diesel}', 'eta_{I,Hybrid}','Location','northwest');  grid on;
 end
 
 % Comments: To scale this up, we would need somewhere between 280-540 fuel
@@ -260,7 +264,7 @@ if(~supressplots(3))
     title('Part B.1: Equilibrium Constant vs. Temperature')
     ylim([0.001,1000]);
     text(50,5,{'H-Power','Operating Temp','25-100K'})
-    plotfixer();grid on
+    grid on
     patch([25,100,100,25],[10^-3,10^-3,10^3,10^3],'g','FaceAlpha',.5,'EdgeAlpha',0);
     set(gca,'children',flipud(get(gca,'children'))) %puts shading beneath lines
 end
@@ -277,12 +281,12 @@ temps = temps + C_TO_K;
 pres = [1,10,100];
 soln = zeros(length(temps),4,length(pres));
 tic
-for j = 1:length(pres)
-    p = pres(j);
-    parfor i =  1:length(temps)
-        warning('off','symbolic:numeric:NumericalInstability');
-        t = temps(i);
+for i =  1:length(temps)
+    t = temps(i);
+    parfor j = 1:length(pres)
+        p = pres(j);
         
+        warning('off','symbolic:numeric:NumericalInstability');
         eqs = [1  == nco   + nch4;...             carbon atom balance
             10 == nh2*2 + nch4*4 + nh2o*2; ... hydrogen atom balance
             3  == nco   + nh2o;...             oxygen atom balance
@@ -290,24 +294,15 @@ for j = 1:length(pres)
             (p ./ (nco + nch4 + nh2 + nh2o).^2) ...
             == f_kp_SMR(t)];
         % 4 eq, 4 unknown
+        assume([nco,nch4,nh2,nh2o],'real'); 
+        assumeAlso([nco,nch4,nh2,nh2o] > 0);
+        assumeAlso([nco,nch4,nh2,nh2o] < 20);
         [a,b,c,d] = vpasolve(eqs,[nco,nch4,nh2,nh2o],[1,1,1,1]);
-        %todo find value closest to 1
-        a(imag(a)~=0) = 0;
-        a(a<0) = 0;
-        a(a>3) = 0;
-        b(imag(b)~=0) = 0;
-        b(b<0) = 0;
-        b(b>3) = 0;
-        c(imag(c)~=0) = 0;
-        c(c<0) = 0;
-        c(c>3) = 0;
-        d(imag(d)~=0) = 0;
-        d(d<0) = 0;
-        d(d>3) = 0;
-        nco_sol(i,j) = double(max(a(a~=0)));
-        nch4_sol(i,j) = double(min(b(b~=0)));
-        nh2_sol(i,j) = double(max(c(c~=0)));
-        nh2o_sol(i,j) = double(min(d(d~=0)));
+        
+        nco_sol(i,j) = double(a);
+        nch4_sol(i,j) = double(b);
+        nh2_sol(i,j) = double(c);
+        nh2o_sol(i,j) = double(d);
         %          soln(i,:,j) = max(double(real([a,b,c,d]));
         
     end
@@ -345,7 +340,7 @@ if(~supressplots(4))
     title('Steam Methane Reforming Composition');
     legend('1atm','10atm','100atm','CO','CH4','H2','H2O','location','West');
     %ylim([0.001,1]);
-    plotfixer(); grid on;
+    grid on;
 end
 
 %% Part B No. 3
@@ -370,26 +365,15 @@ parfor i = 1:length(temps)
         10  == nh2*2   + nh2o*2;...      hydrogen atom balance 
         (nco2.*nh2)./(nco.*nh2o) ... Nernst atom balance
         == f_kp_WGS(t)];        %(note no pressure term, as nmols same on RHS and LHS)
-    % 4 eq, 4 unknown    
+    % 4 eq, 4 unknown   
+    assume([nco,nh2o,nco2,nh2],'real'); 
+    assumeAlso([nco,nh2o,nco2,nh2] > 0);
+    assumeAlso([nco,nh2o,nco2,nh2] < 20);
     [a,b,c,d] = vpasolve(eqs,[nco,nh2o,nco2,nh2],[1,1,1,1]);
-    lowbound = 0;
-    highbound = 5;
-    a(imag(a)~=0) = nan;
-    a(a<lowbound) = nan;
-    a(a>highbound) = nan;
-    b(imag(b)~=0) = nan;
-    b(b<lowbound) = nan;
-    b(b>highbound) = nan;
-    c(imag(c)~=0) = nan;
-    c(c<lowbound) = nan;
-    c(c>highbound) = nan;
-    d(imag(d)~=0) = nan;
-    d(d<lowbound) = nan;
-    d(d>highbound) = nan;
-    nco_wgs(i) = double(min(a(~isnan(a))));
-    nh2o_wgs(i) = double(min(b(~isnan(b))));
-    nco2_wgs(i) = double(max(c(~isnan(c))));
-    nh2_wgs(i) = double(max(d(~isnan(d))));
+    nco_wgs(i) = double(a);
+    nh2o_wgs(i) = double(b);
+    nco2_wgs(i) = double(c);
+    nh2_wgs(i) = double(d);
     %          soln(i,:,j) = max(double(real([a,b,c,d]));
     
 end
@@ -412,7 +396,7 @@ if(~supressplots(4))
     ylabel('Mole Fraction');
     title('Water Gas Shift Composition');
     %ylim([0.001,1]);
-    plotfixer(); grid on;
+    grid on;
 end
 
 
@@ -543,6 +527,36 @@ for s = 2:3 % two stages: hot shift reactor, cold shift reactor
 end
 toc
 pctCO = comps_out_adi(1,:)./sum(comps_out_adi)
+comps_out_adi(:,1) = compositions(:,1);
+y_out_adi = comps_out_adi./repmat(sum(comps_out_adi),4,1);
+y_iso = compositions./repmat(sum(compositions),4,1);
+
+% plot of exit composition vs system station (2x, isothermal and adiabatic)
+if(~supressplots(4))
+f13 = figure(13);
+subplot(1,2,1);
+bar(y_iso');
+xlabel('State, Isothermal');
+ylabel('Mole Fraction');
+ylim([0,0.8]);
+legend('CO', 'H20', 'CO2', 'H2','location','northwest');
+
+subplot(1,2,2);
+bar(y_out_adi');
+xlabel('State, Adiabatic');
+ylabel('Mole Fraction');
+legend('CO', 'H20', 'CO2', 'H2','location','northwest');
+ylim([0,0.8]);
+set(f13, 'Position', [0 0 400 200])
+
+annotation('textbox', [0 0.8 1 0.2], ...
+    'String', 'H2 Reformer Outlet Molecular Composition', ...
+    'EdgeColor', 'none', ...
+    'HorizontalAlignment', 'center',...
+    'FontSize',18); % add title to plot manually, subplots don't include an overall title
+set(f13, 'Position', [300 800 800 400]) %resize plot
+end
+
 
 
 
@@ -571,9 +585,6 @@ Q = Qin(1);
 % to heat reformer)
 
 
-
-
-
 % NEED FOR TABLE:
 % isothermal:
 % -composition of gases exiting reformer and reactors
@@ -588,8 +599,11 @@ Q = Qin(1);
 % 
 % PLOT: exit composition for isothermal and adiabatic at each station
 
-
+if(sum(supressplots)~=4)
+    plotfixer();
+end
 if(savePlots ==1)
+     plotfixer(); 
     if(~supressplots(1))
         saveas(f1,'../plots5/1-CurrentbyLoad','png');
         saveas(f2,'../plots5/2-VbyLoad','png');
@@ -609,6 +623,7 @@ if(savePlots ==1)
         saveas(f10,'../plots5/10-SMRcompmol','png');
         saveas(f11,'../plots5/11-SMRcomp','png');
         saveas(f12,'../plots5/12-WGScomp','png');
+        saveas(f13,'../plots5/13-ReformerComp','png');
     end
 end
 toc(entireTime);
