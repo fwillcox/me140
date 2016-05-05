@@ -7,6 +7,8 @@ function comps = compositionsFun(kp)
          10  == nh2*2   + nh2o*2;...      hydrogen atom balance
          (nco2.*nh2)./(nco.*nh2o) == kp];  %Nernst atom balance % Tin(1) is the first temp in Tin vector, which is Tin(reformer)  
      assume([nco,nh2o,nco2,nh2],'real'); assumeAlso([nco,nh2o,nco2,nh2] > 0); assumeAlso([nco,nh2o,nco2,nh2] < 20)
-     sol = vpasolve(eqs,[nco,nh2o,nco2,nh2],[1,1,1,1]);
-     comps(:,1) = double(struct2array(sol))';
+     [a,b,c,d] = vpasolve(eqs,[nco,nh2o,nco2,nh2],[1,1,1,1]);
+     sol = [a,b,c,d];
+     sizeSent = isequal([4 1],size(sol'));
+     comps(:,1) = double(sol)';
 end

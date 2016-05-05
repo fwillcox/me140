@@ -4,7 +4,8 @@
 
 % ASSUME:
 % (i)  mol_H2 = 1
-clear; close all;clc;hold off;
+clear; close all;clc;
+format compact;
 entireTime = tic;
 
 global PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS ...
@@ -68,6 +69,7 @@ p_load =  i_load  .* v_load;                                        % [W] = [kg*
 p_stack = i_stack .* v_stack;
 p_access = p_stack - p_load;                                        % [W], Acessory Power, i.e. power used to run controls. Pstack-Pload
 if(~supressplots(1))
+    hold off;
     f1 = figure(1);
     plot(p_load,i_load,p_load,i_stack);
     title('Current as a Function of Load');
@@ -275,11 +277,11 @@ temps = temps + C_TO_K;
 pres = [1,10,100];
 soln = zeros(length(temps),4,length(pres));
 tic
-for i = 1:length(temps)
-    t = temps(i);
-    parfor j = 1:length(pres)
+for j = 1:length(pres)
+    p = pres(j);
+    parfor i =  1:length(temps)
         warning('off','symbolic:numeric:NumericalInstability');
-        p = pres(j);
+        t = temps(i);
         
         eqs = [1  == nco   + nch4;...             carbon atom balance
             10 == nh2*2 + nch4*4 + nh2o*2; ... hydrogen atom balance
@@ -492,27 +494,40 @@ comps_in(:,2) = compositionsFun(f_kp_WGS(Tin(2)));
 h_in = hEng(Tin(2), 'co', comps_in(1,2)) + hEng(Tin(2), 'h2ovap', comps_in(2,2)) + hEng(Tin(2), 'co2',comps_in(3,2)) + hEng(Tin(2), 'h2', comps_in(4,2)); % only need WGS
 % ^SHOULD BE -5.5e5 -> CORRECT
 
-error = 0.001;
+error = 0.0001;
 speedFactor = 1000;
 T_guess = zeros(1,3);
 comps_out = zeros(4,3);
-
+tic
 % PROBLEM IS THAT TEMPS ARE JUST CONVERGING TO TEMP AT H_IN - MISSING 
 % SOMETHING CONCEPTUAL. 
 step = 1;
 for s = 2:3 % two stages: hot shift reactor, cold shift reactor
-    T_guess(s) = Tin(s) - step;
+    T_guess(s) = Tin(s) + 20;
     comps_out(:,s) = compositionsFun(f_kp_WGS(T_guess(s)));
-    h_out = hEng(T_guess(s), 'co',comps_out(1,s)) + hEng(T_guess(s), 'h2ovap',comps_out(2,s)) + hEng(T_guess(s), 'co2',comps_out(3,s)) + hEng(T_guess(s), 'h2',comps_out(4,s));
+    h_out = hEng(T_guess(s),   'co',    comps_out(1,s)) ...
+            + hEng(T_guess(s), 'h2ovap',comps_out(2,s)) ...
+            + hEng(T_guess(s), 'co2',   comps_out(3,s)) ...
+            + hEng(T_guess(s), 'h2',    comps_out(4,s));
     dh = h_out-h_in;   
+    % set up newton raphson variables
+    % need to remember previous state for newton raphson
+    tlast = Tin(s);
+    dhlast = T_guess(s) - tlast; 
+    error = abs(error*h_in);
+    disp(s)
     
     while abs(dh) > error
-        T_guess(s) = T_guess(s) - dh/speedFactor;  %increased temp shifts towards reactants. We inteligently guessed this direction - CHECK!
+        dhprime = (dh - dhlast) ./(T_guess(s) - tlast);
+        tlast = T_guess(s);
+        T_guess(s) = T_guess(s) - dh ./ dhprime;  %increased temp shifts towards reactants. We inteligently guessed this direction - CHECK!
         comps_out(:,s) = compositionsFun(f_kp_WGS(T_guess(s)));
+        dhlast = h_out - h_in;
         h_out = hEng(T_guess(s), 'co',comps_out(1,s)) + hEng(T_guess(s), 'h2ovap',comps_out(2,s)) + hEng(T_guess(s), 'co2',comps_out(3,s)) + hEng(T_guess(s), 'h2',comps_out(4,s));
         dh = h_out-h_in
     end
 end
+toc
 
 % 673, 523 ARE JUST INITIAL TEMPS
 % SHOULD GET 740, 569 K
