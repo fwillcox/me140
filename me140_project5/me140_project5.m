@@ -484,29 +484,52 @@ for i = 1:3
 end
 
 
-%Adiabatic
+% Adiabatic (only shift reactors)
+
+% H_in occurs at stage 2
+% comps[species, stage]. Species order: CO, H20, CO2, H2
+comps_in(:,2) = compositionsFun(f_kp_WGS(Tin(2)));
+h_in = hEng(Tin(2), 'co', comps_in(1,2)) + hEng(Tin(2), 'h2ovap', comps_in(2,2)) + hEng(Tin(2), 'co2',comps_in(3,2)) + hEng(Tin(2), 'h2', comps_in(4,2)); % only need WGS
+% ^SHOULD BE -5.5e5 -> CORRECT
 
 error = 0.001;
 speedFactor = 1000;
 T_guess = zeros(1,3);
 comps_out = zeros(4,3);
-v_CH4_SMR = 1;
-v_H2O_SMR = 3;
-%h_in = [hEng(Tin(1), 'h2ovap',v_H2O_SMR) + hEng(Tin(1), 'ch4',v_CH4_SMR),0,0]; %define first stage, and allocate 2nd and 3rd stage
-h_in = [hEng(Tin(1), 'co',1) + hEng(Tin(1), 'h2ovap',2)+ hEng(Tin(1), 'h2',3),0,0]; %define first stage, and allocate 2nd and 3rd stage
 
-for s = 1:3 %three stages: reformer, hot shift reactor, cold shift reactor
-    T_guess(s) = Tin(s);
+% PROBLEM IS THAT TEMPS ARE JUST CONVERGING TO TEMP AT H_IN - MISSING 
+% SOMETHING CONCEPTUAL. 
+step = 1;
+for s = 2:3 % two stages: hot shift reactor, cold shift reactor
+    T_guess(s) = Tin(s) - step;
     comps_out(:,s) = compositionsFun(f_kp_WGS(T_guess(s)));
     h_out = hEng(T_guess(s), 'co',comps_out(1,s)) + hEng(T_guess(s), 'h2ovap',comps_out(2,s)) + hEng(T_guess(s), 'co2',comps_out(3,s)) + hEng(T_guess(s), 'h2',comps_out(4,s));
-    dh = h_out-h_in(s);    
+    dh = h_out-h_in;   
+    
     while abs(dh) > error
+        T_guess(s) = T_guess(s) - dh/speedFactor;  %increased temp shifts towards reactants. We inteligently guessed this direction - CHECK!
         comps_out(:,s) = compositionsFun(f_kp_WGS(T_guess(s)));
         h_out = hEng(T_guess(s), 'co',comps_out(1,s)) + hEng(T_guess(s), 'h2ovap',comps_out(2,s)) + hEng(T_guess(s), 'co2',comps_out(3,s)) + hEng(T_guess(s), 'h2',comps_out(4,s));
-        dh = h_out-h_in(s)
-        T_guess(s) = T_guess(s) - dh/speedFactor;  %increased temp shifts towards reactants. We inteligently guessed this direction.
-        
+        dh = h_out-h_in
     end
-    h_in(s+1) = hEng(T_guess(s), 'co',comps_out(1,s)) + hEng(T_guess(s), 'h2ovap',comps_out(2,s)) + hEng(T_guess(s), 'co2',comps_out(3,s)) + hEng(T_guess(s), 'h2',comps_out(4,s));
 end
+
+% 673, 523 ARE JUST INITIAL TEMPS
+% SHOULD GET 740, 569 K
+
+
+% NEED:
+% isothermal:
+% -composition of gases exiting reformer and reactors
+% adiabatic:
+% -adiabatic outlet temperatures of last two reactors
+% -exit composition for shift reactors
+% 
+% PLOT: exit composition for isothermal and adiabatic at each station
+% 
+% LAST PART:
+% -how much heat is required by reformer?
+% -what fraction of total methane used would be econsumed to do the heating?
+% -more stuff? confused!! ASK ABOUT THIS!!
+
 
