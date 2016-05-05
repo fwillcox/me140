@@ -1,6 +1,6 @@
 % ME 140 Project #5
 % FUEL CELL EVALUATION & HYRDOGEN PRODUCTION ANALYSIS
-% Frankie Willcox, Jon Renslo, Kendall Fagan, Emily Bohl, Natasha Berke
+% Frankie Willcox, Jon Renslo, Kendall Fagan, Emily Bohl, Natasha Berk
 
 % ASSUME:
 % (i)  mol_H2 = 1
@@ -477,16 +477,32 @@ Qin_iso = [NaN NaN NaN];             % [MJ/(kg of reactants)]
 % Percent Methane Burned to Heat Reformer (pct_CH4, ASSUME: adiabatic)
 pct_CH4 = [NaN]; % Note: only applies to Reformer! Not Shift Reactors!
 
+
+% Part 1: Isothermal
+
+% find exit compositions
 compositions = zeros(4,3); %co;h2o;c02;h2
-%Isothermal
-
-
 for i = 1:3
     compositions(:,i) = compositionsFun(f_kp_WGS(Tin(i)));
 end
 
+% find heat addition for each component
+% WGS: CO  + 2*H2O + 3*H2--> ?CO2 + (3+?)H2 + ?CO + ?H2O
+% SMR: CH4 + 3*H2O --> CO + 3*H2 + 2*H2O
+% comps[species, stage]. Species order: CO, H20, CO2, H2
+Qin = zeros(1,3);
+N_H20_in = 3; 
+N_CH4_in = 1;
+h_react =  hEng(Tin(1), 'h2ovap', N_H20_in) + hEng(Tin(1), 'ch4', N_CH4_in); % DOUBLE CHECK CH4 + 3H20 IS RIGHT
+for s = 1:3 % three stages: reformer and two reactors 
+    h_prod = hEng(Tin(s), 'co', compositions(1,s)) + hEng(Tin(s), 'h2ovap', compositions(2,s)) + hEng(Tin(s), 'co2', compositions(3,s)) + hEng(Tin(s), 'h2', compositions(4,s));
+    Qin(s) = h_prod - h_react;
+    
+    h_react = h_prod;
+end
 
-% Adiabatic (only shift reactors)
+
+% Part 2: Adiabatic (only shift reactors)
 
 % H_in occurs at stage 2
 % comps[species, stage]. Species order: CO, H20, CO2, H2
@@ -497,10 +513,8 @@ h_in = hEng(Tin(2), 'co', comps_in(1,2)) + hEng(Tin(2), 'h2ovap', comps_in(2,2))
 error = 0.0001;
 speedFactor = 1000;
 T_guess = zeros(1,3);
-comps_out = zeros(4,3);
-tic
-% PROBLEM IS THAT TEMPS ARE JUST CONVERGING TO TEMP AT H_IN - MISSING 
-% SOMETHING CONCEPTUAL. 
+comps_out_adi = zeros(4,3);
+ 
 step = 1;
 for s = 2:3 % two stages: hot shift reactor, cold shift reactor
     T_guess(s) = Tin(s) + 20;
@@ -514,7 +528,6 @@ for s = 2:3 % two stages: hot shift reactor, cold shift reactor
     % need to remember previous state for newton raphson
     tlast = Tin(s);
     dhlast = T_guess(s) - tlast; 
-    error = abs(error*h_in);
     disp(s)
     
     while abs(dh) > error
@@ -522,7 +535,7 @@ for s = 2:3 % two stages: hot shift reactor, cold shift reactor
         tlast = T_guess(s);
         T_guess(s) = T_guess(s) - dh ./ dhprime;  %increased temp shifts towards reactants. We inteligently guessed this direction - CHECK!
         comps_out(:,s) = compositionsFun(f_kp_WGS(T_guess(s)));
-        dhlast = h_out - h_in;
+        dhlast = dh;
         h_out = hEng(T_guess(s), 'co',comps_out(1,s)) + hEng(T_guess(s), 'h2ovap',comps_out(2,s)) + hEng(T_guess(s), 'co2',comps_out(3,s)) + hEng(T_guess(s), 'h2',comps_out(4,s));
         dh = h_out-h_in
     end
@@ -533,18 +546,42 @@ toc
 % SHOULD GET 740, 569 K
 
 
-% NEED:
+% Part 3: Heating reformer w/ methane
+
+% find methane used by reformer
+% JUST USE HEAT ADDITION FOR ISOTHERMAL REACTION, PRETTY SURE 
+Q = Qin(1);
+% N_meth_burned = Q/LHV_meth % DO EITHER PER MOL OR MASS, FIGURE OUT
+% perc_meth_burned = N_meth_burned/(N_meth_burned + N_meth_rxn) * 100;
+% FIGURE OUT HOW MUCH METH IS USED IN RXN
+
+% find LHV ratio
+% LHV_ratio = LHV_h2*h2_exit/(LHV_meth*(N_meth_burned + N_meth_rxn) * 100;
+
+% -how much heat is required by reformer?
+% -> do CV around reformer - know enthalpy in and out, difference is heat reqd
+% -what fraction of total methane used would be consumed to do the heating?
+% ->use energy density of methane to find how much methane is reqd
+% -find LHV (@ standard ref conditions) of hydrogen produced to LHV of
+% methane reqd to produce it (methane going into reactors and methane reqd
+% to heat reformer)
+
+
+
+
+
+% NEED FOR TABLE:
 % isothermal:
 % -composition of gases exiting reformer and reactors
+% -heat addition reqd for isothermal (do delta h energy balance on either
+% side of each component)
 % adiabatic:
 % -adiabatic outlet temperatures of last two reactors
-% -exit composition for shift reactors
+% -exit composition for shift reactors (and reformer, but same as above)
+% heat part:
+% -methane burned to heat reformer
+% -LHV ratio (efficiency)
 % 
 % PLOT: exit composition for isothermal and adiabatic at each station
-% 
-% LAST PART:
-% -how much heat is required by reformer?
-% -what fraction of total methane used would be econsumed to do the heating?
-% -more stuff? confused!! ASK ABOUT THIS!!
 
 
