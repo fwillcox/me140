@@ -524,6 +524,7 @@ for s = 2:3 % two stages: hot shift reactor, cold shift reactor
     comps_in = comps_out(:,s);
 end
 toc
+pctCO = comps_out(1,:)./sum(comps_out)
 
 
 
