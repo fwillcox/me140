@@ -15,7 +15,7 @@ mol_H2 = 1;
 savePlots = 1;
                 % 1,2,3,4,5,6,7,8,9,10,11
 
-supressplots =   [1,      1,    1,  1];         % supresses plots by section
+supressplots =   [1,      1,    0,  0];         % supresses plots by section
 
 %% Part A, Section 1
 % Currents (load & stack)
@@ -358,35 +358,38 @@ end
 %         % 4 eq, 4 unknown
 %         [a,b,c,d] = vpasolve(eqs,[nco,nh2o,nco2,nh2],[1,1,1,1]);
 syms nco nco2 nh2 nh2o;
-soln_wgs = zeros(length(temps),4,length(pres));
+%soln_wgs = zeros(length(temps),4,length(pres));
 tic
+% ***BROKEN***
 parfor i = 1:length(temps)
     warning('off','symbolic:numeric:NumericalInstability');
     t = temps(i);
     
-    eqs = [       1  == nco2   + nco;...carbon atom balance  %POTENTIAL ERROR: shouldn't this be 2, not 1?
-        4  == nco2*2 + nco + nh2o; ...  oxygen atom balance
+    eqs = [       1  == nco2   + nco;...carbon atom balance  
+        3  == nco2*2 + nco + nh2o; ...  oxygen atom balance
         10  == nh2*2   + nh2o*2;...      hydrogen atom balance 
         (nco2.*nh2)./(nco.*nh2o) ... Nernst atom balance
         == f_kp_WGS(t)];        %(note no pressure term, as nmols same on RHS and LHS)
     % 4 eq, 4 unknown    
     [a,b,c,d] = vpasolve(eqs,[nco,nh2o,nco2,nh2],[1,1,1,1]);
-    a(imag(a)~=0) = 0;
-    a(a<0) = 0;
-    a(a>3) = 0;
-    b(imag(b)~=0) = 0;
-    b(b<0) = 0;
-    b(b>3) = 0;
-    c(imag(c)~=0) = 0;
-    c(c<0) = 0;
-    c(c>3) = 0;
-    d(imag(d)~=0) = 0;
-    d(d<0) = 0;
-    d(d>3) = 0;
-    nco_wgs(i) = double(min(a(a~=0)));
-    nh2o_wgs(i) = double(min(b(b~=0)));
-    nco2_wgs(i) = double(max(c(c~=0)));
-    nh2_wgs(i) = double(max(d(d~=0)));
+    lowbound = 0;
+    highbound = 5;
+    a(imag(a)~=0) = nan;
+    a(a<lowbound) = nan;
+    a(a>highbound) = nan;
+    b(imag(b)~=0) = nan;
+    b(b<lowbound) = nan;
+    b(b>highbound) = nan;
+    c(imag(c)~=0) = nan;
+    c(c<lowbound) = nan;
+    c(c>highbound) = nan;
+    d(imag(d)~=0) = nan;
+    d(d<lowbound) = nan;
+    d(d>highbound) = nan;
+    nco_wgs(i) = double(min(a(~isnan(a))));
+    nh2o_wgs(i) = double(min(b(~isnan(b))));
+    nco2_wgs(i) = double(max(c(~isnan(c))));
+    nh2_wgs(i) = double(max(d(~isnan(d))));
     %          soln(i,:,j) = max(double(real([a,b,c,d]));
     
 end
@@ -412,30 +415,6 @@ if(~supressplots(4))
     plotfixer(); grid on;
 end
 
-
-if(savePlots ==1)
-    if(~supressplots(1))
-        saveas(f1,'../plots5/1-CurrentbyLoad','png');
-        saveas(f2,'../plots5/2-VbyLoad','png');
-        saveas(f3,'../plots5/3-PowerbyLoad','png');
-        saveas(f4,'../plots5/4-massbyload','png');
-    end
-    if(~supressplots(2))
-        saveas(f5,'../plots5/5-Eff','png');
-        saveas(f6,'../plots5/6-lambda','png');
-        saveas(f7,'../plots5/7-PowerLoss','png');
-    end
-    if(~supressplots(3))
-        saveas(f8,'../plots5/8-CompareToGasoline','png');
-        saveas(f9,'../plots5/9-KeqbyT','png');
-    end
-    if(~supressplots(4))
-        saveas(f10,'../plots5/10-SMRcompmol','png');
-        saveas(f11,'../plots5/11-SMRcomp','png');
-        saveas(f12,'../plots5/12-WGScomp','png');
-    end
-end
-toc(entireTime);
 
 %% Part B No. 4
 % Plot exit composition (mol fractions) vs. 3 system stations (Reformer,
@@ -503,44 +482,69 @@ end
 
 
 % Part 2: Adiabatic (only shift reactors)
-
-% H_in occurs at stage 2
-% comps[species, stage]. Species order: CO, H20, CO2, H2
-comps_in(:,2) = compositionsFun(f_kp_WGS(Tin(2)));
-h_in = hEng(Tin(2), 'co', comps_in(1,2)) + hEng(Tin(2), 'h2ovap', comps_in(2,2)) + hEng(Tin(2), 'co2',comps_in(3,2)) + hEng(Tin(2), 'h2', comps_in(4,2)); % only need WGS
-% ^SHOULD BE -5.5e5 -> CORRECT
+% Adiabatic (only shift reactors)
 
 error = 0.0001;
 speedFactor = 1000;
 T_guess = zeros(1,3);
 comps_out_adi = zeros(4,3);
- 
+tic
+% PROBLEM IS THAT TEMPS ARE JUST CONVERGING TO TEMP AT H_IN - MISSING 
+% SOMETHING CONCEPTUAL. 
+% temps = linspace(273,800,40);
+% comps_out = zeros(length(temps),4);
+% for i = 1:length(temps)
+%    comps_out(i,:) = compositionsFun(f_kp_WGS(temps(i)))';
+%    h_out(i) = hEng(temps(i),   'co',    comps_out(i,1)) ...
+%             + hEng(temps(i), 'h2ovap',comps_out(i,2)) ...
+%             + hEng(temps(i), 'co2',   comps_out(i,3)) ...
+%             + hEng(temps(i), 'h2',    comps_out(i,4));
+% end
+
+% H_in occurs at stage 2
+% comps[species, stage]. Species order: CO, H20, CO2, H2
+comps_in(:) = compositions(:,1);
+ % only need WGS
+% ^SHOULD BE -5.5e5 -> CORRECT
+tol = 0.0001;
 step = 1;
 for s = 2:3 % two stages: hot shift reactor, cold shift reactor
+    t = Tin(s);
+    h_in = hEng(t, 'co', comps_in(1)) ...
+        + hEng(t, 'h2ovap', comps_in(2)) ...
+        + hEng(t, 'co2',comps_in(3)) ...
+        + hEng(t, 'h2', comps_in(4));
     T_guess(s) = Tin(s) + 20;
-    comps_out(:,s) = compositionsFun(f_kp_WGS(T_guess(s)));
-    h_out = hEng(T_guess(s),   'co',    comps_out(1,s)) ...
-            + hEng(T_guess(s), 'h2ovap',comps_out(2,s)) ...
-            + hEng(T_guess(s), 'co2',   comps_out(3,s)) ...
-            + hEng(T_guess(s), 'h2',    comps_out(4,s));
-    dh = h_out-h_in;   
+    comps_out_adi(:,s) = compositionsFun(f_kp_WGS(T_guess(s)));
+    h_out = hEng(T_guess(s),   'co',    comps_out_adi(1,s)) ...
+            + hEng(T_guess(s), 'h2ovap',comps_out_adi(2,s)) ...
+            + hEng(T_guess(s), 'co2',   comps_out_adi(3,s)) ...
+            + hEng(T_guess(s), 'h2',    comps_out_adi(4,s));
+    dh = h_out - h_in;   
     % set up newton raphson variables
     % need to remember previous state for newton raphson
     tlast = Tin(s);
     dhlast = T_guess(s) - tlast; 
     disp(s)
     
-    while abs(dh) > error
+    while abs(dh/h_in) > tol %use percentage error for robustness
         dhprime = (dh - dhlast) ./(T_guess(s) - tlast);
         tlast = T_guess(s);
         T_guess(s) = T_guess(s) - dh ./ dhprime;  %increased temp shifts towards reactants. We inteligently guessed this direction - CHECK!
-        comps_out(:,s) = compositionsFun(f_kp_WGS(T_guess(s)));
+        comps_out_adi(:,s) = compositionsFun(f_kp_WGS(T_guess(s)));
         dhlast = dh;
-        h_out = hEng(T_guess(s), 'co',comps_out(1,s)) + hEng(T_guess(s), 'h2ovap',comps_out(2,s)) + hEng(T_guess(s), 'co2',comps_out(3,s)) + hEng(T_guess(s), 'h2',comps_out(4,s));
-        dh = h_out-h_in
+        h_out = hEng(T_guess(s), 'co',comps_out_adi(1,s)) ...
+            + hEng(T_guess(s), 'h2ovap',comps_out_adi(2,s)) ...
+            + hEng(T_guess(s), 'co2',comps_out_adi(3,s)) ...
+            + hEng(T_guess(s), 'h2',comps_out_adi(4,s));
+        dh = h_out-h_in;
     end
+    comps_in = comps_out_adi(:,s);
 end
 toc
+pctCO = comps_out_adi(1,:)./sum(comps_out_adi)
+
+
 
 % 673, 523 ARE JUST INITIAL TEMPS
 % SHOULD GET 740, 569 K
@@ -584,4 +588,28 @@ Q = Qin(1);
 % 
 % PLOT: exit composition for isothermal and adiabatic at each station
 
+
+if(savePlots ==1)
+    if(~supressplots(1))
+        saveas(f1,'../plots5/1-CurrentbyLoad','png');
+        saveas(f2,'../plots5/2-VbyLoad','png');
+        saveas(f3,'../plots5/3-PowerbyLoad','png');
+        saveas(f4,'../plots5/4-massbyload','png');
+    end
+    if(~supressplots(2))
+        saveas(f5,'../plots5/5-Eff','png');
+        saveas(f6,'../plots5/6-lambda','png');
+        saveas(f7,'../plots5/7-PowerLoss','png');
+    end
+    if(~supressplots(3))
+        saveas(f8,'../plots5/8-CompareToGasoline','png');
+        saveas(f9,'../plots5/9-KeqbyT','png');
+    end
+    if(~supressplots(4))
+        saveas(f10,'../plots5/10-SMRcompmol','png');
+        saveas(f11,'../plots5/11-SMRcomp','png');
+        saveas(f12,'../plots5/12-WGScomp','png');
+    end
+end
+toc(entireTime);
 
