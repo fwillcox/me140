@@ -5,6 +5,7 @@
 % ASSUME:
 % (i)  mol_H2 = 1
 clear; close all;clc;hold off;
+entireTime = tic;
 
 global PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS ...
     C_TO_K PSI_TO_PA MM_h MM_h2 MM_o MM_n MM_h2o MM_air PATM HORSEPOWER_TO_W
@@ -13,7 +14,7 @@ mol_H2 = 1;
 savePlots = 1;
                 % 1,2,3,4,5,6,7,8,9,10,11
 
-supressplots =   [0,      0,    0,  0];         % supresses plots by section
+supressplots =   [1,      1,    1,  1];         % supresses plots by section
 
 %% Part A, Section 1
 % Currents (load & stack)
@@ -83,6 +84,7 @@ if(~supressplots(1))
     plot(p_load,p_stack,p_load,p_access);
     title('Stack and Accessory Power as a Function of Load');
     xlabel('Load [Watts]'); ylabel('Power [Watts]');
+    text(5,50,'Net Power = 0 @ 0 Load');
     legend('P_{stack}','P_{accessory}','Location','best'); plotfixer(); grid on;
     
     f4 = figure(4);
@@ -99,10 +101,10 @@ end
 
 % 1st & 2nd Law Efficiencies (eta_I & eta_II) & Inefficiencies (Idot)
 % Stack
-[etaI_stack ,etaII_stack, Idot_stack,lambda_stack] = findEtas(mdot_total, mdot_fuel, Ptotal, Pfuel, T2, p_stack);
+[etaI_stack ,etaII_stack, Idot_stack,lambda_stack,dGstack] = findEtas(mdot_total, mdot_fuel, Ptotal, Pfuel, T2, p_stack);
 
 % Entire System (Load)
-[etaI_load ,etaII_load, Idot_load,lambda_load] =    findEtas(mdot_total, mdot_fuel, Ptotal, Pfuel, T2, p_load);
+[etaI_load ,etaII_load, Idot_load,lambda_load,dGload] =    findEtas(mdot_total, mdot_fuel, Ptotal, Pfuel, T2, p_load);
 if(~supressplots(2))
     f6 = figure(6);
     plot(p_load,lambda_load);
@@ -119,7 +121,7 @@ if(~supressplots(2))
         '\eta_{II,stack}','\eta_{II,system}', 'Location','Best'); plotfixer(); grid on;
     
     f7 = figure(7);
-    plot(p_load,p_stack,'c',p_load,p_load,'bp--');
+    plot(p_load,-dGstack-p_stack,'c',p_load,-dGload-p_load,'bp--');
     title('Power Loss/Inefficiences as a Function of Load');
     xlabel('Load [Watts]'); ylabel('Power Loss/Inefficiencies, Idot [Watts]');
     legend('Idot_{stack}','Idot_{system}','Location','best'); plotfixer(); grid on;
@@ -152,8 +154,8 @@ Qdot_fuelCell_max = max(Qdot_fuelCell);
 % Finding total power of cell out = load power plus Qdot
 powerOut = p_load + Qdot_fuelCell_max;
 
-num_fuelCells_diesel = Wdot_diesel ./ powerOut
-num_fuelCells_hybrid = Wdot_hybrid ./ powerOut
+num_fuelCells_diesel = Wdot_diesel ./ powerOut;
+num_fuelCells_hybrid = Wdot_hybrid ./ powerOut;
 
 if(~supressplots(3))
     % Overall First Law Efficiency of the PEM Fuel Cell = Stack Efficiency
@@ -192,7 +194,7 @@ v_CO_WGS = 1;
 
 T_B1 = linspace(25, 1200, 100); %Temperature for part B1 = T_B1
 T_B1 = T_B1 + C_TO_K;
-%NOTE: Stanford pressure, is usually defined as 100,000, however in energyF
+%NOTE: Standard pressure, is usually defined as 100,000, however in energyF
 %we have standard presssure as 101300. Because the pressure needs to
 %cancel out, I have changed this pressure to 101300, however, we should
 %perhaps consider changing the reference pressure in energyF to 100,000Pa.
@@ -254,10 +256,10 @@ if(~supressplots(3))
     legend('SMR', 'WGS')
     title('Part B.1: Equilibrium Constant vs. Temperature')
     ylim([0.001,1000]);
+    text(50,5,{'H-Power','Operating Temp','25-100K'})
     plotfixer();grid on
     patch([25,100,100,25],[10^-3,10^-3,10^3,10^3],'g','FaceAlpha',.5,'EdgeAlpha',0);
-    set(gca,'children',flipud(get(gca,'children')))
-
+    set(gca,'children',flipud(get(gca,'children'))) %puts shading beneath lines
 end
 %% Part B No. 2
 % Find the Equilibrium Composition (Mol Fractions) of the Steam Methane 
@@ -265,6 +267,7 @@ end
 % SOURCE Nernst Atom Balance: LECTURE 14, SLIDE 4 (equation in lower right corner)
 npts = 20;
 syms nco nch4 nh2 nh2o;
+warning('off','symbolic:numeric:NumericalInstability');
 
 temps = linspace(25,1200,npts);
 temps = temps + C_TO_K;
@@ -273,6 +276,7 @@ soln = zeros(length(temps),4,length(pres));
 tic
 for i = 1:length(temps)
     parfor j = 1:length(pres)
+        warning('off','symbolic:numeric:NumericalInstability');
         p = pres(j);
         t = temps(i);
         
@@ -336,7 +340,7 @@ if(~supressplots(4))
     xlabel('Temperature [K]');
     ylabel('Mole Fraction');
     title('Steam Methane Reforming Composition');
-    legend('1atm','10atm','100atm','CO','CH4','H2','H2O','location','NorthWest');
+    legend('1atm','10atm','100atm','CO','CH4','H2','H2O','location','West');
     %ylim([0.001,1]);
     plotfixer(); grid on;
 end
@@ -354,6 +358,7 @@ syms nco nco2 nh2 nh2o;
 soln_wgs = zeros(length(temps),4,length(pres));
 tic
 parfor i = 1:length(temps)
+    warning('off','symbolic:numeric:NumericalInstability');
     t = temps(i);
     
     eqs = [       1  == nco2   + nco;...carbon atom balance  %POTENTIAL ERROR: shouldn't this be 2, not 1?
@@ -427,6 +432,7 @@ if(savePlots ==1)
         saveas(f12,'../plots5/12-WGScomp','png');
     end
 end
+toc(entireTime);
 
 %% Part B No. 4
 % Plot exit composition (mol fractions) vs. 3 system stations (Reformer,
@@ -471,14 +477,35 @@ pct_CH4 = [NaN]; % Note: only applies to Reformer! Not Shift Reactors!
 compositions = zeros(4,3); %co;h2o;c02;h2
 %Isothermal
 
+
 for i = 1:3
-    eqs = [  1  == nco2   + nco;...          carbon atom balance  %POTENTIAL ERROR: shouldn't this be 2, not 1?
-         3  == nco2*2 + nco + nh2o; ...  oxygen atom balance
-         10  == nh2*2   + nh2o*2;...      hydrogen atom balance
-         (nco2.*nh2)./(nco.*nh2o) == f_kp_WGS(Tin(i))];  %Nernst atom balance % Tin(1) is the first temp in Tin vector, which is Tin(reformer)  
-     syms nco nch4 nh2 nh2o;
-     assume([nco,nh2o,nco2,nh2],'real'); assumeAlso([nco,nh2o,nco2,nh2] > 0); assumeAlso([nco,nh2o,nco2,nh2] < 20)
-     sol = vpasolve(eqs,[nco,nh2o,nco2,nh2],[1,1,1,1]);
-     compositions(:,i) = double(struct2array(sol))';
+    compositions(:,i) = compositionsFun(f_kp_WGS(Tin(i)));
+end
+
+
+%Adiabatic
+
+error = 0.001;
+speedFactor = 1000;
+T_guess = zeros(1,3);
+comps_out = zeros(4,3);
+v_CH4_SMR = 1;
+v_H2O_SMR = 3;
+%h_in = [hEng(Tin(1), 'h2ovap',v_H2O_SMR) + hEng(Tin(1), 'ch4',v_CH4_SMR),0,0]; %define first stage, and allocate 2nd and 3rd stage
+h_in = [hEng(Tin(1), 'co',1) + hEng(Tin(1), 'h2ovap',2)+ hEng(Tin(1), 'h2',3),0,0]; %define first stage, and allocate 2nd and 3rd stage
+
+for s = 1:3 %three stages: reformer, hot shift reactor, cold shift reactor
+    T_guess(s) = Tin(s);
+    comps_out(:,s) = compositionsFun(f_kp_WGS(T_guess(s)));
+    h_out = hEng(T_guess(s), 'co',comps_out(1,s)) + hEng(T_guess(s), 'h2ovap',comps_out(2,s)) + hEng(T_guess(s), 'co2',comps_out(3,s)) + hEng(T_guess(s), 'h2',comps_out(4,s));
+    dh = h_out-h_in(s);    
+    while abs(dh) > error
+        comps_out(:,s) = compositionsFun(f_kp_WGS(T_guess(s)));
+        h_out = hEng(T_guess(s), 'co',comps_out(1,s)) + hEng(T_guess(s), 'h2ovap',comps_out(2,s)) + hEng(T_guess(s), 'co2',comps_out(3,s)) + hEng(T_guess(s), 'h2',comps_out(4,s));
+        dh = h_out-h_in(s)
+        T_guess(s) = T_guess(s) - dh/speedFactor;  %increased temp shifts towards reactants. We inteligently guessed this direction.
+        
+    end
+    h_in(s+1) = hEng(T_guess(s), 'co',comps_out(1,s)) + hEng(T_guess(s), 'h2ovap',comps_out(2,s)) + hEng(T_guess(s), 'co2',comps_out(3,s)) + hEng(T_guess(s), 'h2',comps_out(4,s));
 end
 
