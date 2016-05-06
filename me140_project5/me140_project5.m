@@ -571,15 +571,17 @@ LHV_meth = 50050e3; % [J/kg]
 LHV_h2 = 120000e3*molar_mass_h2; %[J/mol]
 Qinkg = G_PER_KG * Qin / (MM_ch4 * 1 + MM_h2o * 3);
 N_meth_burned = Qinkg/LHV_meth; %mass of methane burned
-total_methane = 1 * MM_ch4 / G_PER_KG;
+%total_methane = 1 * MM_ch4 / G_PER_KG;
 perc_meth_burned = N_meth_burned/total_methane*100;
 
 % find LHV ratio - CHECK!
 N_meth_rxn = 1;
 LHV_ratio_isoth = LHV_h2*compositions(4,3)/(LHV_meth*(N_meth_burned + N_meth_rxn)) * 100;
 LHV_ratio_adia = LHV_h2*comps_out_adi(4,3)/(LHV_meth*(N_meth_burned + N_meth_rxn)) * 100; 
- 
-
+% 
+% LHV_CH4 = 50050; %kJ/kg
+% LHV_CH4 = LHV_CH4/1000 ; %MJ/kg
+% LHV_CH4mol = LHV_CH4 * 1000 * MM_ch4; %J/mol
 
 % NEED FOR TABLE:
 % isothermal:
