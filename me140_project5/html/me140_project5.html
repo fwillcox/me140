@@ -1,0 +1,1282 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>me140_project5</title><meta name="generator" content="MATLAB 9.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-05-05"><meta name="DC.source" content="me140_project5.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Part A, Section 1</a></li><li><a href="#3">Part A, Section 2</a></li><li><a href="#4">Part A, Section 3</a></li><li><a href="#5">Part B, Section 1</a></li><li><a href="#6">Part B No. 2</a></li><li><a href="#7">Part B No. 3</a></li><li><a href="#8">Part B No. 4</a></li></ul></div><pre class="codeinput"><span class="comment">% ME 140 Project #5</span>
+<span class="comment">% FUEL CELL EVALUATION &amp; HYRDOGEN PRODUCTION ANALYSIS</span>
+<span class="comment">% Frankie Willcox, Jon Renslo, Kendall Fagan, Emily Bohl, Natasha Berk</span>
+
+<span class="comment">%Jon's todo list</span>
+<span class="comment">% double check power loss (inefficiencies)</span>
+<span class="comment">% ask about starting from STP (extra methane used?)</span>
+
+<span class="comment">% ASSUME:</span>
+<span class="comment">% (i)  mol_H2 = 1</span>
+clear; close <span class="string">all</span>; clc;
+format <span class="string">compact</span>;
+entireTime = tic;
+
+<span class="keyword">global</span> PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS <span class="keyword">...</span>
+    C_TO_K PSI_TO_PA MM_h MM_h2 MM_o MM_n MM_ch4 MM_h2o MM_air PATM HORSEPOWER_TO_W
+defineGlobals();
+mol_H2 = 1;
+savePlots = 0;
+                <span class="comment">% 1,2,3,4,5,6,7,8,9,10,11</span>
+
+supressplots =   [1,      1,    1,  1];         <span class="comment">% supresses plots by section</span>
+</pre><h2>Part A, Section 1<a name="2"></a></h2><p>Currents (load &amp; stack)</p><pre class="codeinput">i_load =  [0.00 15.06 27.25 36.48 45.1 52.1 56.3 57.6 56.4];       <span class="comment">% [Amps]</span>
+i_stack = [4.82 21.40 35.65 47.20 59.8 69.7 77.0 79.0 80.0];
+
+
+<span class="comment">% Potentials (load &amp; stack)</span>
+v_load =  [17.07 15.05 14.08 13.10 12.07 11.27 10.31 9.87  9.05 ]; <span class="comment">% [Volts]</span>
+v_stack = [17.09 15.22 14.26 12.98 12.42 11.60 10.73 10.21 9.48];
+
+
+<span class="comment">% Temperatures from Thermocouple Readings [C]</span>
+<span class="comment">% KEY: (Kendall please fill in with photo you took)</span>
+T1_C = [42.8 42.9 46.1 48.5 50.5 52.8 54.8 55.8 56.5];
+T2_C =     [42.5 45.8 45.8 48.4 50.3 51.9 53.3 53.9 54.3];
+Tstack_C = [40.7 41.3 42.5 42.9 44.6 45.6 46.9 46.9 47.6];
+
+T1 = T1_C + C_TO_K;                                                <span class="comment">% [K],  T1, air into stack</span>
+T2 = T2_C + C_TO_K;                                                <span class="comment">% [K],  T2, air out of stack</span>
+Tstack = Tstack_C + C_TO_K;                                        <span class="comment">% [K],  metal plates on the stack</span>
+
+<span class="comment">% NOTE: T3-T5 are not needed for now</span>
+<span class="comment">% T3_C =     [48.0 47.1 48.6 48.9 50.4 51.1 51.2 51.1 51.1];       % T3, water reservoir DON'T USE!</span>
+<span class="comment">% T3 = T3_C + C_TO_K;</span>
+T4_C =     [48.0 47.2 48.2 48.9 50.4 51.1 51.2 51.1 51.1];
+T5_C =     [40.7 41.3 42.5 42.9 44.6 45.6 46.9 46.9 47.6];
+T4 = T4_C + C_TO_K;                                                <span class="comment">% T4, water into stack</span>
+T5 = T5_C + C_TO_K;                                                <span class="comment">% T5, water into heat exchanger</span>
+
+
+<span class="comment">% Mass Flow Rates (TODO: check what units the mdots should be in)</span>
+mdot_total_scf = [0.75 1.10 1.45 1.81 2.55 3.10 3.30 3.25 3.40];   <span class="comment">% [scf/min]</span>
+mdot_fuel_scf =  [2.50 6.20 10.5 14.3 18.2 22.0 24.6 25.0 26.1];   <span class="comment">% [scf/hr] (standard cubic feet/hour)</span>
+
+mdot_total = mdot_total_scf * SCF_TO_MOLS * PERMIN_TO_PERSEC * ( MM_air / G_PER_KG);  <span class="comment">% [kg/s]</span>
+mdot_fuel = mdot_fuel_scf * SCF_TO_MOLS * PERHR_TO_PERSEC * (MM_h2  / G_PER_KG);      <span class="comment">% [kg/s]</span>
+mdot_h2o = 40 /G_PER_KG;                                                              <span class="comment">% [kg/s]</span>
+
+<span class="comment">% Pressures</span>
+Pfuel_psi =  [2.9 2.9 3.1 3.3 3.30 3.20 3.00 3.0 3.1];              <span class="comment">% [psi] (gauge)</span>
+Ptotal_psi = [0.2 0.3 0.6 0.7 1.15 1.25 1.35 1.3 1.5];              <span class="comment">% [psi] (gauge), pressure of combined air and H2O after humidifier</span>
+Pfuel =  Pfuel_psi  .* PSI_TO_PA + PATM;                            <span class="comment">% [Pa]</span>
+Ptotal = Ptotal_psi .* PSI_TO_PA + PATM;                            <span class="comment">% [Pa]</span>
+
+<span class="comment">% CALCULATIONS</span>
+<span class="comment">% ------------</span>
+<span class="comment">% Power (USE: p = i*v)</span>
+<span class="comment">% NOTE: "Accessories" include H2O pump, air pump, H2 vent, &amp; controller</span>
+p_load =  i_load  .* v_load;                                        <span class="comment">% [W] = [kg*m^2*s^-3], a.k.a. "load" (power delivered to resistor bank)</span>
+p_stack = i_stack .* v_stack;
+p_access = p_stack - p_load;                                        <span class="comment">% [W], Acessory Power, i.e. power used to run controls. Pstack-Pload</span>
+<span class="keyword">if</span>(~supressplots(1))
+    hold <span class="string">off</span>;
+    f1 = figure(1);
+    plot(p_load,i_load,p_load,i_stack);
+    title(<span class="string">'Current as a Function of Load'</span>);
+    xlabel(<span class="string">'Load [Watts]'</span>); ylabel(<span class="string">'Current [Amps]'</span>);
+    legend(<span class="string">'I_{load}'</span>,<span class="string">'I_{stack}'</span>,<span class="string">'Location'</span>,<span class="string">'best'</span>); grid <span class="string">on</span>;
+
+    f2 = figure(2);
+    plot(p_load,v_load,p_load,v_stack);
+    title(<span class="string">'Potential as a Function of Load'</span>);
+    xlabel(<span class="string">'Load [Watts]'</span>); ylabel(<span class="string">'Potential [Volts]'</span>);
+    legend(<span class="string">'V_{load}'</span>,<span class="string">'V_{stack}'</span>,<span class="string">'Location'</span>,<span class="string">'best'</span>); grid <span class="string">on</span>;
+
+    f3 = figure(3);
+    plot(p_load,p_stack,p_load,p_access);
+    title(<span class="string">'Stack and Accessory Power as a Function of Load'</span>);
+    xlabel(<span class="string">'Load [Watts]'</span>); ylabel(<span class="string">'Power [Watts]'</span>);
+    text(5,50,<span class="string">'Net Power = 0 @ 0 Load'</span>);
+    legend(<span class="string">'P_{stack}'</span>,<span class="string">'P_{accessory}'</span>,<span class="string">'Location'</span>,<span class="string">'best'</span>); grid <span class="string">on</span>;
+
+    f4 = figure(4);
+    plot(p_load, mdot_fuel*100, p_load, mdot_total);
+    title(<span class="string">'Mass Flow Rate as a Function of Load'</span>);
+    xlabel(<span class="string">'Load [Watts]'</span>); ylabel(<span class="string">'Mass Flow Rate [kg/s]'</span>);
+    legend(<span class="string">'mdot_{H}*100'</span>,<span class="string">'mdot_{air}'</span>,<span class="string">'Location'</span>,<span class="string">'best'</span>); grid <span class="string">on</span>;
+
+<span class="keyword">end</span>
+</pre><h2>Part A, Section 2<a name="3"></a></h2><pre class="codeinput"><span class="comment">% SOURCE: LEC 8, SLIDES 21 &amp; 22</span>
+
+<span class="comment">% 1st &amp; 2nd Law Efficiencies (eta_I &amp; eta_II) &amp; Inefficiencies (Idot)</span>
+<span class="comment">% Stack</span>
+[etaI_stack ,etaII_stack, Idot_stack,lambda_stack,dGstack] = findEtas(mdot_total, mdot_fuel, Ptotal, Pfuel, T2, p_stack);
+
+<span class="comment">% Entire System (Load)</span>
+[etaI_load ,etaII_load, Idot_load,lambda_load,dGload] =    findEtas(mdot_total, mdot_fuel, Ptotal, Pfuel, T2, p_load);
+<span class="keyword">if</span>(~supressplots(2))
+    f6 = figure(6);
+    plot(p_load,lambda_load);
+    title(<span class="string">'Air Equivalent as a Function of Load'</span>);
+    xlabel(<span class="string">'Load [Watts]'</span>); ylabel(<span class="string">'Lambda'</span>);
+    legend(<span class="string">'\lambda'</span>,<span class="string">'Location'</span>,<span class="string">'best'</span>);  grid <span class="string">on</span>;
+
+    f5 = figure(5);
+    plot(p_load,etaI_stack,<span class="string">'c'</span>,p_load,etaI_load,<span class="string">'bp--'</span>,<span class="keyword">...</span>
+        p_load,etaII_stack,<span class="string">'r'</span>,p_load,etaII_load,<span class="string">'gp--'</span>);
+    title(<span class="string">'Efficiency as a Function of Load'</span>);
+    xlabel(<span class="string">'Load [Watts]'</span>); ylabel(<span class="string">'Efficiency'</span>);
+    legend(<span class="string">'\eta_{I,stack}'</span>,<span class="string">'\eta_{I,system}'</span>,<span class="keyword">...</span>
+        <span class="string">'\eta_{II,stack}'</span>,<span class="string">'\eta_{II,system}'</span>, <span class="string">'Location'</span>,<span class="string">'Best'</span>);grid <span class="string">on</span>;
+
+    f7 = figure(7);
+    plot(p_load,-dGstack-p_stack,<span class="string">'c'</span>,p_load,-dGload-p_load,<span class="string">'bp--'</span>);
+    title(<span class="string">'Power Loss/Inefficiences as a Function of Load'</span>);
+    xlabel(<span class="string">'Load [Watts]'</span>); ylabel(<span class="string">'Power Loss/Inefficiencies, Idot [Watts]'</span>);
+    legend(<span class="string">'Idot_{stack}'</span>,<span class="string">'Idot_{system}'</span>,<span class="string">'Location'</span>,<span class="string">'best'</span>); grid <span class="string">on</span>;
+<span class="keyword">end</span>
+</pre><h2>Part A, Section 3<a name="4"></a></h2><p>Comparing First Law Efficiencies of PEM Fuel Cell with Diesel &amp; Hybrid Engines</p><pre class="codeinput"><span class="comment">% Typical modern Diesel engine (eta_disel = 42%) (chose diesel truck because it's better than a car and worse than a freight ship)</span>
+<span class="comment">% Source Efficiency: Slide 3, http://www.sae.org/events/gim/presentations/2011/RolandGravel.pdf</span>
+<span class="comment">% Source Horsepower: https://cumminsengines.com/isx15-heavy-duty-truck-2013#overview</span>
+eta_diesel = 0.42;
+eta_diesel = linspace(eta_diesel, eta_diesel, length(p_load)); <span class="comment">%Make it a line instead of points</span>
+Wdot_diesel = 400 * HORSEPOWER_TO_W;  <span class="comment">% [W]</span>
+
+<span class="comment">% Typical gasoline hybrid engine (eta_hybrid = max of 40%)</span>
+<span class="comment">% Source Efficiency &amp; Horsepower: Toyota Hybrid Vehicles, http://www.toyota-global.com/innovation/environmental_technology/hybrid/</span>
+eta_hybrid = 0.40;
+eta_hybrid = linspace(eta_hybrid, eta_hybrid, length(p_load)); <span class="comment">% Make it a line</span>
+Wdot_hybrid = 121 * HORSEPOWER_TO_W;  <span class="comment">% [W]</span>
+
+<span class="comment">% Calcuate Heat Removal (Qdot) --&gt; 40 g/s necessary only for</span>
+<span class="comment">% intensive/extensive conversion</span>
+Qdot_fuelCell = zeros(length(T4));
+<span class="keyword">for</span> i = 1:length(T4)
+    Qdot_fuelCell(i) = hEng(T4(i),<span class="string">'h2o'</span>) - hEng(T5(i),<span class="string">'h2o'</span>);
+<span class="keyword">end</span>
+Qdot_fuelCell_max = max(Qdot_fuelCell);
+
+<span class="comment">% Theoretical Number of Fuel Cells Needed</span>
+<span class="comment">% Finding total power of cell out = load power plus Qdot</span>
+powerOut = p_load + Qdot_fuelCell_max;
+
+num_fuelCells_diesel = Wdot_diesel ./ powerOut;
+num_fuelCells_hybrid = Wdot_hybrid ./ powerOut;
+
+<span class="keyword">if</span>(~supressplots(3))
+    <span class="comment">% Overall First Law Efficiency of the PEM Fuel Cell = Stack Efficiency</span>
+    f8 = figure(8);
+    plot(p_load, etaI_stack, <span class="string">'c'</span>, p_load, eta_diesel, <span class="string">'b:'</span>, p_load, eta_hybrid, <span class="string">'g'</span>);
+    title(<span class="string">'Comparing 1st Law Efficiency: PEM Fuel Cell, Diesel, and Gasoline Hybrid'</span>);
+    xlabel(<span class="string">'Load [Watts]'</span>); ylabel(<span class="string">'Efficiency, eta_{I}'</span>);
+    legend(<span class="string">'eta_{I,stack}'</span>,<span class="string">'eta_{I,Diesel}'</span>, <span class="string">'eta_{I,Hybrid}'</span>,<span class="string">'Location'</span>,<span class="string">'northwest'</span>);  grid <span class="string">on</span>;
+<span class="keyword">end</span>
+
+<span class="comment">% Comments: To scale this up, we would need somewhere between 280-540 fuel</span>
+<span class="comment">% cells to equal the diesel output, and 85-165 fuel cells to equal the</span>
+<span class="comment">% hybrid output.</span>
+</pre><h2>Part B, Section 1<a name="5"></a></h2><p>Part B, Section 1 - Emily &amp; Kendall Calculating Kp Values SOURCE Kp Formula: LECTURE 14, SLIDE 4</p><pre class="codeinput"><span class="comment">% SMR: CH4 + H2O --&gt; CO + 3H2</span>
+<span class="comment">% v values are stoichiometric coefficients</span>
+v_CO_SMR = 1;
+v_H2_SMR = 3;
+v_H2O_SMR = 1;
+v_CH4_SMR = 1;
+
+<span class="comment">% Calculating Kp for SMR</span>
+<span class="comment">% Nv_CO = mm</span>
+<span class="comment">% SMRnumKp =</span>
+
+<span class="comment">% WGS: H2O + CO --&gt; H2 + CO2</span>
+v_H2_WGS = 1;
+v_CO2_WGS = 1;
+v_H2O_WGS = 1;
+v_CO_WGS = 1;
+
+T_B1 = linspace(25, 1200, 100); <span class="comment">%Temperature for part B1 = T_B1</span>
+T_B1 = T_B1 + C_TO_K;
+<span class="comment">%NOTE: Standard pressure, is usually defined as 100,000, however in energyF</span>
+<span class="comment">%we have standard presssure as 101300. Because the pressure needs to</span>
+<span class="comment">%cancel out, I have changed this pressure to 101300, however, we should</span>
+<span class="comment">%perhaps consider changing the reference pressure in energyF to 100,000Pa.</span>
+P_ref = 101300; <span class="comment">%This is the pressure defined for standard conditions.</span>
+<span class="comment">% Standard conditions are what we need because that is what</span>
+<span class="comment">% the little zero indicates in the equation for g.</span>
+R_u = 8.314; <span class="comment">%Universal gas constant</span>
+
+<span class="comment">%G_reaction = G_products - G_reactants</span>
+g_SMR = (gEng(T_B1, P_ref, <span class="string">'co'</span>,v_CO_SMR) + gEng(T_B1, P_ref, <span class="string">'h2'</span>,v_H2_SMR)) - <span class="keyword">...</span>
+    (gEng(T_B1, P_ref, <span class="string">'h2ovap'</span>,v_H2O_SMR) + gEng(T_B1, P_ref, <span class="string">'ch4'</span>,v_CH4_SMR));
+
+g_WGS = (gEng(T_B1, P_ref, <span class="string">'h2'</span>,v_H2_WGS) + gEng(T_B1, P_ref, <span class="string">'co2'</span>,v_CO2_WGS)) - <span class="keyword">...</span>
+    (gEng(T_B1, P_ref, <span class="string">'h2ovap'</span>,v_H2O_WGS) + gEng(T_B1, P_ref, <span class="string">'co'</span>,v_CO_WGS));
+
+<span class="comment">%Lecture 13 - Slide 15</span>
+kp_SMR = exp(-g_SMR ./ (R_u .* T_B1)); <span class="comment">%increases with temp</span>
+kp_WGS = exp(-g_WGS ./ (R_u .* T_B1)); <span class="comment">%decrease with temp</span>
+
+
+<span class="comment">%functions for convenience</span>
+f_kp_SMR = @(T_B1) exp(-((gEng(T_B1, P_ref, <span class="string">'co'</span>,v_CO_SMR) <span class="keyword">...</span>
+    + gEng(T_B1, P_ref, <span class="string">'h2'</span>,v_H2_SMR))  <span class="keyword">...</span>
+    - (gEng(T_B1, P_ref, <span class="string">'h2ovap'</span>,v_H2O_SMR) <span class="keyword">...</span>
+    + gEng(T_B1, P_ref, <span class="string">'ch4'</span>,v_CH4_SMR)))<span class="keyword">...</span>
+    ./ (R_u.*T_B1));
+
+f_kp_WGS = @(T_B1) exp(-((gEng(T_B1, P_ref, <span class="string">'h2'</span>,v_H2_WGS) <span class="keyword">...</span>
+    + gEng(T_B1, P_ref, <span class="string">'co2'</span>,v_CO2_WGS)) <span class="keyword">...</span>
+    -(gEng(T_B1, P_ref, <span class="string">'h2ovap'</span>,v_H2O_WGS) <span class="keyword">...</span>
+    + gEng(T_B1, P_ref, <span class="string">'co'</span>,v_CO_WGS))) <span class="keyword">...</span>
+    ./ (R_u.*T_B1));
+
+<span class="comment">%Prep for plot</span>
+<span class="comment">%convert back to celcius</span>
+T_B1 = T_B1 - C_TO_K;
+<span class="comment">%find index of where kp=10^-3 and kp = 10^3, as the problem asks that we</span>
+<span class="comment">%limit the graph to this range</span>
+[~,i_min_SMR] = min(abs(kp_SMR - 10^-3));
+[~,i_max_SMR] = min(abs(kp_SMR - 10^3)); <span class="comment">%yes, this is supposed to use min() to find the max ;P</span>
+[~,i_min_WGS] = min(abs(kp_WGS - 10^3));
+[~,i_max_WGS] = min(abs(kp_WGS - 10^-3));
+
+[zero_smr,izero_smr] = min(abs(log(kp_SMR)));
+[zero_wgs,izero_wgs] = min(abs(log(kp_WGS)));
+
+<span class="comment">%Plot</span>
+<span class="keyword">if</span>(~supressplots(3))
+    f9 = figure(9);
+    kpIsOne = ones(size(T_B1));
+    semilogy(T_B1(i_min_SMR:i_max_SMR), kp_SMR(i_min_SMR:i_max_SMR), <span class="keyword">...</span>
+        T_B1(i_min_WGS:i_max_WGS), kp_WGS(i_min_WGS:i_max_WGS),T_B1,kpIsOne,<span class="string">'k'</span>);
+    xlabel(<span class="string">'Temperature [C]'</span>)
+    ylabel(<span class="string">'Equilibrium Constant'</span>)
+    text(T_B1(izero_smr) -300 , 1.5,<span class="keyword">...</span>
+        strcat(<span class="string">'SMR equil @ '</span>,num2str(round(T_B1(izero_smr))),<span class="string">'K'</span>));
+    text(T_B1(izero_wgs), 1.5,<span class="keyword">...</span>
+        strcat(<span class="string">'WGS equil @ '</span>,num2str(round(T_B1(izero_wgs))),<span class="string">'K'</span>));
+    legend(<span class="string">'SMR'</span>, <span class="string">'WGS'</span>)
+    title(<span class="string">'Part B.1: Equilibrium Constant vs. Temperature'</span>)
+    ylim([0.001,1000]);
+    text(50,5,{<span class="string">'H-Power'</span>,<span class="string">'Operating Temp'</span>,<span class="string">'25-100K'</span>})
+    grid <span class="string">on</span>
+    patch([25,100,100,25],[10^-3,10^-3,10^3,10^3],<span class="string">'g'</span>,<span class="string">'FaceAlpha'</span>,.5,<span class="string">'EdgeAlpha'</span>,0);
+    set(gca,<span class="string">'children'</span>,flipud(get(gca,<span class="string">'children'</span>))) <span class="comment">%puts shading beneath lines</span>
+<span class="keyword">end</span>
+</pre><h2>Part B No. 2<a name="6"></a></h2><p>Find the Equilibrium Composition (Mol Fractions) of the Steam Methane Reformation(SMR) Reaction SOURCE Nernst Atom Balance: LECTURE 14, SLIDE 4 (equation in lower right corner)</p><pre class="codeinput">npts = 20;
+syms <span class="string">nco</span> <span class="string">nch4</span> <span class="string">nh2</span> <span class="string">nh2o</span>;
+warning(<span class="string">'off'</span>,<span class="string">'symbolic:numeric:NumericalInstability'</span>);
+
+temps = linspace(25,1200,npts);
+temps = temps + C_TO_K;
+pres = [1,10,100];
+soln = zeros(length(temps),4,length(pres));
+tic
+<span class="keyword">for</span> i =  1:length(temps)
+    t = temps(i);
+    <span class="keyword">parfor</span> j = 1:length(pres)
+        p = pres(j);
+
+        warning(<span class="string">'off'</span>,<span class="string">'symbolic:numeric:NumericalInstability'</span>);
+        eqs = [1  == nco   + nch4;<span class="keyword">...</span><span class="comment">             carbon atom balance</span>
+            10 == nh2*2 + nch4*4 + nh2o*2; <span class="keyword">...</span><span class="comment"> hydrogen atom balance</span>
+            3  == nco   + nh2o;<span class="keyword">...</span><span class="comment">             oxygen atom balance</span>
+            nco.*nh2.^3./(nch4.*nh2o).* <span class="keyword">...</span><span class="comment">    Nernst atom balance</span>
+            (p ./ (nco + nch4 + nh2 + nh2o).^2) <span class="keyword">...</span>
+            == f_kp_SMR(t)];
+        <span class="comment">% 4 eq, 4 unknown</span>
+        assume([nco,nch4,nh2,nh2o],<span class="string">'real'</span>);
+        assumeAlso([nco,nch4,nh2,nh2o] &gt; 0);
+        assumeAlso([nco,nch4,nh2,nh2o] &lt; 20);
+        [a,b,c,d] = vpasolve(eqs,[nco,nch4,nh2,nh2o],[1,1,1,1]);
+
+        nco_sol(i,j) = double(a);
+        nch4_sol(i,j) = double(b);
+        nh2_sol(i,j) = double(c);
+        nh2o_sol(i,j) = double(d);
+        <span class="comment">%          soln(i,:,j) = max(double(real([a,b,c,d]));</span>
+
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">% toc;</span>
+<span class="comment">%calculate mole fractions from nmols in composition</span>
+ntot = nch4_sol + nh2_sol + nh2o_sol + nco_sol;
+ych4 = nch4_sol./ntot;
+yh2 = nh2_sol./ntot;
+yh2o = nh2o_sol./ntot;
+yco = nco_sol./ntot;
+
+<span class="keyword">if</span>(~supressplots(4))
+    <span class="comment">%unneeded but cool looking plot</span>
+    f10 = figure(10);
+    plot(temps,nco_sol,<span class="string">'b'</span>,temps,nch4_sol,<span class="string">'m'</span>,temps,nh2_sol,<span class="string">'g'</span>,temps,nh2o_sol,<span class="string">'k'</span>);
+    legend(<span class="string">'CO'</span>,<span class="string">'CH4'</span>,<span class="string">'H2'</span>,<span class="string">'H2O'</span>);
+
+    <span class="comment">%plot mole fractions</span>
+    f11 = figure(11);
+    linestyle = {<span class="string">'-'</span>,<span class="string">'--'</span>,<span class="string">':'</span>};
+    hold <span class="string">on</span>
+    plot(1,0,<span class="string">'-k'</span>,1,0,<span class="string">'--k'</span>,1,0,<span class="string">':k'</span>);
+    hold <span class="string">on</span>
+    <span class="keyword">for</span> i = 1:length(pres)
+        plot(temps,yco(:,i),strcat(linestyle{i},<span class="string">'b'</span>),<span class="keyword">...</span>
+            temps,ych4(:,i),strcat(linestyle{i},<span class="string">'m'</span>),<span class="keyword">...</span>
+            temps,yh2(:,i),strcat(linestyle{i},<span class="string">'g'</span>),<span class="keyword">...</span>
+            temps,yh2o(:,i),strcat(linestyle{i},<span class="string">'r'</span>));
+        hold <span class="string">on</span>
+    <span class="keyword">end</span>
+    hold <span class="string">off</span>
+    xlabel(<span class="string">'Temperature [K]'</span>);
+    ylabel(<span class="string">'Mole Fraction'</span>);
+    title(<span class="string">'Steam Methane Reforming Composition'</span>);
+    legend(<span class="string">'1atm'</span>,<span class="string">'10atm'</span>,<span class="string">'100atm'</span>,<span class="string">'CO'</span>,<span class="string">'CH4'</span>,<span class="string">'H2'</span>,<span class="string">'H2O'</span>,<span class="string">'location'</span>,<span class="string">'West'</span>);
+    <span class="comment">%ylim([0.001,1]);</span>
+    grid <span class="string">on</span>;
+<span class="keyword">end</span>
+</pre><h2>Part B No. 3<a name="7"></a></h2><p>% Equations we'll need:  eqs = [       1  == nco2   + nco;...          carbon atom balance                4  == nco2*2 + nco + nh2o; ...  hydrogen atom balance                6  == nh2*2   + nh2o*2;...      oxygen atom balance                nco.*nh2o.^3./(nco2.*nh2).* ... Nernst atom balance                   == f_kp_SMR(t)];         % 4 eq, 4 unknown         [a,b,c,d] = vpasolve(eqs,[nco,nh2o,nco2,nh2],[1,1,1,1]);</p><pre class="codeinput">syms <span class="string">nco</span> <span class="string">nco2</span> <span class="string">nh2</span> <span class="string">nh2o</span>;
+<span class="comment">%soln_wgs = zeros(length(temps),4,length(pres));</span>
+tic
+<span class="comment">% ***BROKEN***</span>
+<span class="keyword">parfor</span> i = 1:length(temps)
+    warning(<span class="string">'off'</span>,<span class="string">'symbolic:numeric:NumericalInstability'</span>);
+    t = temps(i);
+
+    eqs = [       1  == nco2   + nco;<span class="keyword">...</span><span class="comment">carbon atom balance</span>
+        3  == nco2*2 + nco + nh2o; <span class="keyword">...</span><span class="comment">  oxygen atom balance</span>
+        10  == nh2*2   + nh2o*2;<span class="keyword">...</span><span class="comment">      hydrogen atom balance</span>
+        (nco2.*nh2)./(nco.*nh2o) <span class="keyword">...</span><span class="comment"> Nernst atom balance</span>
+        == f_kp_WGS(t)];        <span class="comment">%(note no pressure term, as nmols same on RHS and LHS)</span>
+    <span class="comment">% 4 eq, 4 unknown</span>
+    assume([nco,nh2o,nco2,nh2],<span class="string">'real'</span>);
+    assumeAlso([nco,nh2o,nco2,nh2] &gt; 0);
+    assumeAlso([nco,nh2o,nco2,nh2] &lt; 20);
+    [a,b,c,d] = vpasolve(eqs,[nco,nh2o,nco2,nh2],[1,1,1,1]);
+    nco_wgs(i) = double(a);
+    nh2o_wgs(i) = double(b);
+    nco2_wgs(i) = double(c);
+    nh2_wgs(i) = double(d);
+    <span class="comment">%          soln(i,:,j) = max(double(real([a,b,c,d]));</span>
+
+<span class="keyword">end</span>
+<span class="comment">% toc;</span>
+ntot_wgs = nco_wgs + nh2_wgs + nh2o_wgs + nco2_wgs;
+yco2_wgs = nco2_wgs./ntot_wgs;
+yh2_wgs = nh2_wgs./ntot_wgs;
+yh2o_wgs = nh2o_wgs./ntot_wgs;
+yco_wgs = nco_wgs./ntot_wgs;
+
+<span class="keyword">if</span>(~supressplots(4))
+
+    f12 = figure(12);
+    plot(temps,yco_wgs,<span class="string">'b'</span>,<span class="keyword">...</span>
+        temps,yco2_wgs,<span class="string">'m'</span>,<span class="keyword">...</span>
+        temps,yh2_wgs,<span class="string">'--g'</span>,<span class="keyword">...</span>
+        temps,yh2o_wgs,<span class="string">'r'</span>);
+    legend(<span class="string">'CO'</span>,<span class="string">'CO2'</span>,<span class="string">'H2'</span>,<span class="string">'H2O'</span>,<span class="string">'location'</span>,<span class="string">'southwest'</span>);
+    xlabel(<span class="string">'Temperature [K]'</span>);
+    ylabel(<span class="string">'Mole Fraction'</span>);
+    title(<span class="string">'Water Gas Shift Composition'</span>);
+    <span class="comment">%ylim([0.001,1]);</span>
+    grid <span class="string">on</span>;
+<span class="keyword">end</span>
+</pre><h2>Part B No. 4<a name="8"></a></h2><p>Plot exit composition (mol fractions) vs. 3 system stations (Reformer, Shift Reactor 1, Shift Reactor 2) Note: do this for 2 Different Assumptions: (1) isothermal, (2) adiabatic SMR: CH4 + 3*H2O --&gt; CO + 3*H2 + 2*H2O <a href="-known">because all assume all methane is used WGS: CO  + 2*H2O + 3*H2--</a> ?CO2 + (3+?)H2 + ?CO + ?H2O &lt;- unknown because WGS doens't go all the way to completition</p><pre class="codeinput"><span class="comment">% NAMING CONVENTIONS:</span>
+<span class="comment">% Station Location: 1=Reformer, 2 = 1st Shift Reactor, 3 = 2nd Shift</span>
+<span class="comment">% Assumption:       iso = isothermal, adi = adiabatic</span>
+<span class="comment">% Inlet/Exit:       in = inlet, ex = exit</span>
+
+<span class="comment">% PSEUDO CODE</span>
+<span class="comment">% Start with Nernst atom balance for WGS reaction to get composition</span>
+<span class="comment">% "Start with isothermal cases - adiabatic is a whole different beast"</span>
+<span class="comment">% Assume first WGS uses up all CH4 and goes fully to completion</span>
+<span class="comment">% Figure out the products from the WGS</span>
+<span class="comment">% Use isothermal temperature values given to figure out Qdot</span>
+<span class="comment">% Go step by step through and get products for each following reaction, ...</span>
+<span class="comment">% Take those products and do isothermal calcs on them</span>
+
+<span class="comment">% Inlet Temperatures</span>
+Tin_C = [800 400 250];    <span class="comment">% [C]</span>
+Tin = Tin_C + C_TO_K; <span class="comment">% [K]</span>
+
+<span class="comment">% Exit Temperatures</span>
+Tex_iso_C = [800 400 250];
+Tex_adi_C = [800 NaN NaN]; <span class="comment">%TODO: solve for Tin_adi_C(2) &amp; (3)</span>
+Tex_iso = Tex_iso_C + C_TO_K;
+Tex_adi = Tex_adi_C + C_TO_K;
+
+<span class="comment">% Heat Addition for Isothermal Reaction (Qin, ASSUME: isothermal)</span>
+Qin_iso = [NaN NaN NaN];             <span class="comment">% [MJ/(kg of reactants)]</span>
+
+<span class="comment">% Percent Methane Burned to Heat Reformer (pct_CH4, ASSUME: adiabatic)</span>
+pct_CH4 = [NaN]; <span class="comment">% Note: only applies to Reformer! Not Shift Reactors!</span>
+
+
+<span class="comment">% Part 1: Isothermal</span>
+<span class="comment">% find exit compositions</span>
+compositions = zeros(4,3); <span class="comment">%co;h2o;c02;h2</span>
+<span class="keyword">for</span> i = 1:3
+    compositions(:,i) = compositionsFun(f_kp_WGS(Tin(i)));
+<span class="keyword">end</span>
+
+<span class="comment">% find heat addition for each component</span>
+<span class="comment">% WGS: CO  + 2*H2O + 3*H2--&gt; ?CO2 + (3+?)H2 + ?CO + ?H2O</span>
+<span class="comment">% SMR: CH4 + 3*H2O --&gt; CO + 3*H2 + 2*H2O</span>
+<span class="comment">% comps[species, stage]. Species order: CO, H20, CO2, H2</span>
+Qin = zeros(1,3);
+N_H20_in = 3;
+N_CH4_in = 1;
+h_react =  hEng(Tin(1), <span class="string">'h2ovap'</span>, N_H20_in) + hEng(Tin(1), <span class="string">'ch4'</span>, N_CH4_in);
+<span class="keyword">for</span> s = 1:3 <span class="comment">% three stages: reformer and two reactors</span>
+    h_prod = hEng(Tin(s), <span class="string">'co'</span>, compositions(1,s)) + hEng(Tin(s), <span class="string">'h2ovap'</span>, compositions(2,s)) + hEng(Tin(s), <span class="string">'co2'</span>, compositions(3,s)) + hEng(Tin(s), <span class="string">'h2'</span>, compositions(4,s));
+    Qin(s) = h_prod - h_react;
+
+    <span class="keyword">if</span> (s == 3) <span class="keyword">break</span>; <span class="keyword">end</span>
+    h_react = hEng(Tin(s+1), <span class="string">'co'</span>, compositions(1,s)) + hEng(Tin(s+1), <span class="string">'h2ovap'</span>, compositions(2,s)) + hEng(Tin(s+1), <span class="string">'co2'</span>, compositions(3,s)) + hEng(Tin(s+1), <span class="string">'h2'</span>, compositions(4,s));
+<span class="keyword">end</span>
+<span class="comment">% Qin_MJkg = ?</span>
+<span class="comment">% TODO: GET Qin IN MJ/KG (CURRENTLY IN J. STORE IN NEW VARIABLE B/C Qin IS USED BELOW)</span>
+
+<span class="comment">% PSEUDOCODE APPROACH</span>
+<span class="comment">% Determine composition of each (CO H20vap CO2 H2) where we calculate Qin</span>
+<span class="comment">% Use molar mass to get kg of each</span>
+<span class="comment">% Divide Qin by kg total</span>
+<span class="comment">% Convert J to MJ by dividing by a constant (10^6)</span>
+
+<span class="comment">% currently in J/mol of methane reacted</span>
+<span class="comment">%should be 3Mj/kg</span>
+Qin_perkg = Qin / (MM_ch4 / G_PER_KG) /1e6; <span class="comment">% J/mol --&gt; MJ/kg</span>
+
+
+<span class="comment">% Part 2: Adiabatic (only shift reactors)</span>
+error = 0.0001;
+speedFactor = 1000;
+T_guess = zeros(1,3);
+comps_out_adi = zeros(4,3);
+tic
+<span class="comment">% PROBLEM IS THAT TEMPS ARE JUST CONVERGING TO TEMP AT H_IN - MISSING</span>
+<span class="comment">% SOMETHING CONCEPTUAL.</span>
+<span class="comment">% temps = linspace(273,800,40);</span>
+<span class="comment">% comps_out = zeros(length(temps),4);</span>
+<span class="comment">% for i = 1:length(temps)</span>
+<span class="comment">%    comps_out(i,:) = compositionsFun(f_kp_WGS(temps(i)))';</span>
+<span class="comment">%    h_out(i) = hEng(temps(i),   'co',    comps_out(i,1)) ...</span>
+<span class="comment">%             + hEng(temps(i), 'h2ovap',comps_out(i,2)) ...</span>
+<span class="comment">%             + hEng(temps(i), 'co2',   comps_out(i,3)) ...</span>
+<span class="comment">%             + hEng(temps(i), 'h2',    comps_out(i,4));</span>
+<span class="comment">% end</span>
+
+<span class="comment">% H_in occurs at stage 2</span>
+<span class="comment">% comps[species, stage]. Species order: CO, H20, CO2, H2</span>
+comps_in(:) = compositions(:,1);
+tol = 0.0001;
+step = 1;
+<span class="keyword">for</span> s = 2:3 <span class="comment">% two stages: hot shift reactor, cold shift reactor</span>
+    t = Tin(s);
+    h_in = hEng(t, <span class="string">'co'</span>, comps_in(1)) <span class="keyword">...</span>
+        + hEng(t, <span class="string">'h2ovap'</span>, comps_in(2)) <span class="keyword">...</span>
+        + hEng(t, <span class="string">'co2'</span>,comps_in(3)) <span class="keyword">...</span>
+        + hEng(t, <span class="string">'h2'</span>, comps_in(4));
+    T_guess(s) = Tin(s) + 20;
+    comps_out_adi(:,s) = compositionsFun(f_kp_WGS(T_guess(s)));
+    h_out = hEng(T_guess(s),   <span class="string">'co'</span>,    comps_out_adi(1,s)) <span class="keyword">...</span>
+            + hEng(T_guess(s), <span class="string">'h2ovap'</span>,comps_out_adi(2,s)) <span class="keyword">...</span>
+            + hEng(T_guess(s), <span class="string">'co2'</span>,   comps_out_adi(3,s)) <span class="keyword">...</span>
+            + hEng(T_guess(s), <span class="string">'h2'</span>,    comps_out_adi(4,s));
+    dh = h_out - h_in;
+    <span class="comment">% set up newton raphson variables</span>
+    <span class="comment">% need to remember previous state for newton raphson</span>
+    tlast = Tin(s);
+    dhlast = T_guess(s) - tlast;
+
+    <span class="keyword">while</span> abs(dh/h_in) &gt; tol <span class="comment">%use percentage error for robustness</span>
+        dhprime = (dh - dhlast) ./(T_guess(s) - tlast);
+        tlast = T_guess(s);
+        T_guess(s) = T_guess(s) - dh ./ dhprime;
+        comps_out_adi(:,s) = compositionsFun(f_kp_WGS(T_guess(s)));
+        dhlast = dh;
+        h_out = hEng(T_guess(s), <span class="string">'co'</span>,comps_out_adi(1,s)) <span class="keyword">...</span>
+            + hEng(T_guess(s), <span class="string">'h2ovap'</span>,comps_out_adi(2,s)) <span class="keyword">...</span>
+            + hEng(T_guess(s), <span class="string">'co2'</span>,comps_out_adi(3,s)) <span class="keyword">...</span>
+            + hEng(T_guess(s), <span class="string">'h2'</span>,comps_out_adi(4,s));
+        dh = h_out-h_in;
+    <span class="keyword">end</span>
+    comps_in = comps_out_adi(:,s);
+<span class="keyword">end</span>
+<span class="comment">% toc</span>
+pctCO = comps_out_adi(1,:)./sum(comps_out_adi);
+comps_out_adi(:,1) = compositions(:,1);
+y_out_adi = comps_out_adi./repmat(sum(comps_out_adi),4,1);
+y_iso = compositions./repmat(sum(compositions),4,1);
+<span class="comment">% ^SHOULD GET 740, 569 K FOR T_guess</span>
+
+<span class="comment">% plot of exit composition vs system station (2x, isothermal and adiabatic)</span>
+<span class="keyword">if</span>(~supressplots(4))
+f13 = figure(13);
+subplot(1,2,1);
+bar(y_iso');
+xlabel(<span class="string">'State, Isothermal'</span>);
+ylabel(<span class="string">'Mole Fraction'</span>);
+ylim([0,0.8]);
+legend(<span class="string">'CO'</span>, <span class="string">'H20'</span>, <span class="string">'CO2'</span>, <span class="string">'H2'</span>,<span class="string">'location'</span>,<span class="string">'northwest'</span>);
+
+subplot(1,2,2);
+bar(y_out_adi');
+xlabel(<span class="string">'State, Adiabatic'</span>);
+ylabel(<span class="string">'Mole Fraction'</span>);
+legend(<span class="string">'CO'</span>, <span class="string">'H20'</span>, <span class="string">'CO2'</span>, <span class="string">'H2'</span>,<span class="string">'location'</span>,<span class="string">'northwest'</span>);
+ylim([0,0.8]);
+set(f13, <span class="string">'Position'</span>, [0 0 400 200])
+
+annotation(<span class="string">'textbox'</span>, [0 0.8 1 0.2], <span class="keyword">...</span>
+    <span class="string">'String'</span>, <span class="string">'H2 Reformer Outlet Molecular Composition'</span>, <span class="keyword">...</span>
+    <span class="string">'EdgeColor'</span>, <span class="string">'none'</span>, <span class="keyword">...</span>
+    <span class="string">'HorizontalAlignment'</span>, <span class="string">'center'</span>,<span class="keyword">...</span>
+    <span class="string">'FontSize'</span>,18); <span class="comment">% add title to plot manually, subplots don't include an overall title</span>
+set(f13, <span class="string">'Position'</span>, [300 800 800 400]) <span class="comment">%resize plot</span>
+<span class="keyword">end</span>
+
+
+<span class="comment">% Part 3: Heating reformer w/ methane</span>
+<span class="comment">% find methane used by reformer - CHECK!</span>
+molar_mass_meth = 16.043/1000; <span class="comment">% [kg/mol]</span>
+molar_mass_h2 = 2.016/1000; <span class="comment">% [kg/mol]</span>
+LHV_meth = 50050e3*MM_ch4/G_PER_KG; <span class="comment">% [J/mol]</span>
+LHV_h2 = 120000e3*molar_mass_h2; <span class="comment">%[J/mol]</span>
+N_meth_burned = Qin(1)/LHV_meth; <span class="comment">%moles of methane burned</span>
+perc_meth_burned = N_meth_burned./(N_meth_burned+1) * 100; <span class="comment">%1 is the mole used for the actual reaction</span>
+
+<span class="comment">% find LHV ratio - CHECK!</span>
+N_meth_rxn = 1;
+LHV_ratio_isoth = LHV_h2*compositions(4,3)/(LHV_meth*(N_meth_burned + N_meth_rxn)) * 100;
+LHV_ratio_adia = LHV_h2*comps_out_adi(4,3)/(LHV_meth*(N_meth_burned + N_meth_rxn)) * 100;
+
+
+<span class="comment">% NEED FOR TABLE:</span>
+<span class="comment">% isothermal:</span>
+<span class="comment">% -composition of gases exiting reformer and reactors</span>
+<span class="comment">% -heat addition reqd for isothermal (do delta h energy balance on either</span>
+<span class="comment">% side of each component)</span>
+<span class="comment">% adiabatic:</span>
+<span class="comment">% -adiabatic outlet temperatures of last two reactors</span>
+<span class="comment">% -exit composition for shift reactors (and reformer, but same as above)</span>
+<span class="comment">% heat part:</span>
+<span class="comment">% -methane burned to heat reformer</span>
+<span class="comment">% -LHV ratio (efficiency)</span>
+<span class="comment">%</span>
+<span class="comment">% PLOT: exit composition for isothermal and adiabatic at each station</span>
+
+<span class="keyword">if</span>(sum(supressplots)~=4)
+    plotfixer();
+<span class="keyword">end</span>
+<span class="keyword">if</span>(savePlots ==1)
+     plotfixer();
+    <span class="keyword">if</span>(~supressplots(1))
+        saveas(f1,<span class="string">'../plots5/1-CurrentbyLoad'</span>,<span class="string">'png'</span>);
+        saveas(f2,<span class="string">'../plots5/2-VbyLoad'</span>,<span class="string">'png'</span>);
+        saveas(f3,<span class="string">'../plots5/3-PowerbyLoad'</span>,<span class="string">'png'</span>);
+        saveas(f4,<span class="string">'../plots5/4-massbyload'</span>,<span class="string">'png'</span>);
+    <span class="keyword">end</span>
+    <span class="keyword">if</span>(~supressplots(2))
+        saveas(f5,<span class="string">'../plots5/5-Eff'</span>,<span class="string">'png'</span>);
+        saveas(f6,<span class="string">'../plots5/6-lambda'</span>,<span class="string">'png'</span>);
+        saveas(f7,<span class="string">'../plots5/7-PowerLoss'</span>,<span class="string">'png'</span>);
+    <span class="keyword">end</span>
+    <span class="keyword">if</span>(~supressplots(3))
+        saveas(f8,<span class="string">'../plots5/8-CompareToGasoline'</span>,<span class="string">'png'</span>);
+        saveas(f9,<span class="string">'../plots5/9-KeqbyT'</span>,<span class="string">'png'</span>);
+    <span class="keyword">end</span>
+    <span class="keyword">if</span>(~supressplots(4))
+        saveas(f10,<span class="string">'../plots5/10-SMRcompmol'</span>,<span class="string">'png'</span>);
+        saveas(f11,<span class="string">'../plots5/11-SMRcomp'</span>,<span class="string">'png'</span>);
+        saveas(f12,<span class="string">'../plots5/12-WGScomp'</span>,<span class="string">'png'</span>);
+        saveas(f13,<span class="string">'../plots5/13-ReformerComp'</span>,<span class="string">'png'</span>);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">% toc(entireTime);</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2016a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+% ME 140 Project #5
+% FUEL CELL EVALUATION & HYRDOGEN PRODUCTION ANALYSIS
+% Frankie Willcox, Jon Renslo, Kendall Fagan, Emily Bohl, Natasha Berk
+
+%Jon's todo list
+% double check power loss (inefficiencies)
+% ask about starting from STP (extra methane used?)
+
+% ASSUME:
+% (i)  mol_H2 = 1
+clear; close all; clc;
+format compact;
+entireTime = tic;
+
+global PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS ...
+    C_TO_K PSI_TO_PA MM_h MM_h2 MM_o MM_n MM_ch4 MM_h2o MM_air PATM HORSEPOWER_TO_W
+defineGlobals();
+mol_H2 = 1;
+savePlots = 0;
+                % 1,2,3,4,5,6,7,8,9,10,11
+
+supressplots =   [1,      1,    1,  1];         % supresses plots by section
+
+%% Part A, Section 1
+% Currents (load & stack)
+i_load =  [0.00 15.06 27.25 36.48 45.1 52.1 56.3 57.6 56.4];       % [Amps]
+i_stack = [4.82 21.40 35.65 47.20 59.8 69.7 77.0 79.0 80.0];
+
+
+% Potentials (load & stack)
+v_load =  [17.07 15.05 14.08 13.10 12.07 11.27 10.31 9.87  9.05 ]; % [Volts]
+v_stack = [17.09 15.22 14.26 12.98 12.42 11.60 10.73 10.21 9.48];
+
+
+% Temperatures from Thermocouple Readings [C]
+% KEY: (Kendall please fill in with photo you took)
+T1_C = [42.8 42.9 46.1 48.5 50.5 52.8 54.8 55.8 56.5];
+T2_C =     [42.5 45.8 45.8 48.4 50.3 51.9 53.3 53.9 54.3];
+Tstack_C = [40.7 41.3 42.5 42.9 44.6 45.6 46.9 46.9 47.6];
+
+T1 = T1_C + C_TO_K;                                                % [K],  T1, air into stack
+T2 = T2_C + C_TO_K;                                                % [K],  T2, air out of stack
+Tstack = Tstack_C + C_TO_K;                                        % [K],  metal plates on the stack
+
+% NOTE: T3-T5 are not needed for now
+% T3_C =     [48.0 47.1 48.6 48.9 50.4 51.1 51.2 51.1 51.1];       % T3, water reservoir DON'T USE!
+% T3 = T3_C + C_TO_K;
+T4_C =     [48.0 47.2 48.2 48.9 50.4 51.1 51.2 51.1 51.1];
+T5_C =     [40.7 41.3 42.5 42.9 44.6 45.6 46.9 46.9 47.6];
+T4 = T4_C + C_TO_K;                                                % T4, water into stack
+T5 = T5_C + C_TO_K;                                                % T5, water into heat exchanger
+
+
+% Mass Flow Rates (TODO: check what units the mdots should be in)
+mdot_total_scf = [0.75 1.10 1.45 1.81 2.55 3.10 3.30 3.25 3.40];   % [scf/min]
+mdot_fuel_scf =  [2.50 6.20 10.5 14.3 18.2 22.0 24.6 25.0 26.1];   % [scf/hr] (standard cubic feet/hour)
+
+mdot_total = mdot_total_scf * SCF_TO_MOLS * PERMIN_TO_PERSEC * ( MM_air / G_PER_KG);  % [kg/s]
+mdot_fuel = mdot_fuel_scf * SCF_TO_MOLS * PERHR_TO_PERSEC * (MM_h2  / G_PER_KG);      % [kg/s]
+mdot_h2o = 40 /G_PER_KG;                                                              % [kg/s]
+
+% Pressures
+Pfuel_psi =  [2.9 2.9 3.1 3.3 3.30 3.20 3.00 3.0 3.1];              % [psi] (gauge)
+Ptotal_psi = [0.2 0.3 0.6 0.7 1.15 1.25 1.35 1.3 1.5];              % [psi] (gauge), pressure of combined air and H2O after humidifier
+Pfuel =  Pfuel_psi  .* PSI_TO_PA + PATM;                            % [Pa]
+Ptotal = Ptotal_psi .* PSI_TO_PA + PATM;                            % [Pa]
+
+% CALCULATIONS
+% REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+% Power (USE: p = i*v)
+% NOTE: "Accessories" include H2O pump, air pump, H2 vent, & controller
+p_load =  i_load  .* v_load;                                        % [W] = [kg*m^2*s^-3], a.k.a. "load" (power delivered to resistor bank)
+p_stack = i_stack .* v_stack;
+p_access = p_stack - p_load;                                        % [W], Acessory Power, i.e. power used to run controls. Pstack-Pload
+if(~supressplots(1))
+    hold off;
+    f1 = figure(1);
+    plot(p_load,i_load,p_load,i_stack);
+    title('Current as a Function of Load');
+    xlabel('Load [Watts]'); ylabel('Current [Amps]');
+    legend('I_{load}','I_{stack}','Location','best'); grid on;
+    
+    f2 = figure(2);
+    plot(p_load,v_load,p_load,v_stack);
+    title('Potential as a Function of Load');
+    xlabel('Load [Watts]'); ylabel('Potential [Volts]');
+    legend('V_{load}','V_{stack}','Location','best'); grid on;
+    
+    f3 = figure(3);
+    plot(p_load,p_stack,p_load,p_access);
+    title('Stack and Accessory Power as a Function of Load');
+    xlabel('Load [Watts]'); ylabel('Power [Watts]');
+    text(5,50,'Net Power = 0 @ 0 Load');
+    legend('P_{stack}','P_{accessory}','Location','best'); grid on;
+    
+    f4 = figure(4);
+    plot(p_load, mdot_fuel*100, p_load, mdot_total);
+    title('Mass Flow Rate as a Function of Load');
+    xlabel('Load [Watts]'); ylabel('Mass Flow Rate [kg/s]');
+    legend('mdot_{H}*100','mdot_{air}','Location','best'); grid on;
+    
+end
+
+%% Part A, Section 2
+
+% SOURCE: LEC 8, SLIDES 21 & 22
+
+% 1st & 2nd Law Efficiencies (eta_I & eta_II) & Inefficiencies (Idot)
+% Stack
+[etaI_stack ,etaII_stack, Idot_stack,lambda_stack,dGstack] = findEtas(mdot_total, mdot_fuel, Ptotal, Pfuel, T2, p_stack);
+
+% Entire System (Load)
+[etaI_load ,etaII_load, Idot_load,lambda_load,dGload] =    findEtas(mdot_total, mdot_fuel, Ptotal, Pfuel, T2, p_load);
+if(~supressplots(2))
+    f6 = figure(6);
+    plot(p_load,lambda_load);
+    title('Air Equivalent as a Function of Load');
+    xlabel('Load [Watts]'); ylabel('Lambda');
+    legend('\lambda','Location','best');  grid on;
+    
+    f5 = figure(5);
+    plot(p_load,etaI_stack,'c',p_load,etaI_load,'bpREPLACE_WITH_DASH_DASH',...
+        p_load,etaII_stack,'r',p_load,etaII_load,'gpREPLACE_WITH_DASH_DASH');
+    title('Efficiency as a Function of Load');
+    xlabel('Load [Watts]'); ylabel('Efficiency');
+    legend('\eta_{I,stack}','\eta_{I,system}',...
+        '\eta_{II,stack}','\eta_{II,system}', 'Location','Best');grid on;
+    
+    f7 = figure(7);
+    plot(p_load,-dGstack-p_stack,'c',p_load,-dGload-p_load,'bpREPLACE_WITH_DASH_DASH');
+    title('Power Loss/Inefficiences as a Function of Load');
+    xlabel('Load [Watts]'); ylabel('Power Loss/Inefficiencies, Idot [Watts]');
+    legend('Idot_{stack}','Idot_{system}','Location','best'); grid on;
+end
+
+%% Part A, Section 3
+% Comparing First Law Efficiencies of PEM Fuel Cell with Diesel & Hybrid Engines
+
+% Typical modern Diesel engine (eta_disel = 42%) (chose diesel truck because it's better than a car and worse than a freight ship)
+% Source Efficiency: Slide 3, http://www.sae.org/events/gim/presentations/2011/RolandGravel.pdf
+% Source Horsepower: https://cumminsengines.com/isx15-heavy-duty-truck-2013#overview
+eta_diesel = 0.42;
+eta_diesel = linspace(eta_diesel, eta_diesel, length(p_load)); %Make it a line instead of points
+Wdot_diesel = 400 * HORSEPOWER_TO_W;  % [W]
+
+% Typical gasoline hybrid engine (eta_hybrid = max of 40%)
+% Source Efficiency & Horsepower: Toyota Hybrid Vehicles, http://www.toyota-global.com/innovation/environmental_technology/hybrid/
+eta_hybrid = 0.40;
+eta_hybrid = linspace(eta_hybrid, eta_hybrid, length(p_load)); % Make it a line
+Wdot_hybrid = 121 * HORSEPOWER_TO_W;  % [W]
+
+% Calcuate Heat Removal (Qdot) REPLACE_WITH_DASH_DASH> 40 g/s necessary only for
+% intensive/extensive conversion
+Qdot_fuelCell = zeros(length(T4));
+for i = 1:length(T4)
+    Qdot_fuelCell(i) = hEng(T4(i),'h2o') - hEng(T5(i),'h2o');
+end
+Qdot_fuelCell_max = max(Qdot_fuelCell);
+
+% Theoretical Number of Fuel Cells Needed
+% Finding total power of cell out = load power plus Qdot
+powerOut = p_load + Qdot_fuelCell_max;
+
+num_fuelCells_diesel = Wdot_diesel ./ powerOut;
+num_fuelCells_hybrid = Wdot_hybrid ./ powerOut;
+
+if(~supressplots(3))
+    % Overall First Law Efficiency of the PEM Fuel Cell = Stack Efficiency
+    f8 = figure(8);
+    plot(p_load, etaI_stack, 'c', p_load, eta_diesel, 'b:', p_load, eta_hybrid, 'g');
+    title('Comparing 1st Law Efficiency: PEM Fuel Cell, Diesel, and Gasoline Hybrid');
+    xlabel('Load [Watts]'); ylabel('Efficiency, eta_{I}');
+    legend('eta_{I,stack}','eta_{I,Diesel}', 'eta_{I,Hybrid}','Location','northwest');  grid on;
+end
+
+% Comments: To scale this up, we would need somewhere between 280-540 fuel
+% cells to equal the diesel output, and 85-165 fuel cells to equal the
+% hybrid output.
+
+%% Part B, Section 1
+% Part B, Section 1 - Emily & Kendall
+% Calculating Kp Values
+% SOURCE Kp Formula: LECTURE 14, SLIDE 4
+
+% SMR: CH4 + H2O REPLACE_WITH_DASH_DASH> CO + 3H2
+% v values are stoichiometric coefficients
+v_CO_SMR = 1;
+v_H2_SMR = 3;
+v_H2O_SMR = 1;
+v_CH4_SMR = 1;
+
+% Calculating Kp for SMR
+% Nv_CO = mm
+% SMRnumKp =
+
+% WGS: H2O + CO REPLACE_WITH_DASH_DASH> H2 + CO2
+v_H2_WGS = 1;
+v_CO2_WGS = 1;
+v_H2O_WGS = 1;
+v_CO_WGS = 1;
+
+T_B1 = linspace(25, 1200, 100); %Temperature for part B1 = T_B1
+T_B1 = T_B1 + C_TO_K;
+%NOTE: Standard pressure, is usually defined as 100,000, however in energyF
+%we have standard presssure as 101300. Because the pressure needs to
+%cancel out, I have changed this pressure to 101300, however, we should
+%perhaps consider changing the reference pressure in energyF to 100,000Pa.
+P_ref = 101300; %This is the pressure defined for standard conditions.
+% Standard conditions are what we need because that is what
+% the little zero indicates in the equation for g.
+R_u = 8.314; %Universal gas constant
+
+%G_reaction = G_products - G_reactants
+g_SMR = (gEng(T_B1, P_ref, 'co',v_CO_SMR) + gEng(T_B1, P_ref, 'h2',v_H2_SMR)) - ...
+    (gEng(T_B1, P_ref, 'h2ovap',v_H2O_SMR) + gEng(T_B1, P_ref, 'ch4',v_CH4_SMR));
+
+g_WGS = (gEng(T_B1, P_ref, 'h2',v_H2_WGS) + gEng(T_B1, P_ref, 'co2',v_CO2_WGS)) - ...
+    (gEng(T_B1, P_ref, 'h2ovap',v_H2O_WGS) + gEng(T_B1, P_ref, 'co',v_CO_WGS));
+
+%Lecture 13 - Slide 15
+kp_SMR = exp(-g_SMR ./ (R_u .* T_B1)); %increases with temp
+kp_WGS = exp(-g_WGS ./ (R_u .* T_B1)); %decrease with temp
+
+
+%functions for convenience
+f_kp_SMR = @(T_B1) exp(-((gEng(T_B1, P_ref, 'co',v_CO_SMR) ...
+    + gEng(T_B1, P_ref, 'h2',v_H2_SMR))  ...
+    - (gEng(T_B1, P_ref, 'h2ovap',v_H2O_SMR) ...
+    + gEng(T_B1, P_ref, 'ch4',v_CH4_SMR)))...
+    ./ (R_u.*T_B1));
+
+f_kp_WGS = @(T_B1) exp(-((gEng(T_B1, P_ref, 'h2',v_H2_WGS) ...
+    + gEng(T_B1, P_ref, 'co2',v_CO2_WGS)) ...
+    -(gEng(T_B1, P_ref, 'h2ovap',v_H2O_WGS) ...
+    + gEng(T_B1, P_ref, 'co',v_CO_WGS))) ...
+    ./ (R_u.*T_B1));
+
+%Prep for plot
+%convert back to celcius
+T_B1 = T_B1 - C_TO_K;
+%find index of where kp=10^-3 and kp = 10^3, as the problem asks that we
+%limit the graph to this range
+[~,i_min_SMR] = min(abs(kp_SMR - 10^-3));
+[~,i_max_SMR] = min(abs(kp_SMR - 10^3)); %yes, this is supposed to use min() to find the max ;P
+[~,i_min_WGS] = min(abs(kp_WGS - 10^3));
+[~,i_max_WGS] = min(abs(kp_WGS - 10^-3));
+
+[zero_smr,izero_smr] = min(abs(log(kp_SMR)));
+[zero_wgs,izero_wgs] = min(abs(log(kp_WGS)));
+
+%Plot
+if(~supressplots(3))
+    f9 = figure(9);
+    kpIsOne = ones(size(T_B1));
+    semilogy(T_B1(i_min_SMR:i_max_SMR), kp_SMR(i_min_SMR:i_max_SMR), ...
+        T_B1(i_min_WGS:i_max_WGS), kp_WGS(i_min_WGS:i_max_WGS),T_B1,kpIsOne,'k');
+    xlabel('Temperature [C]')
+    ylabel('Equilibrium Constant')
+    text(T_B1(izero_smr) -300 , 1.5,...
+        strcat('SMR equil @ ',num2str(round(T_B1(izero_smr))),'K'));
+    text(T_B1(izero_wgs), 1.5,...
+        strcat('WGS equil @ ',num2str(round(T_B1(izero_wgs))),'K'));
+    legend('SMR', 'WGS')
+    title('Part B.1: Equilibrium Constant vs. Temperature')
+    ylim([0.001,1000]);
+    text(50,5,{'H-Power','Operating Temp','25-100K'})
+    grid on
+    patch([25,100,100,25],[10^-3,10^-3,10^3,10^3],'g','FaceAlpha',.5,'EdgeAlpha',0);
+    set(gca,'children',flipud(get(gca,'children'))) %puts shading beneath lines
+end
+%% Part B No. 2
+% Find the Equilibrium Composition (Mol Fractions) of the Steam Methane 
+% Reformation(SMR) Reaction 
+% SOURCE Nernst Atom Balance: LECTURE 14, SLIDE 4 (equation in lower right corner)
+npts = 20;
+syms nco nch4 nh2 nh2o;
+warning('off','symbolic:numeric:NumericalInstability');
+
+temps = linspace(25,1200,npts);
+temps = temps + C_TO_K;
+pres = [1,10,100];
+soln = zeros(length(temps),4,length(pres));
+tic
+for i =  1:length(temps)
+    t = temps(i);
+    parfor j = 1:length(pres)
+        p = pres(j);
+        
+        warning('off','symbolic:numeric:NumericalInstability');
+        eqs = [1  == nco   + nch4;...             carbon atom balance
+            10 == nh2*2 + nch4*4 + nh2o*2; ... hydrogen atom balance
+            3  == nco   + nh2o;...             oxygen atom balance
+            nco.*nh2.^3./(nch4.*nh2o).* ...    Nernst atom balance
+            (p ./ (nco + nch4 + nh2 + nh2o).^2) ...
+            == f_kp_SMR(t)];
+        % 4 eq, 4 unknown
+        assume([nco,nch4,nh2,nh2o],'real'); 
+        assumeAlso([nco,nch4,nh2,nh2o] > 0);
+        assumeAlso([nco,nch4,nh2,nh2o] < 20);
+        [a,b,c,d] = vpasolve(eqs,[nco,nch4,nh2,nh2o],[1,1,1,1]);
+        
+        nco_sol(i,j) = double(a);
+        nch4_sol(i,j) = double(b);
+        nh2_sol(i,j) = double(c);
+        nh2o_sol(i,j) = double(d);
+        %          soln(i,:,j) = max(double(real([a,b,c,d]));
+        
+    end
+end
+% toc;
+%calculate mole fractions from nmols in composition
+ntot = nch4_sol + nh2_sol + nh2o_sol + nco_sol;
+ych4 = nch4_sol./ntot;
+yh2 = nh2_sol./ntot;
+yh2o = nh2o_sol./ntot;
+yco = nco_sol./ntot;
+
+if(~supressplots(4))
+    %unneeded but cool looking plot
+    f10 = figure(10);
+    plot(temps,nco_sol,'b',temps,nch4_sol,'m',temps,nh2_sol,'g',temps,nh2o_sol,'k');
+    legend('CO','CH4','H2','H2O');
+    
+    %plot mole fractions
+    f11 = figure(11);
+    linestyle = {'-','REPLACE_WITH_DASH_DASH',':'};
+    hold on
+    plot(1,0,'-k',1,0,'REPLACE_WITH_DASH_DASHk',1,0,':k');
+    hold on
+    for i = 1:length(pres)
+        plot(temps,yco(:,i),strcat(linestyle{i},'b'),...
+            temps,ych4(:,i),strcat(linestyle{i},'m'),...
+            temps,yh2(:,i),strcat(linestyle{i},'g'),...
+            temps,yh2o(:,i),strcat(linestyle{i},'r'));
+        hold on
+    end
+    hold off
+    xlabel('Temperature [K]');
+    ylabel('Mole Fraction');
+    title('Steam Methane Reforming Composition');
+    legend('1atm','10atm','100atm','CO','CH4','H2','H2O','location','West');
+    %ylim([0.001,1]);
+    grid on;
+end
+
+%% Part B No. 3
+% % Equations we'll need:
+%  eqs = [       1  == nco2   + nco;...          carbon atom balance
+%                4  == nco2*2 + nco + nh2o; ...  hydrogen atom balance
+%                6  == nh2*2   + nh2o*2;...      oxygen atom balance
+%                nco.*nh2o.^3./(nco2.*nh2).* ... Nernst atom balance
+%                   == f_kp_SMR(t)];
+%         % 4 eq, 4 unknown
+%         [a,b,c,d] = vpasolve(eqs,[nco,nh2o,nco2,nh2],[1,1,1,1]);
+syms nco nco2 nh2 nh2o;
+%soln_wgs = zeros(length(temps),4,length(pres));
+tic
+% ***BROKEN***
+parfor i = 1:length(temps)
+    warning('off','symbolic:numeric:NumericalInstability');
+    t = temps(i);
+    
+    eqs = [       1  == nco2   + nco;...carbon atom balance  
+        3  == nco2*2 + nco + nh2o; ...  oxygen atom balance
+        10  == nh2*2   + nh2o*2;...      hydrogen atom balance 
+        (nco2.*nh2)./(nco.*nh2o) ... Nernst atom balance
+        == f_kp_WGS(t)];        %(note no pressure term, as nmols same on RHS and LHS)
+    % 4 eq, 4 unknown   
+    assume([nco,nh2o,nco2,nh2],'real'); 
+    assumeAlso([nco,nh2o,nco2,nh2] > 0);
+    assumeAlso([nco,nh2o,nco2,nh2] < 20);
+    [a,b,c,d] = vpasolve(eqs,[nco,nh2o,nco2,nh2],[1,1,1,1]);
+    nco_wgs(i) = double(a);
+    nh2o_wgs(i) = double(b);
+    nco2_wgs(i) = double(c);
+    nh2_wgs(i) = double(d);
+    %          soln(i,:,j) = max(double(real([a,b,c,d]));
+    
+end
+% toc;
+ntot_wgs = nco_wgs + nh2_wgs + nh2o_wgs + nco2_wgs;
+yco2_wgs = nco2_wgs./ntot_wgs;
+yh2_wgs = nh2_wgs./ntot_wgs;
+yh2o_wgs = nh2o_wgs./ntot_wgs;
+yco_wgs = nco_wgs./ntot_wgs;
+
+if(~supressplots(4))
+    
+    f12 = figure(12);
+    plot(temps,yco_wgs,'b',...
+        temps,yco2_wgs,'m',...
+        temps,yh2_wgs,'REPLACE_WITH_DASH_DASHg',...
+        temps,yh2o_wgs,'r');
+    legend('CO','CO2','H2','H2O','location','southwest');
+    xlabel('Temperature [K]');
+    ylabel('Mole Fraction');
+    title('Water Gas Shift Composition');
+    %ylim([0.001,1]);
+    grid on;
+end
+
+
+%% Part B No. 4
+% Plot exit composition (mol fractions) vs. 3 system stations (Reformer,
+% Shift Reactor 1, Shift Reactor 2) 
+% Note: do this for 2 Different Assumptions: (1) isothermal, (2) adiabatic
+% SMR: CH4 + 3*H2O REPLACE_WITH_DASH_DASH> CO + 3*H2 + 2*H2O <-known because all assume all
+% methane is used
+% WGS: CO  + 2*H2O + 3*H2REPLACE_WITH_DASH_DASH> ?CO2 + (3+?)H2 + ?CO + ?H2O <- unknown because WGS
+% doens't go all the way to completition
+
+
+% NAMING CONVENTIONS: 
+% Station Location: 1=Reformer, 2 = 1st Shift Reactor, 3 = 2nd Shift
+% Assumption:       iso = isothermal, adi = adiabatic 
+% Inlet/Exit:       in = inlet, ex = exit
+
+% PSEUDO CODE
+% Start with Nernst atom balance for WGS reaction to get composition
+% "Start with isothermal cases - adiabatic is a whole different beast"
+% Assume first WGS uses up all CH4 and goes fully to completion
+% Figure out the products from the WGS
+% Use isothermal temperature values given to figure out Qdot
+% Go step by step through and get products for each following reaction, ...
+% Take those products and do isothermal calcs on them
+
+% Inlet Temperatures 
+Tin_C = [800 400 250];    % [C]
+Tin = Tin_C + C_TO_K; % [K]
+
+% Exit Temperatures
+Tex_iso_C = [800 400 250]; 
+Tex_adi_C = [800 NaN NaN]; %TODO: solve for Tin_adi_C(2) & (3)
+Tex_iso = Tex_iso_C + C_TO_K;
+Tex_adi = Tex_adi_C + C_TO_K;
+
+% Heat Addition for Isothermal Reaction (Qin, ASSUME: isothermal)
+Qin_iso = [NaN NaN NaN];             % [MJ/(kg of reactants)]
+
+% Percent Methane Burned to Heat Reformer (pct_CH4, ASSUME: adiabatic)
+pct_CH4 = [NaN]; % Note: only applies to Reformer! Not Shift Reactors!
+
+
+% Part 1: Isothermal
+% find exit compositions
+compositions = zeros(4,3); %co;h2o;c02;h2
+for i = 1:3
+    compositions(:,i) = compositionsFun(f_kp_WGS(Tin(i)));
+end
+
+% find heat addition for each component
+% WGS: CO  + 2*H2O + 3*H2REPLACE_WITH_DASH_DASH> ?CO2 + (3+?)H2 + ?CO + ?H2O
+% SMR: CH4 + 3*H2O REPLACE_WITH_DASH_DASH> CO + 3*H2 + 2*H2O
+% comps[species, stage]. Species order: CO, H20, CO2, H2
+Qin = zeros(1,3);
+N_H20_in = 3; 
+N_CH4_in = 1;
+h_react =  hEng(Tin(1), 'h2ovap', N_H20_in) + hEng(Tin(1), 'ch4', N_CH4_in); 
+for s = 1:3 % three stages: reformer and two reactors 
+    h_prod = hEng(Tin(s), 'co', compositions(1,s)) + hEng(Tin(s), 'h2ovap', compositions(2,s)) + hEng(Tin(s), 'co2', compositions(3,s)) + hEng(Tin(s), 'h2', compositions(4,s));
+    Qin(s) = h_prod - h_react;
+    
+    if (s == 3) break; end
+    h_react = hEng(Tin(s+1), 'co', compositions(1,s)) + hEng(Tin(s+1), 'h2ovap', compositions(2,s)) + hEng(Tin(s+1), 'co2', compositions(3,s)) + hEng(Tin(s+1), 'h2', compositions(4,s));
+end
+% Qin_MJkg = ?
+% TODO: GET Qin IN MJ/KG (CURRENTLY IN J. STORE IN NEW VARIABLE B/C Qin IS USED BELOW)
+
+% PSEUDOCODE APPROACH
+% Determine composition of each (CO H20vap CO2 H2) where we calculate Qin
+% Use molar mass to get kg of each
+% Divide Qin by kg total
+% Convert J to MJ by dividing by a constant (10^6)
+
+% currently in J/mol of methane reacted
+%should be 3Mj/kg
+Qin_perkg = Qin / (MM_ch4 / G_PER_KG) /1e6; % J/mol REPLACE_WITH_DASH_DASH> MJ/kg
+
+
+% Part 2: Adiabatic (only shift reactors)
+error = 0.0001;
+speedFactor = 1000;
+T_guess = zeros(1,3);
+comps_out_adi = zeros(4,3);
+tic
+% PROBLEM IS THAT TEMPS ARE JUST CONVERGING TO TEMP AT H_IN - MISSING 
+% SOMETHING CONCEPTUAL. 
+% temps = linspace(273,800,40);
+% comps_out = zeros(length(temps),4);
+% for i = 1:length(temps)
+%    comps_out(i,:) = compositionsFun(f_kp_WGS(temps(i)))';
+%    h_out(i) = hEng(temps(i),   'co',    comps_out(i,1)) ...
+%             + hEng(temps(i), 'h2ovap',comps_out(i,2)) ...
+%             + hEng(temps(i), 'co2',   comps_out(i,3)) ...
+%             + hEng(temps(i), 'h2',    comps_out(i,4));
+% end
+
+% H_in occurs at stage 2
+% comps[species, stage]. Species order: CO, H20, CO2, H2
+comps_in(:) = compositions(:,1);
+tol = 0.0001;
+step = 1;
+for s = 2:3 % two stages: hot shift reactor, cold shift reactor
+    t = Tin(s);
+    h_in = hEng(t, 'co', comps_in(1)) ...
+        + hEng(t, 'h2ovap', comps_in(2)) ...
+        + hEng(t, 'co2',comps_in(3)) ...
+        + hEng(t, 'h2', comps_in(4));
+    T_guess(s) = Tin(s) + 20;
+    comps_out_adi(:,s) = compositionsFun(f_kp_WGS(T_guess(s)));
+    h_out = hEng(T_guess(s),   'co',    comps_out_adi(1,s)) ...
+            + hEng(T_guess(s), 'h2ovap',comps_out_adi(2,s)) ...
+            + hEng(T_guess(s), 'co2',   comps_out_adi(3,s)) ...
+            + hEng(T_guess(s), 'h2',    comps_out_adi(4,s));
+    dh = h_out - h_in;   
+    % set up newton raphson variables
+    % need to remember previous state for newton raphson
+    tlast = Tin(s);
+    dhlast = T_guess(s) - tlast; 
+    
+    while abs(dh/h_in) > tol %use percentage error for robustness
+        dhprime = (dh - dhlast) ./(T_guess(s) - tlast);
+        tlast = T_guess(s);
+        T_guess(s) = T_guess(s) - dh ./ dhprime; 
+        comps_out_adi(:,s) = compositionsFun(f_kp_WGS(T_guess(s)));
+        dhlast = dh;
+        h_out = hEng(T_guess(s), 'co',comps_out_adi(1,s)) ...
+            + hEng(T_guess(s), 'h2ovap',comps_out_adi(2,s)) ...
+            + hEng(T_guess(s), 'co2',comps_out_adi(3,s)) ...
+            + hEng(T_guess(s), 'h2',comps_out_adi(4,s));
+        dh = h_out-h_in;
+    end
+    comps_in = comps_out_adi(:,s);
+end
+% toc
+pctCO = comps_out_adi(1,:)./sum(comps_out_adi);
+comps_out_adi(:,1) = compositions(:,1);
+y_out_adi = comps_out_adi./repmat(sum(comps_out_adi),4,1);
+y_iso = compositions./repmat(sum(compositions),4,1);
+% ^SHOULD GET 740, 569 K FOR T_guess
+
+% plot of exit composition vs system station (2x, isothermal and adiabatic)
+if(~supressplots(4))
+f13 = figure(13);
+subplot(1,2,1);
+bar(y_iso');
+xlabel('State, Isothermal');
+ylabel('Mole Fraction');
+ylim([0,0.8]);
+legend('CO', 'H20', 'CO2', 'H2','location','northwest');
+
+subplot(1,2,2);
+bar(y_out_adi');
+xlabel('State, Adiabatic');
+ylabel('Mole Fraction');
+legend('CO', 'H20', 'CO2', 'H2','location','northwest');
+ylim([0,0.8]);
+set(f13, 'Position', [0 0 400 200])
+
+annotation('textbox', [0 0.8 1 0.2], ...
+    'String', 'H2 Reformer Outlet Molecular Composition', ...
+    'EdgeColor', 'none', ...
+    'HorizontalAlignment', 'center',...
+    'FontSize',18); % add title to plot manually, subplots don't include an overall title
+set(f13, 'Position', [300 800 800 400]) %resize plot
+end
+
+
+% Part 3: Heating reformer w/ methane
+% find methane used by reformer - CHECK!
+molar_mass_meth = 16.043/1000; % [kg/mol]
+molar_mass_h2 = 2.016/1000; % [kg/mol]
+LHV_meth = 50050e3*MM_ch4/G_PER_KG; % [J/mol]
+LHV_h2 = 120000e3*molar_mass_h2; %[J/mol]
+N_meth_burned = Qin(1)/LHV_meth; %moles of methane burned
+perc_meth_burned = N_meth_burned./(N_meth_burned+1) * 100; %1 is the mole used for the actual reaction
+
+% find LHV ratio - CHECK!
+N_meth_rxn = 1;
+LHV_ratio_isoth = LHV_h2*compositions(4,3)/(LHV_meth*(N_meth_burned + N_meth_rxn)) * 100;
+LHV_ratio_adia = LHV_h2*comps_out_adi(4,3)/(LHV_meth*(N_meth_burned + N_meth_rxn)) * 100;
+
+
+% NEED FOR TABLE:
+% isothermal:
+% -composition of gases exiting reformer and reactors
+% -heat addition reqd for isothermal (do delta h energy balance on either
+% side of each component)
+% adiabatic:
+% -adiabatic outlet temperatures of last two reactors
+% -exit composition for shift reactors (and reformer, but same as above)
+% heat part:
+% -methane burned to heat reformer
+% -LHV ratio (efficiency)
+% 
+% PLOT: exit composition for isothermal and adiabatic at each station
+
+if(sum(supressplots)~=4)
+    plotfixer();
+end
+if(savePlots ==1)
+     plotfixer(); 
+    if(~supressplots(1))
+        saveas(f1,'../plots5/1-CurrentbyLoad','png');
+        saveas(f2,'../plots5/2-VbyLoad','png');
+        saveas(f3,'../plots5/3-PowerbyLoad','png');
+        saveas(f4,'../plots5/4-massbyload','png');
+    end
+    if(~supressplots(2))
+        saveas(f5,'../plots5/5-Eff','png');
+        saveas(f6,'../plots5/6-lambda','png');
+        saveas(f7,'../plots5/7-PowerLoss','png');
+    end
+    if(~supressplots(3))
+        saveas(f8,'../plots5/8-CompareToGasoline','png');
+        saveas(f9,'../plots5/9-KeqbyT','png');
+    end
+    if(~supressplots(4))
+        saveas(f10,'../plots5/10-SMRcompmol','png');
+        saveas(f11,'../plots5/11-SMRcomp','png');
+        saveas(f12,'../plots5/12-WGScomp','png');
+        saveas(f13,'../plots5/13-ReformerComp','png');
+    end
+end
+% toc(entireTime);
+
+
+##### SOURCE END #####
+--></body></html>
