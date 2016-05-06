@@ -13,7 +13,7 @@ format compact;
 entireTime = tic;
 
 global PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS ...
-    C_TO_K PSI_TO_PA MM_h MM_h2 MM_o MM_n MM_h2o MM_air PATM HORSEPOWER_TO_W
+    C_TO_K PSI_TO_PA MM_h MM_h2 MM_o MM_n MM_ch4 MM_h2o MM_air PATM HORSEPOWER_TO_W
 defineGlobals();
 mol_H2 = 1;
 savePlots = 1;
@@ -567,16 +567,16 @@ end
 % find methane used by reformer - CHECK!
 molar_mass_meth = 16.043/1000; % [kg/mol]
 molar_mass_h2 = 2.016/1000; % [kg/mol]
-LHV_meth = 50050e3*molar_mass_meth; % [J/mol]
+LHV_meth = 50050e3*MM_ch4/G_PER_KG; % [J/mol]
 LHV_h2 = 120000e3*molar_mass_h2; %[J/mol]
-N_meth_burned = Qin(1)/LHV_meth;
-perc_meth_burned = N_meth_burned*100;
+N_meth_burned = Qin(1)/LHV_meth; %moles of methane burned
+perc_meth_burned = N_meth_burned./(N_meth_burned+1) * 100; %1 is the mole used for the actual reaction
 
 % find LHV ratio - CHECK!
 N_meth_rxn = 1;
 LHV_ratio_isoth = LHV_h2*compositions(4,3)/(LHV_meth*(N_meth_burned + N_meth_rxn)) * 100;
 LHV_ratio_adia = LHV_h2*comps_out_adi(4,3)/(LHV_meth*(N_meth_burned + N_meth_rxn)) * 100; 
- 
+
 
 % NEED FOR TABLE:
 % isothermal:
