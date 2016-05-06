@@ -471,6 +471,7 @@ end
 % Convert J to MJ by dividing by a constant (10^6)
 
 % currently in J/mol of methane reacted
+%should be 3Mj/kg
 Qin_perkg = Qin / (MM_ch4 / G_PER_KG) /1e6; % J/mol --> MJ/kg
 
 % Part 2: Adiabatic (only shift reactors)
