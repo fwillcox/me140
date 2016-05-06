@@ -13,7 +13,7 @@ format compact;
 entireTime = tic;
 
 global PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS ...
-    C_TO_K PSI_TO_PA MM_h MM_h2 MM_o MM_n MM_h2o MM_air PATM HORSEPOWER_TO_W MM_ch4
+    C_TO_K PSI_TO_PA MM_h MM_h2 MM_o MM_n MM_ch4 MM_h2o MM_air PATM HORSEPOWER_TO_W
 defineGlobals();
 mol_H2 = 1;
 savePlots = 1;
@@ -355,6 +355,7 @@ end
 syms nco nco2 nh2 nh2o;
 %soln_wgs = zeros(length(temps),4,length(pres));
 tic
+% ***BROKEN***
 parfor i = 1:length(temps)
     warning('off','symbolic:numeric:NumericalInstability');
     t = temps(i);
@@ -464,6 +465,7 @@ for s = 1:3 % three stages: reformer and two reactors
 end
 % Qin_MJkg = ?
 % TODO: GET Qin IN MJ/KG (CURRENTLY IN J. STORE IN NEW VARIABLE B/C Qin IS USED BELOW)
+
 % PSEUDOCODE APPROACH
 % Determine composition of each (CO H20vap CO2 H2) where we calculate Qin
 % Use molar mass to get kg of each
@@ -474,12 +476,24 @@ end
 %should be 3Mj/kg
 Qin_perkg = Qin / (MM_ch4 / G_PER_KG) /1e6; % J/mol --> MJ/kg
 
+
 % Part 2: Adiabatic (only shift reactors)
 error = 0.0001;
 speedFactor = 1000;
 T_guess = zeros(1,3);
 comps_out_adi = zeros(4,3);
 tic
+% PROBLEM IS THAT TEMPS ARE JUST CONVERGING TO TEMP AT H_IN - MISSING 
+% SOMETHING CONCEPTUAL. 
+% temps = linspace(273,800,40);
+% comps_out = zeros(length(temps),4);
+% for i = 1:length(temps)
+%    comps_out(i,:) = compositionsFun(f_kp_WGS(temps(i)))';
+%    h_out(i) = hEng(temps(i),   'co',    comps_out(i,1)) ...
+%             + hEng(temps(i), 'h2ovap',comps_out(i,2)) ...
+%             + hEng(temps(i), 'co2',   comps_out(i,3)) ...
+%             + hEng(temps(i), 'h2',    comps_out(i,4));
+% end
 
 % H_in occurs at stage 2
 % comps[species, stage]. Species order: CO, H20, CO2, H2
@@ -557,16 +571,16 @@ end
 % find methane used by reformer - CHECK!
 molar_mass_meth = 16.043/1000; % [kg/mol]
 molar_mass_h2 = 2.016/1000; % [kg/mol]
-LHV_meth = 50050e3*molar_mass_meth; % [J/mol]
+LHV_meth = 50050e3*MM_ch4/G_PER_KG; % [J/mol]
 LHV_h2 = 120000e3*molar_mass_h2; %[J/mol]
-N_meth_burned = Qin_perkg(1)/LHV_meth; %[MJ/kg / (J/Kg)]
-perc_meth_burned = N_meth_burned*100;
+N_meth_burned = Qin(1)/LHV_meth; %moles of methane burned
+perc_meth_burned = N_meth_burned./(N_meth_burned+1) * 100; %1 is the mole used for the actual reaction
 
 % find LHV ratio - CHECK!
 N_meth_rxn = 1;
 LHV_ratio_isoth = LHV_h2*compositions(4,3)/(LHV_meth*(N_meth_burned + N_meth_rxn)) * 100;
 LHV_ratio_adia = LHV_h2*comps_out_adi(4,3)/(LHV_meth*(N_meth_burned + N_meth_rxn)) * 100; 
- 
+
 
 % NEED FOR TABLE:
 % isothermal:
