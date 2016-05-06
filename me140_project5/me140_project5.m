@@ -16,12 +16,12 @@ global PERMIN_TO_PERSEC PERHR_TO_PERSEC G_PER_KG LHV F N_TO_O SCF_TO_MOLS ...
     C_TO_K PSI_TO_PA MM_h MM_h2 MM_o MM_n MM_ch4 MM_h2o MM_air PATM HORSEPOWER_TO_W
 defineGlobals();
 mol_H2 = 1;
-savePlots = 1;
+savePlots = 0;
                 % 1,2,3,4,5,6,7,8,9,10,11
 
-supressplots =   [0,      0,    0,  0];         % supresses plots by section
+supressplots =   [1,      1,    1,  1];         % supresses plots by section
 
-%% Part A, Section 1
+% Part A, Section 1
 % Currents (load & stack)
 i_load =  [0.00 15.06 27.25 36.48 45.1 52.1 56.3 57.6 56.4];       % [Amps]
 i_stack = [4.82 21.40 35.65 47.20 59.8 69.7 77.0 79.0 80.0];
@@ -101,7 +101,7 @@ if(~supressplots(1))
     
 end
 
-%% Part A, Section 2
+% Part A, Section 2
 
 % SOURCE: LEC 8, SLIDES 21 & 22
 
@@ -133,7 +133,7 @@ if(~supressplots(2))
     legend('Idot_{stack}','Idot_{system}','Location','best'); grid on;
 end
 
-%% Part A, Section 3
+% Part A, Section 3
 % Comparing First Law Efficiencies of PEM Fuel Cell with Diesel & Hybrid Engines
 
 % Typical modern Diesel engine (eta_disel = 42%) (chose diesel truck because it's better than a car and worse than a freight ship)
@@ -177,7 +177,7 @@ end
 % cells to equal the diesel output, and 85-165 fuel cells to equal the
 % hybrid output.
 
-%% Part B, Section 1
+% Part B, Section 1
 % Part B, Section 1 - Emily & Kendall
 % Calculating Kp Values
 % SOURCE Kp Formula: LECTURE 14, SLIDE 4
@@ -268,7 +268,7 @@ if(~supressplots(3))
     patch([25,100,100,25],[10^-3,10^-3,10^3,10^3],'g','FaceAlpha',.5,'EdgeAlpha',0);
     set(gca,'children',flipud(get(gca,'children'))) %puts shading beneath lines
 end
-%% Part B No. 2
+% Part B No. 2
 % Find the Equilibrium Composition (Mol Fractions) of the Steam Methane 
 % Reformation(SMR) Reaction 
 % SOURCE Nernst Atom Balance: LECTURE 14, SLIDE 4 (equation in lower right corner)
@@ -307,7 +307,7 @@ for i =  1:length(temps)
         
     end
 end
-toc;
+% toc;
 %calculate mole fractions from nmols in composition
 ntot = nch4_sol + nh2_sol + nh2o_sol + nco_sol;
 ych4 = nch4_sol./ntot;
@@ -343,7 +343,7 @@ if(~supressplots(4))
     grid on;
 end
 
-%% Part B No. 3
+% Part B No. 3
 % % Equations we'll need:
 %  eqs = [       1  == nco2   + nco;...          carbon atom balance
 %                4  == nco2*2 + nco + nh2o; ...  hydrogen atom balance
@@ -377,7 +377,7 @@ parfor i = 1:length(temps)
     %          soln(i,:,j) = max(double(real([a,b,c,d]));
     
 end
-toc;
+% toc;
 ntot_wgs = nco_wgs + nh2_wgs + nh2o_wgs + nco2_wgs;
 yco2_wgs = nco2_wgs./ntot_wgs;
 yh2_wgs = nh2_wgs./ntot_wgs;
@@ -400,7 +400,7 @@ if(~supressplots(4))
 end
 
 
-%% Part B No. 4
+% Part B No. 4
 % Plot exit composition (mol fractions) vs. 3 system stations (Reformer,
 % Shift Reactor 1, Shift Reactor 2) 
 % Note: do this for 2 Different Assumptions: (1) isothermal, (2) adiabatic
@@ -517,7 +517,6 @@ for s = 2:3 % two stages: hot shift reactor, cold shift reactor
     % need to remember previous state for newton raphson
     tlast = Tin(s);
     dhlast = T_guess(s) - tlast; 
-    disp(s)
     
     while abs(dh/h_in) > tol %use percentage error for robustness
         dhprime = (dh - dhlast) ./(T_guess(s) - tlast);
@@ -533,8 +532,8 @@ for s = 2:3 % two stages: hot shift reactor, cold shift reactor
     end
     comps_in = comps_out_adi(:,s);
 end
-toc
-pctCO = comps_out_adi(1,:)./sum(comps_out_adi)
+% toc
+pctCO = comps_out_adi(1,:)./sum(comps_out_adi);
 comps_out_adi(:,1) = compositions(:,1);
 y_out_adi = comps_out_adi./repmat(sum(comps_out_adi),4,1);
 y_iso = compositions./repmat(sum(compositions),4,1);
@@ -579,7 +578,7 @@ perc_meth_burned = N_meth_burned./(N_meth_burned+1) * 100; %1 is the mole used f
 % find LHV ratio - CHECK!
 N_meth_rxn = 1;
 LHV_ratio_isoth = LHV_h2*compositions(4,3)/(LHV_meth*(N_meth_burned + N_meth_rxn)) * 100;
-LHV_ratio_adia = LHV_h2*comps_out_adi(4,3)/(LHV_meth*(N_meth_burned + N_meth_rxn)) * 100; 
+LHV_ratio_adia = LHV_h2*comps_out_adi(4,3)/(LHV_meth*(N_meth_burned + N_meth_rxn)) * 100;
 
 
 % NEED FOR TABLE:
@@ -623,5 +622,5 @@ if(savePlots ==1)
         saveas(f13,'../plots5/13-ReformerComp','png');
     end
 end
-toc(entireTime);
+% toc(entireTime);
 
